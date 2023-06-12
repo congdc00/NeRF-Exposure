@@ -94,7 +94,7 @@ class BNeRFSystem(BaseSystem):
     
     def training_step(self, batch, batch_idx):
         out = self(batch)
-        print(f"out {out.shape}")
+        print(f"out {out.keys()}")
 
         loss = 0.
 
