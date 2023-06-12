@@ -55,7 +55,6 @@ class BNeRFSystem(BaseSystem):
             elif self.dataset.directions.ndim == 4: # (N, H, W, 3) 
                 directions = self.dataset.directions[index, y, x]
 
-            print(f"c2w {c2w.shape}")
             rays_o, rays_d = get_rays(directions, c2w) # Khởi tạo tia [8192,3], [8192,3]
             rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank) # Khởi tạo nhãn
             fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank)
@@ -70,6 +69,8 @@ class BNeRFSystem(BaseSystem):
             fg_mask = self.dataset.all_fg_masks[index].view(-1).to(self.rank)
         
         rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1)
+        print(f"rays {rays.shape}")
+        print(f"rgb {rgb.shape}")
 
         if stage in ['train']:
             if self.config.model.background_color == 'white':

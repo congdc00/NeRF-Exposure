@@ -25,10 +25,10 @@ def get_rays(directions, c2w, keepdim=False):
 
     Args: 
         directions: ma trận lưới [800,800,3]
-        c2w: transform matrix
+        c2w: transform matrix [8192, 3, 4]
     Return:
-        rays_o: Toạ độ điểm gốc của tia ( dành cho từng xpoint)
-        rays_d: Toạ độ điểm hướng của tia ( dành cho từng xpoint)
+        rays_o: Toạ độ điểm gốc của tia ( dành cho từng xpoint) [8192,3]
+        rays_d: Toạ độ điểm hướng của tia ( dành cho từng xpoint) [8192,3]
     """
     # rays_d = directions @ c2w[:, :3].T # (H, W, 3) # slow?
     assert directions.shape[-1] == 3
