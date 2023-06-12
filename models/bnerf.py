@@ -91,21 +91,24 @@ class BNeRFModel(BaseModel):
                 cone_angle=self.cone_angle,
                 alpha_thre=0.0
             )   
-            print(f"ray_indices {ray_indices.shape}")
-            print(f"t_starts {t_starts.shape}")
-            print(f"t_ends {t_ends.shape}")
-        
+            # ray_indices torch.Size([45629])
+            # t_starts torch.Size([45629, 1])
+            # t_ends torch.Size([45629, 1])
+            
+        # ray_indices.long torch.Size([45629]) chỉ mục của tia
+        # t_origins torch.Size([45629, 3])
+        # t_dirs torch.Size([45629, 3])
         ray_indices = ray_indices.long()
-        print(f"ray_indices.long {ray_indices.shape}")
         t_origins = rays_o[ray_indices]
-        print(f"t_origins {t_origins.shape}")
         t_dirs = rays_d[ray_indices]
-        print(f"t_dirs {t_dirs.shape}")
         midpoints = (t_starts + t_ends) / 2.
         positions = t_origins + t_dirs * midpoints  
         intervals = t_ends - t_starts
 
         density, feature = self.geometry(positions) 
+        print(f"positions {positions.shape}")
+        print(f"density {density.shape}")
+        print(f"feature {feature.shape}")
         rgb = self.texture(feature, t_dirs)
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
