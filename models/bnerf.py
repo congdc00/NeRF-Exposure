@@ -105,10 +105,10 @@ class BNeRFModel(BaseModel):
         rgb = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
         # bright_ness = self.shutter_speed(dir_feature, t_origins)
 
-        weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
-        print(f"weights {weights.shape}")
+        weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([205797, 1])
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
+        print(f"comp_rgb {weights.shape}")
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)   
 
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
