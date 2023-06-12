@@ -100,7 +100,7 @@ class NeRFModel(BaseModel):
         intervals = t_ends - t_starts
 
         density, feature = self.geometry(positions) 
-        rgb = self.texture(feature, t_dirs)
+        rgb, _ = self.texture(feature, t_dirs)
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
@@ -156,6 +156,6 @@ class NeRFModel(BaseModel):
             _, feature = chunk_batch(self.geometry, export_config.chunk_size, False, mesh['v_pos'].to(self.rank))
             viewdirs = torch.zeros(feature.shape[0], 3).to(feature)
             viewdirs[...,2] = -1. # set the viewing directions to be -z (looking down)
-            rgb = self.texture(feature, viewdirs).clamp(0,1)
+            rgb,_ = self.texture(feature, viewdirs).clamp(0,1)
             mesh['v_rgb'] = rgb.cpu()
         return mesh
