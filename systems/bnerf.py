@@ -12,7 +12,6 @@ import systems
 from systems.base import BaseSystem
 from systems.criterions import PSNR
 
-
 @systems.register('bnerf-system')
 class BNeRFSystem(BaseSystem):
     """
@@ -133,10 +132,10 @@ class BNeRFSystem(BaseSystem):
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
 
-        print(f"theta {out['theta'].shape}")
-        print(f"positions {out['positions'].shape}")
-        print(f"comp_rgb {out['comp_rgb'].shape}")
-
+        
+        torch.save(out['theta'], "theta.pt")
+        torch.save(out['positions'], "positions.pt")
+        
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},

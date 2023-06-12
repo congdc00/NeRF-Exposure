@@ -127,13 +127,14 @@ class BNeRFModel(BaseModel):
             'theta': weights,
             'positions':positions
         })
-            
-        out.update({
-            'weights': weights.view(-1),
-            'points': midpoints.view(-1),
-            'intervals': intervals.view(-1),
-            'ray_indices': ray_indices.view(-1)
-        })
+        
+        if self.training:
+            out.update({
+                'weights': weights.view(-1),
+                'points': midpoints.view(-1),
+                'intervals': intervals.view(-1),
+                'ray_indices': ray_indices.view(-1)
+            })
         
         return out
 
