@@ -30,6 +30,7 @@ class VolumeRadiance(nn.Module):
         if 'color_activation' in self.config:
             color = get_activation(self.config.color_activation)(color)
         print(f"features {features.shape}")
+        print(f"dirs_embd {dirs_embd.shape}")
         return color
 
     def update_step(self, epoch, global_step):
