@@ -60,8 +60,8 @@ class BNeRFModel(BaseModel):
 
     def forward_(self, rays):
         n_rays = rays.shape[0]
-        rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3)
-        print(f"rays_o {rays_o.shape} and rays_d {rays_d.shape}")
+        rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
+
         def sigma_fn(t_starts, t_ends, ray_indices):
             ray_indices = ray_indices.long()
             t_origins = rays_o[ray_indices]
@@ -70,14 +70,14 @@ class BNeRFModel(BaseModel):
             density, _ = self.geometry(positions)
             return density[...,None]
         
-        def rgb_sigma_fn(t_starts, t_ends, ray_indices):
-            ray_indices = ray_indices.long()
-            t_origins = rays_o[ray_indices]
-            t_dirs = rays_d[ray_indices]
-            positions = t_origins + t_dirs * (t_starts + t_ends) / 2.
-            density, feature = self.geometry(positions) 
-            rgb = self.texture(feature, t_dirs)
-            return rgb, density[...,None]
+        # def rgb_sigma_fn(t_starts, t_ends, ray_indices):
+        #     ray_indices = ray_indices.long()
+        #     t_origins = rays_o[ray_indices]
+        #     t_dirs = rays_d[ray_indices]
+        #     positions = t_origins + t_dirs * (t_starts + t_ends) / 2.
+        #     density, feature = self.geometry(positions) 
+        #     rgb = self.texture(feature, t_dirs)
+        #     return rgb, density[...,None]
 
         with torch.no_grad():
             ray_indices, t_starts, t_ends = ray_marching(
@@ -108,6 +108,7 @@ class BNeRFModel(BaseModel):
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)       
 
+        # Export 
         out = {
             'comp_rgb': comp_rgb,
             'opacity': opacity,
@@ -115,7 +116,6 @@ class BNeRFModel(BaseModel):
             'rays_valid': opacity > 0,
             'num_samples': torch.as_tensor([len(t_starts)], dtype=torch.int32, device=rays.device)
         }
-
         if self.training:
             out.update({
                 'weights': weights.view(-1),
