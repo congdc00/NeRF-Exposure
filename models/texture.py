@@ -23,15 +23,15 @@ class VolumeRadiance(nn.Module):
         self.network = network
     
     def forward(self, features, dirs, *args):
+        """
+        feature [num_points, 16]"""
         dirs = (dirs + 1.) / 2. # (-1, 1) => (0, 1)
-        dirs_embd = self.encoding(dirs.view(-1, self.n_dir_dims))
+        dirs_embd = self.encoding(dirs.view(-1, self.n_dir_dims)) #[num_points, 16]
         network_inp = torch.cat([features.view(-1, features.shape[-1]), dirs_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
         if 'color_activation' in self.config:
             color = get_activation(self.config.color_activation)(color)
-        print(f"features {features.shape}")
-        print(f"dirs_embd {dirs_embd.shape}")
-        return color
+        return color, dirs_embd
 
     def update_step(self, epoch, global_step):
         update_module_step(self.encoding, epoch, global_step)

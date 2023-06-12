@@ -16,7 +16,7 @@ class BNeRFModel(BaseModel):
     def setup(self):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
-        # self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
+        self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
 
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
@@ -50,7 +50,6 @@ class BNeRFModel(BaseModel):
 
         def occ_eval_fn(x):
             density, _ = self.geometry(x)
-            # approximate for 1 - torch.exp(-density[...,None] * self.render_step_size) based on taylor series
             return density[...,None] * self.render_step_size
         
         if self.training and self.config.grid_prune:
@@ -103,12 +102,12 @@ class BNeRFModel(BaseModel):
         # positions [N_rays, 3], density [N_rays], feature [N_rays, 16]16 là số chiều được mã hoá ra
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích
         rgb = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
-        # bright_ness = self.shutter_speed(dir_feature, t_origins)
+        bright_ness = self.shutter_speed(dir_feature, t_origins)
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #([Num_points, 1])
-        # comp_rgb = comp_rgb*bright_ness
+        comp_rgb = comp_rgb*bright_ness
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)   
 
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
@@ -152,7 +151,7 @@ class BNeRFModel(BaseModel):
         losses = {}
         losses.update(self.geometry.regularizations(out))
         losses.update(self.texture.regularizations(out))
-        # losses.update(self.shutter_speed.regularizations(out))
+        losses.update(self.shutter_speed.regularizations(out))
         return losses
 
     @torch.no_grad()
