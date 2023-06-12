@@ -5,8 +5,20 @@ import time
 import logging
 from datetime import datetime
 
+import datasets
+import systems
+import pytorch_lightning as pl
+from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
+from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
+from utils.callbacks import CodeSnapshotCallback, ConfigSnapshotCallback, CustomProgressBar
+from utils.misc import load_config  
+
+from loguru import logger
 
 def main():
+
+    # Thêm thamm số
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', required=True, help='path to config file')
     parser.add_argument('--gpu', default='0', help='GPU(s) to be used')
@@ -22,7 +34,6 @@ def main():
     group.add_argument('--validate', action='store_true')
     group.add_argument('--test', action='store_true')
     group.add_argument('--predict', action='store_true')
-    # group.add_argument('--export', action='store_true') # TODO: a separate export action
 
     parser.add_argument('--exp_dir', default='./exp')
     parser.add_argument('--runs_dir', default='./runs')
@@ -30,21 +41,14 @@ def main():
 
     args, extras = parser.parse_known_args()
 
-    # set CUDA_VISIBLE_DEVICES then import pytorch-lightning
+    # Cài đặt môi trường
     os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     n_gpus = len(args.gpu.split(','))
 
-    import datasets
-    import systems
-    import pytorch_lightning as pl
-    from pytorch_lightning import Trainer
-    from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
-    from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
-    from utils.callbacks import CodeSnapshotCallback, ConfigSnapshotCallback, CustomProgressBar
-    from utils.misc import load_config    
+      
 
-    # parse YAML config to OmegaConf
+    # Lấy cấu hình từ file yaml
     config = load_config(args.config, cli_args=extras)
     config.cmd_args = vars(args)
 
@@ -107,12 +111,13 @@ def main():
     )
 
     if args.train:
+        logger.info("Mode training: ")
         if args.resume and not args.resume_weights_only:
-            # FIXME: different behavior in pytorch-lighting>1.9 ?
             trainer.fit(system, datamodule=dm, ckpt_path=args.resume)
         else:
             trainer.fit(system, datamodule=dm)
         trainer.test(system, datamodule=dm)
+
     elif args.validate:
         trainer.validate(system, datamodule=dm, ckpt_path=args.resume)
     elif args.test:

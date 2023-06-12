@@ -13,8 +13,8 @@ from systems.base import BaseSystem
 from systems.criterions import PSNR
 
 
-@systems.register('nerf-system')
-class NeRFSystem(BaseSystem):
+@systems.register('bnerf-system')
+class BNeRFSystem(BaseSystem):
     """
     Two ways to print to console:
     1. self.print: correctly handle progress bar
