@@ -1,3 +1,5 @@
+# Customize hàm train của pytorch
+
 systems = {}
 
 

@@ -18,7 +18,7 @@ from loguru import logger
 
 def main():
 
-    # Thêm thamm số
+    # Step1 : Thêm thamm số
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', required=True, help='path to config file')
     parser.add_argument('--gpu', default='0', help='GPU(s) to be used')
@@ -41,14 +41,14 @@ def main():
 
     args, extras = parser.parse_known_args()
 
-    # Cài đặt môi trường
+    # Step 2: Cài đặt môi trường
     os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     n_gpus = len(args.gpu.split(','))
 
       
 
-    # Lấy cấu hình từ file yaml
+    # Step 3: Lấy cấu hình từ file yaml
     config = load_config(args.config, cli_args=extras)
     config.cmd_args = vars(args)
 
@@ -60,6 +60,7 @@ def main():
     config.config_dir = config.get('config_dir') or os.path.join(config.exp_dir, config.trial_name, 'config')
 
     logger = logging.getLogger('pytorch_lightning')
+    # Step 3.1: Cài cấu hình đã lấy ra
     if args.verbose:
         logger.setLevel(logging.DEBUG)
 
@@ -67,9 +68,8 @@ def main():
         config.seed = int(time.time() * 1000) % 1000
     pl.seed_everything(config.seed)
 
-    dm = datasets.make(config.dataset.name, config.dataset)
-    system = systems.make(config.system.name, config, load_from_checkpoint=None if not args.resume_weights_only else args.resume)
 
+    # Step 4: Lưu log
     callbacks = []
     if args.train:
         callbacks += [
@@ -89,18 +89,17 @@ def main():
 
     loggers = []
     if args.train:
-        loggers += [
-            TensorBoardLogger(args.runs_dir, name=config.name, version=config.trial_name),
-            CSVLogger(config.exp_dir, name=config.trial_name, version='csv_logs')
-        ]
+        loggers += [TensorBoardLogger(args.runs_dir, name=config.name, version=config.trial_name),CSVLogger(config.exp_dir, name=config.trial_name, version='csv_logs')]
     
     if sys.platform == 'win32':
-        # does not support multi-gpu on windows
+        logger.info(f"You run on windows")
         strategy = 'dp'
         assert n_gpus == 1
     else:
+        logger.info(f"You run on Linux")
         strategy = 'ddp_find_unused_parameters_false'
     
+    # Step 5: Bắt đầu train
     trainer = Trainer(
         devices=n_gpus,
         accelerator='gpu',
@@ -110,18 +109,28 @@ def main():
         **config.trainer
     )
 
+    # Load data
+    dm = datasets.make(config.dataset.name, config.dataset)
+
+    system = systems.make(config.system.name, config, load_from_checkpoint=None if not args.resume_weights_only else args.resume)
+
+    # train
     if args.train:
-        logger.info("Mode training: ")
         if args.resume and not args.resume_weights_only:
             trainer.fit(system, datamodule=dm, ckpt_path=args.resume)
         else:
             trainer.fit(system, datamodule=dm)
         trainer.test(system, datamodule=dm)
 
+    # validation
     elif args.validate:
         trainer.validate(system, datamodule=dm, ckpt_path=args.resume)
+
+    # test
     elif args.test:
         trainer.test(system, datamodule=dm, ckpt_path=args.resume)
+    
+    # predict
     elif args.predict:
         trainer.predict(system, datamodule=dm, ckpt_path=args.resume)
 
