@@ -113,7 +113,7 @@ class BNeRFModel(BaseModel):
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)   
 
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
-        
+
         # Export 
         out = {
             'comp_rgb': comp_rgb,
@@ -122,13 +122,13 @@ class BNeRFModel(BaseModel):
             'rays_valid': opacity > 0,
             'num_samples': torch.as_tensor([len(t_starts)], dtype=torch.int32, device=rays.device)
         }
-        if self.training:
-            out.update({
-                'weights': weights.view(-1),
-                'points': midpoints.view(-1),
-                'intervals': intervals.view(-1),
-                'ray_indices': ray_indices.view(-1)
-            })
+        # if self.training:
+        out.update({
+            'weights': weights.view(-1),
+            'points': midpoints.view(-1),
+            'intervals': intervals.view(-1),
+            'ray_indices': ray_indices.view(-1)
+        })
         
         return out
 
