@@ -88,7 +88,7 @@ class BNeRFSystem(BaseSystem):
         
         batch.update({
             'rays': rays,
-            'rgb_label': rgb_label,
+            'rgb': rgb_label,
             'fg_mask': fg_mask
         })
     
@@ -102,7 +102,7 @@ class BNeRFSystem(BaseSystem):
             train_num_rays = int(self.train_num_rays * (self.train_num_samples / out['num_samples'].sum().item()))        
             self.train_num_rays = min(int(self.train_num_rays * 0.9 + train_num_rays * 0.1), self.config.model.max_train_num_rays)
         
-        loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb_label'][out['rays_valid'][...,0]])
+        loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
         self.log('train/loss_rgb', loss_rgb)
         loss += loss_rgb * self.C(self.config.system.loss.lambda_rgb)
 
@@ -116,7 +116,7 @@ class BNeRFSystem(BaseSystem):
 
         for name, value in losses_model_reg.items():
             self.log(f'train/loss_{name}', value)
-            
+
             loss_ = value * self.C(self.config.system.loss[f"lambda_{name}"])
             loss += loss_
 

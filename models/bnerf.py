@@ -91,10 +91,16 @@ class BNeRFModel(BaseModel):
                 cone_angle=self.cone_angle,
                 alpha_thre=0.0
             )   
+            print(f"ray_indices {ray_indices.shape}")
+            print(f"t_starts {t_starts.shape}")
+            print(f"t_ends {t_ends.shape}")
         
         ray_indices = ray_indices.long()
+        print(f"ray_indices.long {ray_indices.shape}")
         t_origins = rays_o[ray_indices]
+        print(f"t_origins {t_origins.shape}")
         t_dirs = rays_d[ray_indices]
+        print(f"t_dirs {t_dirs.shape}")
         midpoints = (t_starts + t_ends) / 2.
         positions = t_origins + t_dirs * midpoints  
         intervals = t_ends - t_starts
