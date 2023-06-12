@@ -57,7 +57,7 @@ class BNeRFSystem(BaseSystem):
                 directions = self.dataset.directions[index, y, x]
 
             rays_o, rays_d = get_rays(directions, c2w) # Khởi tạo tia [8192,3], [8192,3]
-            rgb_label = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank) # Khởi tạo nhãn [8192, 3]
+            rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank) # Khởi tạo nhãn [8192, 3]
             fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank) 
         else:
             c2w = self.dataset.all_c2w[index][0]
@@ -66,7 +66,7 @@ class BNeRFSystem(BaseSystem):
             elif self.dataset.directions.ndim == 4: # (N, H, W, 3)
                 directions = self.dataset.directions[index][0]
             rays_o, rays_d = get_rays(directions, c2w)
-            rgb_label = self.dataset.all_images[index].view(-1, self.dataset.all_images.shape[-1]).to(self.rank)
+            rgb = self.dataset.all_images[index].view(-1, self.dataset.all_images.shape[-1]).to(self.rank)
             fg_mask = self.dataset.all_fg_masks[index].view(-1).to(self.rank)
         
         rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1) #[8192, 6]
@@ -84,11 +84,11 @@ class BNeRFSystem(BaseSystem):
         
 
         if self.dataset.apply_mask:
-            rgb_label = rgb_label * fg_mask[...,None] + self.model.background_color * (1 - fg_mask[...,None])        
+            rgb = rgb * fg_mask[...,None] + self.model.background_color * (1 - fg_mask[...,None])        
         
         batch.update({
             'rays': rays,
-            'rgb': rgb_label,
+            'rgb': rgb,
             'fg_mask': fg_mask
         })
     
