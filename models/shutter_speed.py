@@ -9,13 +9,13 @@ from models.network_utils import get_encoding, get_mlp
 from systems.utils import update_module_step
 
 
-@models.register('volume-radiance')
-class VolumeRadiance(nn.Module):
+@models.register('volume-brightness')
+class VolumeBrightness(nn.Module):
     def __init__(self, config):
-        super(VolumeRadiance, self).__init__()
+        super(VolumeBrightness, self).__init__()
         self.config = config
-        self.n_dir_dims = self.config.get('n_dir_dims', 3)
-        self.n_output_dims = 3
+        self.n_dir_dims = self.config.get('n_dir_dims', 1)
+        self.n_output_dims = 1
         encoding = get_encoding(self.n_dir_dims, self.config.dir_encoding_config)
         self.n_input_dims = self.config.input_feature_dim + encoding.n_output_dims
         network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)    

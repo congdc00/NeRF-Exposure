@@ -102,13 +102,13 @@ class BNeRFModel(BaseModel):
         
         # positions [N_rays, 3], density [N_rays], feature [N_rays, 16]16 là số chiều được mã hoá ra
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích
-        rgb = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
+        rgb, dir_feature = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
         # bright_ness = self.shutter_speed(dir_feature, t_origins)
 
-        weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([205797, 1])
+        weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
-        comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
-        print(f"comp_rgb {weights.shape}")
+        comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #([Num_points, 1])
+        # comp_rgb = comp_rgb*bright_ness
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)   
 
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
@@ -152,6 +152,7 @@ class BNeRFModel(BaseModel):
         losses = {}
         losses.update(self.geometry.regularizations(out))
         losses.update(self.texture.regularizations(out))
+        losses.update(self.shutter_speed.regularizations(out))
         return losses
 
     @torch.no_grad()
@@ -161,6 +162,6 @@ class BNeRFModel(BaseModel):
             _, feature = chunk_batch(self.geometry, export_config.chunk_size, False, mesh['v_pos'].to(self.rank))
             viewdirs = torch.zeros(feature.shape[0], 3).to(feature)
             viewdirs[...,2] = -1. # set the viewing directions to be -z (looking down)
-            rgb = self.texture(feature, viewdirs).clamp(0,1)
+            rgb, _ = self.texture(feature, viewdirs).clamp(0,1)
             mesh['v_rgb'] = rgb.cpu()
         return mesh

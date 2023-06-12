@@ -15,6 +15,7 @@ class VolumeRadiance(nn.Module):
         super(VolumeRadiance, self).__init__()
         self.config = config
         self.n_dir_dims = self.config.get('n_dir_dims', 3)
+        print(f"self.n_dir_dims {self.n_dir_dims.shape}")
         self.n_output_dims = 3
         encoding = get_encoding(self.n_dir_dims, self.config.dir_encoding_config)
         self.n_input_dims = self.config.input_feature_dim + encoding.n_output_dims
