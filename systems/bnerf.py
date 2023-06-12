@@ -55,6 +55,8 @@ class BNeRFSystem(BaseSystem):
             elif self.dataset.directions.ndim == 4: # (N, H, W, 3)
                 directions = self.dataset.directions[index, y, x]
 
+            print(f"self.dataset.directions {self.dataset.directions.shape}")
+
             
             rays_o, rays_d = get_rays(directions, c2w) # Khởi tạo tia [8192,3], [8192,3]
             rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank) # Khởi tạo nhãn
