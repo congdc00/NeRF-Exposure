@@ -21,7 +21,15 @@ def get_ray_directions(W, H, fx, fy, cx, cy, use_pixel_centers=True):
 
 
 def get_rays(directions, c2w, keepdim=False):
-    # Rotate ray directions from camera coordinate to the world coordinate
+    """Rotate ray directions from camera coordinate to the world coordinate
+
+    Args: 
+        directions: ma trận lưới [800,800,3]
+        c2w: transform matrix
+    Return:
+        rays_o: Toạ độ điểm gốc của tia ( dành cho từng xpoint)
+        rays_d: Toạ độ điểm hướng của tia ( dành cho từng xpoint)
+    """
     # rays_d = directions @ c2w[:, :3].T # (H, W, 3) # slow?
     assert directions.shape[-1] == 3
 
