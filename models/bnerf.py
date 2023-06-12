@@ -113,7 +113,7 @@ class BNeRFModel(BaseModel):
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)   
 
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
-
+        
         # Export 
         out = {
             'comp_rgb': comp_rgb,
