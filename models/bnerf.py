@@ -14,8 +14,8 @@ from nerfacc import ContractionType, OccupancyGrid, ray_marching, render_weight_
 @models.register('bnerf')
 class BNeRFModel(BaseModel):
     def setup(self):
-        self.geometry = models.make(self.config.geometry.name, self.config.geometry)
-        self.texture = models.make(self.config.texture.name, self.config.texture)
+        self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
+        self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
         if self.config.learned_background:
@@ -96,18 +96,19 @@ class BNeRFModel(BaseModel):
         positions = t_origins + t_dirs * midpoints  # R_sample : toạ độ cuả từng điểm
         intervals = t_ends - t_starts
 
-        density, feature = self.geometry(positions) 
-        # positions torch.Size([N_rays, 3]) 
-        # density torch.Size([N_rays])
-        # feature torch.Size([N_rays, 16]) 16 là số chiều được mã hoá ra
+        # Step 1: Dự đoán
+        
+        # positions [N_rays, 3], density [N_rays], feature [N_rays, 16]16 là số chiều được mã hoá ra
+        density, feature = self.geometry(positions) # Dự đoán mật độ thể tích
         rgb = self.texture(feature, t_dirs) # Dự đoán ra màu sắc
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
 
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
-        depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
-        # comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)       
+        comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)   
+
+        depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
 
         # Export 
         out = {
