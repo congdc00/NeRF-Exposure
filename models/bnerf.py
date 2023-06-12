@@ -16,6 +16,8 @@ class BNeRFModel(BaseModel):
     def setup(self):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
+        # self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
+
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
         if self.config.learned_background:
@@ -99,11 +101,12 @@ class BNeRFModel(BaseModel):
         # Step 1: Dự đoán
         
         # positions [N_rays, 3], density [N_rays], feature [N_rays, 16]16 là số chiều được mã hoá ra
-        density, feature = self.geometry(positions) # Dự đoán mật độ thể tích
-        rgb = self.texture(feature, t_dirs) # Dự đoán ra màu sắc
+        density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích
+        rgb = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
+        # bright_ness = self.shutter_speed(dir_feature, t_origins)
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
-
+        print(f"weights {weights.shape}")
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)   
