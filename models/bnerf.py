@@ -122,7 +122,12 @@ class BNeRFModel(BaseModel):
             'rays_valid': opacity > 0,
             'num_samples': torch.as_tensor([len(t_starts)], dtype=torch.int32, device=rays.device)
         }
-        # if self.training:
+        if self.training:
+            out.update({
+                'theta': weights,
+                'positions':positions
+            })
+            
         out.update({
             'weights': weights.view(-1),
             'points': midpoints.view(-1),
