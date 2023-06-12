@@ -69,15 +69,6 @@ class BNeRFModel(BaseModel):
             positions = t_origins + t_dirs * (t_starts + t_ends) / 2.
             density, _ = self.geometry(positions)
             return density[...,None]
-        
-        # def rgb_sigma_fn(t_starts, t_ends, ray_indices):
-        #     ray_indices = ray_indices.long()
-        #     t_origins = rays_o[ray_indices]
-        #     t_dirs = rays_d[ray_indices]
-        #     positions = t_origins + t_dirs * (t_starts + t_ends) / 2.
-        #     density, feature = self.geometry(positions) 
-        #     rgb = self.texture(feature, t_dirs)
-        #     return rgb, density[...,None]
 
         with torch.no_grad():
             ray_indices, t_starts, t_ends = ray_marching(
@@ -91,31 +82,32 @@ class BNeRFModel(BaseModel):
                 cone_angle=self.cone_angle,
                 alpha_thre=0.0
             )   
-            # ray_indices torch.Size([45629])
-            # t_starts torch.Size([45629, 1])
-            # t_ends torch.Size([45629, 1])
+            # ray_indices torch.Size([N_rays])
+            # t_starts torch.Size([N_rays, 1])
+            # t_ends torch.Size([v, 1])
             
-        # ray_indices.long torch.Size([45629]) chỉ mục của tia
-        # t_origins torch.Size([45629, 3])
-        # t_dirs torch.Size([45629, 3])
+        # ray_indices.long torch.Size([N_rays]) chỉ mục của tia
+        # t_origins torch.Size([N_rays, 3])
+        # t_dirs torch.Size([N_rays, 3])
         ray_indices = ray_indices.long()
         t_origins = rays_o[ray_indices]
         t_dirs = rays_d[ray_indices]
         midpoints = (t_starts + t_ends) / 2.
-        positions = t_origins + t_dirs * midpoints  
+        positions = t_origins + t_dirs * midpoints  # R_sample : toạ độ cuả từng điểm
         intervals = t_ends - t_starts
 
         density, feature = self.geometry(positions) 
-        print(f"positions {positions.shape}")
-        print(f"density {density.shape}")
-        print(f"feature {feature.shape}")
-        rgb = self.texture(feature, t_dirs)
+        # positions torch.Size([N_rays, 3]) 
+        # density torch.Size([N_rays])
+        # feature torch.Size([N_rays, 16]) 16 là số chiều được mã hoá ra
+        rgb = self.texture(feature, t_dirs) # Dự đoán ra màu sắc
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
+
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
-        comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)       
+        # comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)       
 
         # Export 
         out = {
