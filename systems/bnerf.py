@@ -38,6 +38,7 @@ class BNeRFSystem(BaseSystem):
                 index = torch.randint(0, len(self.dataset.all_images), size=(self.train_num_rays,), device=self.dataset.all_images.device)
             else:
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)
+        
         if stage in ['train']:
             
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
@@ -56,8 +57,8 @@ class BNeRFSystem(BaseSystem):
                 directions = self.dataset.directions[index, y, x]
 
             rays_o, rays_d = get_rays(directions, c2w) # Khởi tạo tia [8192,3], [8192,3]
-            rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank) # Khởi tạo nhãn
-            fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank)
+            rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank) # Khởi tạo nhãn [8192, 3]
+            fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank) 
         else:
             c2w = self.dataset.all_c2w[index][0]
             if self.dataset.directions.ndim == 3: # (H, W, 3)
@@ -68,10 +69,9 @@ class BNeRFSystem(BaseSystem):
             rgb = self.dataset.all_images[index].view(-1, self.dataset.all_images.shape[-1]).to(self.rank)
             fg_mask = self.dataset.all_fg_masks[index].view(-1).to(self.rank)
         
-        rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1)
-        print(f"rays {rays.shape}")
-        print(f"rgb {rgb.shape}")
+        rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1) #[8192, 6]
 
+        # Chọn background
         if stage in ['train']:
             if self.config.model.background_color == 'white':
                 self.model.background_color = torch.ones((3,), dtype=torch.float32, device=self.rank)
@@ -82,6 +82,7 @@ class BNeRFSystem(BaseSystem):
         else:
             self.model.background_color = torch.ones((3,), dtype=torch.float32, device=self.rank)
         
+
         if self.dataset.apply_mask:
             rgb = rgb * fg_mask[...,None] + self.model.background_color * (1 - fg_mask[...,None])        
         
@@ -93,6 +94,7 @@ class BNeRFSystem(BaseSystem):
     
     def training_step(self, batch, batch_idx):
         out = self(batch)
+        print(f"out {out.shape]}")
 
         loss = 0.
 
@@ -106,7 +108,6 @@ class BNeRFSystem(BaseSystem):
         loss += loss_rgb * self.C(self.config.system.loss.lambda_rgb)
 
         # distortion loss proposed in MipNeRF360
-        # an efficient implementation from https://github.com/sunset1995/torch_efficient_distloss, but still slows down training by ~30%
         if self.C(self.config.system.loss.lambda_distortion) > 0:
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
             self.log('train/loss_distortion', loss_distortion)
