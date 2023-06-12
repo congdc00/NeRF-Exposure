@@ -61,7 +61,7 @@ class BNeRFModel(BaseModel):
     def forward_(self, rays):
         n_rays = rays.shape[0]
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3)
-
+        print(f"rays_o {rays_o.shape} and rays_d {rays_d.shape}")
         def sigma_fn(t_starts, t_ends, ray_indices):
             ray_indices = ray_indices.long()
             t_origins = rays_o[ray_indices]
