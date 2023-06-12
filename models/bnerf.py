@@ -101,7 +101,7 @@ class BNeRFModel(BaseModel):
         
         # positions [N_rays, 3], density [N_rays], feature [N_rays, 16]16 là số chiều được mã hoá ra
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích
-        rgb = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
+        rgb, dir_feature = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(dir_feature, t_origins)
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
