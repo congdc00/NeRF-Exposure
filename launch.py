@@ -91,13 +91,8 @@ def main():
     if args.train:
         loggers += [TensorBoardLogger(args.runs_dir, name=config.name, version=config.trial_name),CSVLogger(config.exp_dir, name=config.trial_name, version='csv_logs')]
     
-    if sys.platform == 'win32':
-        logger.info(f"You run on windows")
-        strategy = 'dp'
-        assert n_gpus == 1
-    else:
-        logger.info(f"You run on Linux")
-        strategy = 'ddp_find_unused_parameters_false'
+    
+    strategy = 'ddp_find_unused_parameters_false'
     
     # Step 5: Bắt đầu train
     trainer = Trainer(

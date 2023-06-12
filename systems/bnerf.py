@@ -113,8 +113,10 @@ class BNeRFSystem(BaseSystem):
             loss += loss_distortion * self.C(self.config.system.loss.lambda_distortion)
 
         losses_model_reg = self.model.regularizations(out)
+
         for name, value in losses_model_reg.items():
             self.log(f'train/loss_{name}', value)
+            
             loss_ = value * self.C(self.config.system.loss[f"lambda_{name}"])
             loss += loss_
 
@@ -124,21 +126,7 @@ class BNeRFSystem(BaseSystem):
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
 
-        return {
-            'loss': loss
-        }
-    
-    """
-    # aggregate outputs from different devices (DP)
-    def training_step_end(self, out):
-        pass
-    """
-    
-    """
-    # aggregate outputs from different iterations
-    def training_epoch_end(self, out):
-        pass
-    """
+        return {'loss': loss}
     
     def validation_step(self, batch, batch_idx):
         out = self(batch)
