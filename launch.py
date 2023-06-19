@@ -53,7 +53,6 @@ def main():
     config.cmd_args = vars(args)
 
     config.trial_name = config.get('trial_name') or (config.tag + datetime.now().strftime('@%Y%m%d-%H%M%S'))
-    print(f"nhan duoc {config.get('exp_dir')}")
     config.exp_dir = config.get('exp_dir') or os.path.join(args.exp_dir, config.name)
     config.save_dir = config.get('save_dir') or os.path.join(config.exp_dir, config.trial_name, 'save')
     config.ckpt_dir = config.get('ckpt_dir') or os.path.join(config.exp_dir, config.trial_name, 'ckpt')
