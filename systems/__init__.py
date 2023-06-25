@@ -18,4 +18,4 @@ def make(name, config, load_from_checkpoint=None):
     return system
 
 
-from . import nerf, bnerf, neus
+from . import nerf, bnerf,ssnerf1, ssnerf2, neus
