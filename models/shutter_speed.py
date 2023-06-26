@@ -19,7 +19,7 @@ class VolumeBrightness(nn.Module):
 
         encoding = get_encoding(self.n_ori_dims, self.config.dir_encoding_config)
 
-        self.n_input_dims = encoding.n_output_dims #+ self.config.input_feature_dim #16 +16
+        self.n_input_dims = encoding.n_output_dims + self.config.input_feature_dim #16 +16
         network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)    
         self.encoding = encoding
         self.network = network
