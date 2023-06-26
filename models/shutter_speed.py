@@ -19,7 +19,7 @@ class VolumeBrightness(nn.Module):
 
         encoding = get_encoding(self.n_ori_dims, self.config.dir_encoding_config)
 
-        self.n_input_dims = encoding.n_output_dims + self.config.input_feature_dim #16 +16
+        self.n_input_dims = encoding.n_output_dims #+ self.config.input_feature_dim #16 +16
         network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)    
         self.encoding = encoding
         self.network = network
@@ -38,10 +38,9 @@ class VolumeBrightness(nn.Module):
         
         #TODO: Tim hieu ky so chieu nay 
         print(f"args {args}")
-
-
-        network_inp = torch.cat([features.view(-1, features.shape[-1]), origins_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1) #([97790, 32])
+        network_inp = torch.cat( origins_embd + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1) #([97790, 32])
         print(f"features {network_inp.size()}")
+
         brightness = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
 
         # Dung cho neus
