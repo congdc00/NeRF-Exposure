@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_efficient_distloss import flatten_eff_distloss
-
+import imageio
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_debug
 
@@ -141,7 +141,7 @@ class SSNeRF1System(BaseSystem):
             {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}}
         ])
-        
+        imageio.imwrite("./anhtest.png", batch['rgb'].view(H, W, 3))
         return {
             'psnr': psnr,
             'index': batch['index']
