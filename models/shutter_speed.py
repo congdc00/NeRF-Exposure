@@ -38,7 +38,7 @@ class VolumeBrightness(nn.Module):
         
         #TODO: Tim hieu ky so chieu nay 
         print(f"args {args}")
-        network_inp = torch.cat( origins_embd + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1) #([97790, 32])
+        network_inp = torch.cat([origins_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1) #([97790, 32])
         print(f"features {network_inp.size()}")
 
         brightness = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
