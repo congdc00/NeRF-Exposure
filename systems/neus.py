@@ -141,6 +141,7 @@ class NeuSSystem(BaseSystem):
         losses_model_reg = self.model.regularizations(out)
         for name, value in losses_model_reg.items():
             self.log(f'train/loss_{name}', value)
+            print(f"loss {value}")
             loss_ = value * self.C(self.config.system.loss[f"lambda_{name}"])
             loss += loss_
         
