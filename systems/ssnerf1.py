@@ -141,7 +141,6 @@ class SSNeRF1System(BaseSystem):
             {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}}
         ])
-        imageio.imwrite("./anhtest.png", batch['rgb'].view(H, W, 3))
         return {
             'psnr': psnr,
             'index': batch['index']
