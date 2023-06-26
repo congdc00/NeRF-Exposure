@@ -83,26 +83,25 @@ class SSNeRF1Model(BaseModel):
                 cone_angle=self.cone_angle,
                 alpha_thre=0.0
             )   
-            # ray_indices torch.Size([N_rays])
-            # t_starts torch.Size([N_rays, 1])
-            # t_ends torch.Size([v, 1])
             
-        # ray_indices.long torch.Size([N_rays]) chỉ mục của tia
-        # t_origins torch.Size([N_rays, 3])
-        # t_dirs torch.Size([N_rays, 3])
         ray_indices = ray_indices.long()
         t_origins = rays_o[ray_indices]
         t_dirs = rays_d[ray_indices]
         midpoints = (t_starts + t_ends) / 2.
-        positions = t_origins + t_dirs * midpoints  # R_sample : toạ độ cuả từng điểm
+        positions = t_origins + t_dirs * midpoints  # positions [N_rays, 3]  == R_sample
         intervals = t_ends - t_starts
 
         # Step 1: Predict colour point
         
-        # positions [N_rays, 3], density [N_rays], feature [N_rays, 16]16 là số chiều được mã hoá ra
-        density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích
-        rgb, dir_feature = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(dir_feature, t_origins)
+        # Forward
+        density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
+        rgb , dir_feature= self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
+        bright_ness = self.shutter_speed(dir_feature,t_origins)
+        print(f"density {density.size()}")
+        print(f"cor_feature {cor_feature.size()}")
+        print(f"rgb {rgb.size()}")
+        print(f"dir_feature {dir_feature.size()}")
+        print(f"bright_ness {bright_ness.size()}")
 
         # Step 2: Rendering 
         # Trọng số

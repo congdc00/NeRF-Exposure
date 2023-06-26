@@ -29,8 +29,10 @@ class VolumeBrightness(nn.Module):
         origins_embd = self.encoding(origins.view(-1, self.n_ori_dims))
         network_inp = torch.cat([features.view(-1, features.shape[-1]), origins_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
         brightness = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
+        print(f"network_inp {network_inp.size()}")
         # Dung cho neus
         if 'brightness_activation' in self.config:
+            print("chay den brightness_activation")
             brightness = get_activation(self.config.brightness_activation)(brightness)
         return brightness
 
