@@ -111,11 +111,11 @@ class SSNeRF1Model(BaseModel):
         # Độ mờ
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         # Màu sắc dự đoán ra
-        real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #([Num_points, 1])
+        comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #([Num_points, 1])
         # Độ sáng
         bright_ness = accumulate_along_rays(weights, ray_indices, values=bright_ness, n_rays=n_rays)
 
-        comp_rgb = real_rgb*bright_ness
+        comp_rgb = comp_rgb*bright_ness
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)   
 
         real_rgb += self.background_color * (1.0 - opacity) 
@@ -124,7 +124,6 @@ class SSNeRF1Model(BaseModel):
         # Export 
         out = {
             'comp_rgb': comp_rgb,
-            'real_rgb': real_rgb,
             'opacity': opacity,
             'depth': depth,
             'rays_valid': opacity > 0,
