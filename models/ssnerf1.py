@@ -45,6 +45,8 @@ class SSNeRF1Model(BaseModel):
         self.background_color = None
     
     def update_step(self, epoch, global_step):
+        
+        # Lan truyen nguoc
         update_module_step(self.geometry, epoch, global_step)
         update_module_step(self.texture, epoch, global_step)
 
@@ -92,10 +94,9 @@ class SSNeRF1Model(BaseModel):
         intervals = t_ends - t_starts
 
         # Step 1: Predict colour point
-        
         # Forward
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
-        rgb , dir_feature= self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
+        rgb , dir_feature = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(dir_feature,t_origins)
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
@@ -127,13 +128,10 @@ class SSNeRF1Model(BaseModel):
             'opacity': opacity,
             'depth': depth,
             'rays_valid': opacity > 0,
-            'num_samples': torch.as_tensor([len(t_starts)], dtype=torch.int32, device=rays.device)
-        }
-        
-        out.update({
+            'num_samples': torch.as_tensor([len(t_starts)], dtype=torch.int32, device=rays.device),
             'theta': weights,
             'positions':positions
-        })
+        }
         
         if self.training:
             out.update({
@@ -150,9 +148,8 @@ class SSNeRF1Model(BaseModel):
             out = self.forward_(rays)
         else:
             out = chunk_batch(self.forward_, self.config.ray_chunk, True, rays)
-        return {
-            **out,
-        }
+
+        return {**out,}
 
     def train(self, mode=True):
         self.randomized = mode and self.config.randomized
@@ -166,7 +163,6 @@ class SSNeRF1Model(BaseModel):
         losses = {}
         losses.update(self.geometry.regularizations(out))
         losses.update(self.texture.regularizations(out))
-        losses.update(self.shutter_speed.regularizations(out))
         return losses
 
     @torch.no_grad()
