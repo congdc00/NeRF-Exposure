@@ -49,6 +49,7 @@ class SSNeRF1Model(BaseModel):
         # Lan truyen nguoc
         update_module_step(self.geometry, epoch, global_step)
         update_module_step(self.texture, epoch, global_step)
+        update_module_step(self.shutter_speed, epoch, global_step)
 
         def occ_eval_fn(x):
             density, _ = self.geometry(x)

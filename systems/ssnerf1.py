@@ -129,6 +129,11 @@ class SSNeRF1System(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         out = self(batch)
+        
+        image_origin = batch['rgb'] 
+        image_predict = out['comp_rgb']
+        color_predict = out["real_rgb"]
+
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
 
