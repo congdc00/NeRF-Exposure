@@ -148,7 +148,7 @@ class SSNeRF1Model(BaseModel):
             out = self.forward_(rays)
         else:
             out = chunk_batch(self.forward_, self.config.ray_chunk, True, rays)
-
+            
         return {**out,}
 
     def train(self, mode=True):
@@ -163,6 +163,7 @@ class SSNeRF1Model(BaseModel):
         losses = {}
         losses.update(self.geometry.regularizations(out))
         losses.update(self.texture.regularizations(out))
+        losses.update(self.shutter_speed.regularizations(out))
         return losses
 
     @torch.no_grad()
