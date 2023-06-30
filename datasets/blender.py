@@ -3,7 +3,7 @@ import json
 import math
 import numpy as np
 from PIL import Image
-
+import cv2
 import torch
 from torch.utils.data import Dataset, DataLoader, IterableDataset
 import torchvision.transforms.functional as TF
@@ -57,9 +57,12 @@ class BlenderDatasetBase():
             c2w = torch.from_numpy(np.array(frame['transform_matrix'])[:3, :4])
             self.all_c2w.append(c2w)
 
-            img_path = os.path.join(self.config.root_dir, f"{frame['file_path']}.png")
-            img = Image.open(img_path)
-            
+            img_path = os.path.join(self.config.root_dir, f"{frame['file_path']}.exr")
+            image = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+            img = Image.fromarray(np.float32(image))
+
+            #img = Image.open(img_path)
+
             img = img.resize(self.img_wh, Image.BICUBIC)
             img = TF.to_tensor(img).permute(1, 2, 0) # (4, h, w) => (h, w, 4)
 
