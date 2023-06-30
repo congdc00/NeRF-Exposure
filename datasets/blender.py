@@ -57,16 +57,17 @@ class BlenderDatasetBase():
             c2w = torch.from_numpy(np.array(frame['transform_matrix'])[:3, :4])
             self.all_c2w.append(c2w)
 
-            img_path = os.path.join(self.config.root_dir, f"{frame['file_path']}.exr")
-            
+            img_path = os.path.join(self.config.root_dir, f"{frame['file_path']}.png")
+            print(f"image {frame['file_path']}.png")
+            print(f"c2w {c2w}")
             ## Dang exr
-            img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            # img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+            # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             # img = Image.fromarray(color_coverted)
 
             ## Dang png
-            # img = Image.open(img_path)
-            # img = img.resize(self.img_wh, Image.BICUBIC)
+            img = Image.open(img_path)
+            img = img.resize(self.img_wh, Image.BICUBIC)
 
             img = TF.to_tensor(img).permute(1, 2, 0) # (4, h, w) => (h, w, 4)
 
