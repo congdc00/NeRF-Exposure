@@ -62,8 +62,7 @@ class BlenderDatasetBase():
             ## Dang exr
             opencv_image = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
             color_coverted = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2RGB)
-            pil_image = Image.fromarray(color_coverted)
-            img = Image.fromarray(pil_image)
+            img = Image.fromarray(color_coverted)
 
             ## Dang png
             # img = Image.open(img_path)
