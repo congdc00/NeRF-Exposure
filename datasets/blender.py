@@ -57,7 +57,7 @@ class BlenderDatasetBase():
             c2w = torch.from_numpy(np.array(frame['transform_matrix'])[:3, :4])
             self.all_c2w.append(c2w)
 
-            img_path = os.path.join(self.config.root_dir, f"{frame['file_path']}.png")
+            img_path = os.path.join(self.config.root_dir, f"{frame['file_path']}.exr")
             img = Image.open(img_path)
             img = img.resize(self.img_wh, Image.BICUBIC)
             img = TF.to_tensor(img).permute(1, 2, 0) # (4, h, w) => (h, w, 4)
