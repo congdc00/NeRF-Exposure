@@ -13,7 +13,7 @@ import pytorch_lightning as pl
 import datasets
 from models.ray_utils import get_ray_directions
 from utils.misc import get_rank
-
+os.environ["OPENCV_IO_ENABLE_OPENEXR"]="1"
 
 class BlenderDatasetBase():
     def setup(self, config, split):
