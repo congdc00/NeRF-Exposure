@@ -64,7 +64,7 @@ class BlenderDatasetBase():
             img = Image.fromarray(img)
             ## Dang png
             # img = Image.open(img_path)
-            # img = img.resize(self.img_wh, Image.BICUBIC)
+            img = img.resize(self.img_wh, Image.BICUBIC)
 
             img = TF.to_tensor(img).permute(1, 2, 0) # (4, h, w) => (h, w, 4)
 
