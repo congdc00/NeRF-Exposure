@@ -57,6 +57,7 @@ class BlenderDatasetBase():
             c2w = torch.from_numpy(np.array(frame['transform_matrix'])[:3, :4])
             self.all_c2w.append(c2w)
 
+            print(f"self.config.root_dir {self.config.root_dir}")
             img_path = os.path.join(self.config.root_dir, f"{frame['file_path']}.exr")
             img = Image.open(img_path)
             img = img.resize(self.img_wh, Image.BICUBIC)
