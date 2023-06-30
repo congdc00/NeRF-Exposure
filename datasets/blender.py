@@ -58,7 +58,7 @@ class BlenderDatasetBase():
             self.all_c2w.append(c2w)
 
             img_path = os.path.join(self.config.root_dir, f"{frame['file_path']}.png")
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            
             ## Dang exr
             # img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
             # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -66,6 +66,7 @@ class BlenderDatasetBase():
 
             ## Dang png
             img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             # img = Image.open(img_path)
             # img = img.resize(self.img_wh, Image.BICUBIC)
 
