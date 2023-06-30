@@ -133,20 +133,21 @@ class SSNeRF1System(BaseSystem):
         image_origin = batch['rgb'] 
         image_predict = out['comp_rgb']
         color_predict = out["real_rgb"]
+        density_predict = out['depth']
 
         psnr = self.criterions['psnr'](image_predict.to(image_origin), image_origin)
         W, H = self.dataset.img_wh
 
-        
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
-        print("save Images")
+
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            # {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}}
+            # {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
         ])
+
         return {
             'psnr': psnr,
             'index': batch['index']
