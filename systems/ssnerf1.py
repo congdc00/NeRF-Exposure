@@ -141,7 +141,7 @@ class SSNeRF1System(BaseSystem):
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
 
-        content = str(out["bright_ness"][0]) + "and " + str(out["test"])
+        content = str(out["bright_ness"][0]) + "and " #+ str(out["test"])
         file_path = "./bright_ness.txt"
         with open(file_path, 'w') as file:
             file.write(content)
