@@ -146,7 +146,7 @@ class NeRFSystem(BaseSystem):
 
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
-        
+
         file_path = "./log_psnr.txt"
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
@@ -155,7 +155,7 @@ class NeRFSystem(BaseSystem):
             content = ""
 
         with open(file_path, 'w') as file:
-            content = content + "\n" + str(psnr.tolist()[0])
+            content = content + "\n" + str(psnr.tolist())
             file.write(content)
         
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
