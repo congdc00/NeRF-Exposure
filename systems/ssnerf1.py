@@ -162,7 +162,7 @@ class SSNeRF1System(BaseSystem):
             content = ""
 
         with open(file_path, 'w') as file:
-            content = content + "\n" + str(round(psnr.tolist(),2))
+            content = content + str(round(psnr.tolist(),2)) + "\n"
             file.write(content)
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
