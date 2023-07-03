@@ -67,6 +67,7 @@ class BlenderDatasetBase():
             ## Dang png
             img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(img)
             # img = Image.open(img_path)
             # img = img.resize(self.img_wh, Image.BICUBIC)
 
