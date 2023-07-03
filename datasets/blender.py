@@ -57,7 +57,7 @@ class BlenderDatasetBase():
             c2w = torch.from_numpy(np.array(frame['transform_matrix'])[:3, :4])
             self.all_c2w.append(c2w)
 
-            img_path = os.path.join(self.config.root_dir, f"{frame['file_path']}.exr")
+            img_path = os.path.join(self.config.root_dir, f"{frame['file_path']}.png")
             
             ## Dang exr
             # img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
