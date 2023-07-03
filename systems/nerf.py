@@ -5,7 +5,7 @@ from torch_efficient_distloss import flatten_eff_distloss
 
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_debug
-
+import os
 import models
 from models.ray_utils import get_rays
 import systems
@@ -146,6 +146,17 @@ class NeRFSystem(BaseSystem):
 
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
+        
+        file_path = "./log_psnr.txt"
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                content = file.read()
+        else:
+            content = ""
+
+        with open(file_path, 'w') as file:
+            content = content + "\n" + str(psnr.tolist()[0])
+            file.write(content)
         
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
