@@ -142,7 +142,7 @@ class SSNeRF1System(BaseSystem):
         torch.save(out['positions'], "positions.pt")
         content = "Đây là nội dung cần lưu trong file."
 
-        content = bright_ness.shape
+        content = out["bright_ness"].shape
         file_path = "./bright_ness.txt"
         with open(file_path, 'w') as file:
             file.write(content)
