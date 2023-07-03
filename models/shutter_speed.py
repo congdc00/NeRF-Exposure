@@ -24,11 +24,10 @@ class VolumeBrightness(nn.Module):
         self.encoding = encoding
         self.network = network
     
-    def forward(self, features, origins, *args):
+    def forward(self, origins, *args):
         """
         Args:
             origins torch.Size([97790, 3])
-            features: torch.Size([97790, 16])
         Result:
             brightness: torch.Size([97790, 1])
         """

@@ -97,9 +97,9 @@ class SSNeRF1Model(BaseModel):
         # Step 1: Predict colour point
         # Forward
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
-        rgb , dir_feature = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
+        rgb = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
         
-        bright_ness_out = self.shutter_speed(dir_feature,t_origins)
+        bright_ness_out = self.shutter_speed(t_origins)
         bright_ness = bright_ness_out[0] # lấy ra shutter speed đại diện cho ảnh
 
         # network_inp torch.Size([97790, 32])
