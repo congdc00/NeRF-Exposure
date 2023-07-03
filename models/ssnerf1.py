@@ -115,8 +115,10 @@ class SSNeRF1Model(BaseModel):
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #([Num_points, 1])
 
         # Độ sáng
-        bright_ness = accumulate_along_rays(weights, ray_indices, values=bright_ness, n_rays=n_rays)
+        weight_f = torch.ones_like(weights)
+        bright_ness = accumulate_along_rays(weight_f, ray_indices, values=bright_ness, n_rays=n_rays)
         print(f"type weights ---------------------- {weights.size()}")
+        print(f"type weights ---------------------- {bright_ness.size()}")
         comp_rgb = real_rgb*bright_ness
 
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
