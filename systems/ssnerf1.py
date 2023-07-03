@@ -32,6 +32,7 @@ class SSNeRF1System(BaseSystem):
     def preprocess_data(self, batch, stage):
         if 'index' in batch: # validation / testing
             index = batch['index']
+            print(f"index {index}")
         else:
             if self.config.model.batch_image_sampling:
                 index = torch.randint(0, len(self.dataset.all_images), size=(self.train_num_rays,), device=self.dataset.all_images.device)
@@ -140,7 +141,7 @@ class SSNeRF1System(BaseSystem):
 
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
-
+        print(f"bright_ness {out['bright_ness'][0]}")
         content = str(out["bright_ness"][0]) 
         file_path = "./bright_ness.txt"
         with open(file_path, 'w') as file:
