@@ -116,7 +116,7 @@ class SSNeRF1Model(BaseModel):
 
         # Độ sáng
         bright_ness = accumulate_along_rays(weights, ray_indices, values=bright_ness, n_rays=n_rays)
-        
+        print(f"type brightness ---------------------- {bright_ness}")
         comp_rgb = real_rgb*bright_ness
 
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
@@ -126,7 +126,6 @@ class SSNeRF1Model(BaseModel):
         # Export 
         out = {
             'comp_rgb': comp_rgb,
-            "test": type(bright_ness),
             'bright_ness':bright_ness,
             "real_rgb": real_rgb,
             'opacity': opacity,
