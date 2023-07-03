@@ -106,7 +106,7 @@ class NeRFModel(BaseModel):
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
-        # comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)       # => Chuyen nen thanh den
+        comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)       # => Chuyen nen thanh den
 
         out = {
             'comp_rgb': comp_rgb,
