@@ -2,7 +2,7 @@ import os
 import json
 import math
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageEnhance
 import cv2
 import torch
 from torch.utils.data import Dataset, DataLoader, IterableDataset
@@ -65,10 +65,13 @@ class BlenderDatasetBase():
             # img = Image.fromarray(color_coverted)
 
             # Dang png 1
-            img = imageio.imread(img_path)
+            # img = imageio.imread(img_path)
 
             ## Dang png 2
+            factor = 1.5 
             img = Image.open(img_path)
+            enhancer = ImageEnhance.Brightness(img)
+            img = enhancer.enhance(factor)
             img = img.resize(self.img_wh, Image.BICUBIC)
 
             img = TF.to_tensor(img).permute(1, 2, 0) # (4, h, w) => (h, w, 4)
