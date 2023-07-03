@@ -46,7 +46,7 @@ class SSNeRF1System(BaseSystem):
                 bright_ness.append(self.dataset.all_factor[i])
                 
             batch.update({
-                'bright_ness': bright_ness,
+                'bright_ness': bright_ness
             })
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
             
@@ -94,7 +94,6 @@ class SSNeRF1System(BaseSystem):
             rgb = rgb * fg_mask[...,None] + self.model.background_color * (1 - fg_mask[...,None])        
         
         batch.update({
-            'bright_ness': bright_ness,
             'rays': rays,
             'rgb': rgb,
             'fg_mask': fg_mask
