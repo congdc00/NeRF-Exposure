@@ -21,7 +21,7 @@ class VolumeRadiance(nn.Module):
 
         self.n_input_dims = self.config.input_feature_dim + encoding.n_output_dims
         print(f"n_input_dims {self.n_input_dims}")
-        print(f"input_feature_dim {self.input_feature_dim}")
+        print(f"input_feature_dim {self.config.input_feature_dim}")
         print(f"n_output_dims {self.n_output_dims}")
         
         network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)    
