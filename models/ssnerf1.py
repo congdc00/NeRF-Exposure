@@ -119,7 +119,7 @@ class SSNeRF1Model(BaseModel):
         bright_ness = accumulate_along_rays(weight_f, ray_indices, values=bright_ness_out, n_rays=n_rays)
         print(f"type bright_ness_out ---------------------- {bright_ness_out.size()}")
         print(f"type bright_ness ---------------------- {bright_ness.size()}")
-        print(f"type comp_rgb ---------------------- {comp_rgb.size()}")
+        print(f"type real_rgb ---------------------- {real_rgb.size()}")
         comp_rgb = real_rgb*bright_ness
 
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
