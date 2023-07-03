@@ -42,7 +42,7 @@ class SSNeRF1Model(BaseModel):
                 contraction_type=self.contraction_type
             )
         self.randomized = self.config.randomized
-        self.background_color = None
+        self.background_color = 0
     
     def update_step(self, epoch, global_step):
         
