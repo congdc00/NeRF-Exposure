@@ -98,7 +98,7 @@ class SSNeRF1Model(BaseModel):
         # Forward
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb , dir_feature = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(dir_feature,t_origins)
+        bright_ness_out = self.shutter_speed(dir_feature,t_origins)
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
         # cor_feature torch.Size([97790, 16])
@@ -116,9 +116,9 @@ class SSNeRF1Model(BaseModel):
 
         # Độ sáng
         weight_f = torch.ones_like(weights)
-        bright_ness = accumulate_along_rays(weight_f, ray_indices, values=bright_ness, n_rays=n_rays)
-        print(f"type weights ---------------------- {weights.size()}")
-        print(f"type weights ---------------------- {bright_ness.size()}")
+        bright_ness = accumulate_along_rays(weight_f, ray_indices, values=bright_ness_out, n_rays=n_rays)
+        print(f"type bright_ness_out ---------------------- {bright_ness_out.size()}")
+        print(f"type bright_ness ---------------------- {bright_ness.size()}")
         comp_rgb = real_rgb*bright_ness
 
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
