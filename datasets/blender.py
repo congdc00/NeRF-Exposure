@@ -65,11 +65,11 @@ class BlenderDatasetBase():
             # img = Image.fromarray(color_coverted)
 
             # Dang png 1
-            img = imageio.imread(img_path, format='EXR-FI')
+            # img = imageio.imread(img_path, format='EXR-FI')
 
             ## Dang png 2
-            # img = Image.open(img_path)
-            # img = img.resize(self.img_wh, Image.BICUBIC)
+            img = Image.open(img_path)
+            img = img.resize(self.img_wh, Image.BICUBIC)
 
             img = TF.to_tensor(img).permute(1, 2, 0) # (4, h, w) => (h, w, 4)
 
