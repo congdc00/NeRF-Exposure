@@ -75,7 +75,7 @@ class BlenderDatasetBase():
                 img.convert("F")
                 enhancer = ImageEnhance.Brightness(img)
                 img = enhancer.enhance(factor)
-                self.all_factor.append(torch.tensor(factor))
+                self.all_factor.append(factor)
             except:
                 pass
 
@@ -89,8 +89,7 @@ class BlenderDatasetBase():
         self.all_c2w, self.all_images, self.all_fg_masks, self.all_factor = \
             torch.stack(self.all_c2w, dim=0).float().to(self.rank), \
             torch.stack(self.all_images, dim=0).float().to(self.rank), \
-            torch.stack(self.all_fg_masks, dim=0).float().to(self.rank), \
-            torch.stack(self.all_factor, dim=0).float().to(self.rank)
+            torch.stack(self.all_fg_masks, dim=0).float().to(self.rank)
 
 class BlenderDataset(Dataset, BlenderDatasetBase):
     def __init__(self, config, split):
