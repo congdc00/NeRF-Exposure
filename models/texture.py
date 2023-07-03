@@ -19,10 +19,10 @@ class VolumeRadiance(nn.Module):
 
         encoding = get_encoding(self.n_dir_dims, self.config.dir_encoding_config)
 
-        self.n_input_dims = self.config.input_feature_dim
+        self.n_input_dims = self.config.input_feature_dim + encoding.n_output_dims
         print(f"n_input_dims {self.n_input_dims}")
         print(f"input_feature_dim {self.config.input_feature_dim}")
-        print(f"n_output_dims {encoding.n_output_dims}")
+        print(f"n_output_dims {self.n_output_dims}")
         
         network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)    
         self.encoding = encoding
@@ -31,7 +31,9 @@ class VolumeRadiance(nn.Module):
     def forward(self, features, dirs, *args):
         """
         feature [num_points, 16]"""
-        network_inp = torch.cat([features.view(-1, features.shape[-1])] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
+        dirs = (dirs + 1.) / 2. # (-1, 1) => (0, 1)
+        dirs_embd = self.encoding(dirs.view(-1, self.n_dir_dims)) #[num_points, 16]
+        network_inp = torch.cat([features.view(-1, features.shape[-1]), dirs_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
         if 'color_activation' in self.config:
             color = get_activation(self.config.color_activation)(color)
