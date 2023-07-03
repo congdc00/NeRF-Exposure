@@ -154,7 +154,7 @@ class SSNeRF1System(BaseSystem):
         torch.save(out['positions'], "positions.pt")
         
          
-        file_path = "./log.txt"
+        file_path = "./log_psnr.txt"
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
                 content = file.read()
@@ -162,7 +162,7 @@ class SSNeRF1System(BaseSystem):
             content = ""
 
         with open(file_path, 'w') as file:
-            content = content + "\n" + str(psnr)
+            content = content + "\n" + str(psnr.tolist()[0])
             file.write(content)
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
