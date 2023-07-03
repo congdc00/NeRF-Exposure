@@ -29,14 +29,12 @@ class VolumeBrightness(nn.Module):
         Args:
             origins torch.Size([97790, 3])
             features: torch.Size([97790, 16])
-
         Result:
             brightness: torch.Size([97790, 1])
         """
         origins = (origins + 1.) / 2. # (-1, 1) => (0, 1)
         origins_embd = self.encoding(origins.view(-1, self.n_ori_dims)) # origins_embd torch.Size([97790, 16])
         
-        #TODO: Tim hieu ky so chieu nay 
         network_inp = torch.cat([origins_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1) #([97790, 32])
         brightness = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
 
