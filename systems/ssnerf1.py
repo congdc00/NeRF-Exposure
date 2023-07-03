@@ -40,6 +40,7 @@ class SSNeRF1System(BaseSystem):
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)
         
         if stage in ['train']:
+            print(f"index {type(index)}")
             bright_ness = self.dataset.all_factor[index]
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
             
