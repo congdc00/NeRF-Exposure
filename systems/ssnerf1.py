@@ -183,12 +183,12 @@ class SSNeRF1System(BaseSystem):
                 # DP
                 if step_out['index'].ndim == 1:
                     out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
-                    out_set_ssim[step_out['index'].item()] = {'ssim': step_out['ssim']}
+                    # out_set_ssim[step_out['index'].item()] = {'ssim': step_out['ssim']}
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
                         out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-                        out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
+                        # out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
             psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
             ssim = torch.mean(torch.stack([o['ssim'] for o in out_set_ssim.values()]))
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
