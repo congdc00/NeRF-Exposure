@@ -98,8 +98,8 @@ class SSNeRF1System(BaseSystem):
     
     def training_step(self, batch, batch_idx):
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
-        print(f"--------------bright_ness {len(batch['bright_ness'])}-------------")
-        print(f"--------------out bright_ness {len(out['bright_ness'])}-------------")
+        # print(f"--------------bright_ness {len(batch['bright_ness'])}-------------")
+        # print(f"--------------out bright_ness {len(out['bright_ness'])}-------------")
         loss = 0.
 
         # update train_num_rays

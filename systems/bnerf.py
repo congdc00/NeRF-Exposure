@@ -10,7 +10,7 @@ import models
 from models.ray_utils import get_rays
 import systems
 from systems.base import BaseSystem
-from systems.criterions import PSNR
+from systems.criterions import PSNR, SSIM
 
 @systems.register('bnerf-system')
 class BNeRFSystem(BaseSystem):
@@ -21,7 +21,8 @@ class BNeRFSystem(BaseSystem):
     """
     def prepare(self):
         self.criterions = {
-            'psnr': PSNR()
+            'psnr': PSNR(),
+            'ssim': SSIM()
         }
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
@@ -130,6 +131,7 @@ class BNeRFSystem(BaseSystem):
     def validation_step(self, batch, batch_idx):
         out = self(batch)
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
+        ssim = self.criterions['ssim'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
 
         
@@ -144,6 +146,7 @@ class BNeRFSystem(BaseSystem):
         
         return {
             'psnr': psnr,
+            'ssim': ssim,
             'index': batch['index']
         }
           
