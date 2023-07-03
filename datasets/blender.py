@@ -65,14 +65,14 @@ class BlenderDatasetBase():
             # img = Image.fromarray(color_coverted)
 
             ## Dang png 1
-            img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            img = Image.fromarray(img)
-            img = img.resize(self.img_wh, Image.BICUBIC)
+            # img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+            # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            # img = Image.fromarray(img)
+            # img = img.resize(self.img_wh, Image.BICUBIC)
 
             ## Dang png 2
-            # img = Image.open(img_path)
-            # img = img.resize(self.img_wh, Image.BICUBIC)
+            img = Image.open(img_path)
+            img = img.resize(self.img_wh, Image.BICUBIC)
 
             img = TF.to_tensor(img).permute(1, 2, 0) # (4, h, w) => (h, w, 4)
 
