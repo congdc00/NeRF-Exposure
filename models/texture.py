@@ -31,7 +31,7 @@ class VolumeRadiance(nn.Module):
     def forward(self, features, dirs, *args):
         """
         feature [num_points, 16]"""
-        network_inp = torch.cat(features.view(-1, features.shape[-1]) + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
+        network_inp = torch.cat([features.view(-1, features.shape[-1])] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
         if 'color_activation' in self.config:
             color = get_activation(self.config.color_activation)(color)
