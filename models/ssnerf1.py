@@ -126,6 +126,7 @@ class SSNeRF1Model(BaseModel):
         # Export 
         out = {
             'comp_rgb': comp_rgb,
+            "test": bright_ness.shape
             'bright_ness':bright_ness,
             "real_rgb": real_rgb,
             'opacity': opacity,
