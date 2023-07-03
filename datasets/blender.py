@@ -51,7 +51,7 @@ class BlenderDatasetBase():
         self.directions = \
             get_ray_directions(self.w, self.h, self.focal, self.focal, self.w//2, self.h//2).to(self.rank) # (h, w, 3)           
 
-        self.all_c2w, self.all_images, self.all_fg_masks = [], [], []
+        self.all_c2w, self.all_images, self.all_fg_masks, self.all_factor = [], [], [], []
 
         for i, frame in enumerate(meta['frames']):
             c2w = torch.from_numpy(np.array(frame['transform_matrix'])[:3, :4])
@@ -75,6 +75,7 @@ class BlenderDatasetBase():
                 img.convert("F")
                 enhancer = ImageEnhance.Brightness(img)
                 img = enhancer.enhance(factor)
+                self.all_factor.append(factor)
             except:
                 pass
 
@@ -85,11 +86,11 @@ class BlenderDatasetBase():
             self.all_fg_masks.append(img[..., -1]) # (h, w)
             self.all_images.append(img[...,:3])
 
-        self.all_c2w, self.all_images, self.all_fg_masks = \
+        self.all_c2w, self.all_images, self.all_fg_masks, self.all_factor = \
             torch.stack(self.all_c2w, dim=0).float().to(self.rank), \
             torch.stack(self.all_images, dim=0).float().to(self.rank), \
-            torch.stack(self.all_fg_masks, dim=0).float().to(self.rank)
-        
+            torch.stack(self.all_fg_masks, dim=0).float().to(self.rank), \
+            torch.stack(self.all_factor, dim=0).float().to(self.rank)
 
 class BlenderDataset(Dataset, BlenderDatasetBase):
     def __init__(self, config, split):

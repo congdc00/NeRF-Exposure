@@ -30,7 +30,6 @@ class SSNeRF1System(BaseSystem):
         return self.model(batch['rays'])
     
     def preprocess_data(self, batch, stage):
-        print(f"---------test----------- {batch.keys()}")
         if 'index' in batch: # validation / testing
             index = batch['index']
         
@@ -41,7 +40,7 @@ class SSNeRF1System(BaseSystem):
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)
         
         if stage in ['train']:
-            
+            bright_ness = self.dataset.all_factor[index]
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
             
             # Khởi tạo meshgrid
@@ -88,6 +87,7 @@ class SSNeRF1System(BaseSystem):
             rgb = rgb * fg_mask[...,None] + self.model.background_color * (1 - fg_mask[...,None])        
         
         batch.update({
+            'bright_ness': bright_ness,
             'rays': rays,
             'rgb': rgb,
             'fg_mask': fg_mask
@@ -95,7 +95,7 @@ class SSNeRF1System(BaseSystem):
     
     def training_step(self, batch, batch_idx):
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
-
+        print(f"--------------bright_ness {batch['bright_ness']}-------------")
         loss = 0.
 
         # update train_num_rays
