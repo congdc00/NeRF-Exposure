@@ -94,8 +94,8 @@ class SSNeRF1Model(BaseModel):
         positions = t_origins + t_dirs * midpoints  # positions [N_rays, 3]  == R_sample
         intervals = t_ends - t_starts
 
-        print(f"t_dirs.shape() {t_dirs.shape()}")
-        print(f"positions.shape() {positions.shape()}")
+        print(f"t_dirs.shape() {t_dirs.size()}")
+        print(f"positions.shape() {positions.size()}")
 
         # Step 1: Predict colour point
         # Forward
