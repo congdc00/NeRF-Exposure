@@ -140,6 +140,12 @@ class SSNeRF1System(BaseSystem):
 
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
+        content = "Đây là nội dung cần lưu trong file."
+
+        content = bright_ness.shape
+        file_path = "./bright_ness.txt"
+        with open(file_path, 'w') as file:
+            file.write(content)
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             # {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
