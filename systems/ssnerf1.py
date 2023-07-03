@@ -10,7 +10,7 @@ import models
 from models.ray_utils import get_rays
 import systems
 from systems.base import BaseSystem
-from systems.criterions import PSNR
+from systems.criterions import PSNR, SSIM
 
 @systems.register('ssnerf1-system')
 class SSNeRF1System(BaseSystem):
@@ -21,7 +21,8 @@ class SSNeRF1System(BaseSystem):
     """
     def prepare(self):
         self.criterions = {
-            'psnr': PSNR()
+            'psnr': PSNR(),
+            'ssim': SSIM()
         }
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
@@ -143,6 +144,7 @@ class SSNeRF1System(BaseSystem):
         shutter_speed_predict = out['bright_ness'][0]
 
         psnr = self.criterions['psnr'](image_predict.to(image_origin), image_origin)
+        ssim = self.criterions['ssim'](image_predict.to(image_origin), image_origin)
         W, H = self.dataset.img_wh
 
         torch.save(out['theta'], "theta.pt")
@@ -165,30 +167,30 @@ class SSNeRF1System(BaseSystem):
 
         return {
             'psnr': psnr,
+            'ssim':ssim,
             'index': batch['index']
         }
           
     
-    """
-    # aggregate outputs from different devices when using DP
-    def validation_step_end(self, out):
-        pass
-    """
-    
     def validation_epoch_end(self, out):
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
-            out_set = {}
+            out_set_psnr = {}
+            out_set_ssim = {}
             for step_out in out:
                 # DP
                 if step_out['index'].ndim == 1:
-                    out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                    out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                    out_set_ssim[step_out['index'].item()] = {'ssim': step_out['ssim']}
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
-                        out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-            psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
+                        out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+                        out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
+            psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
+            ssim = torch.mean(torch.stack([o['ssim'] for o in out_set_ssim.values()]))
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
+            self.log('val/ssim', ssim, prog_bar=True, rank_zero_only=True)         
 
     def test_step(self, batch, batch_idx):  
         out = self(batch)
