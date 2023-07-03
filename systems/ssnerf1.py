@@ -144,8 +144,8 @@ class SSNeRF1System(BaseSystem):
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            # {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
+            {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            #{'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
         ])
 
         return {
