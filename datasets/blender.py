@@ -68,7 +68,7 @@ class BlenderDatasetBase():
             # img = imageio.imread(img_path)
 
             ## Dang png 2
-            factor = 1.5 
+            factor = 1
             img = Image.open(img_path)
             enhancer = ImageEnhance.Brightness(img)
             img = enhancer.enhance(factor)
