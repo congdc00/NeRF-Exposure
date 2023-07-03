@@ -46,8 +46,6 @@ def main():
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     n_gpus = len(args.gpu.split(','))
 
-      
-
     # Step 3: Lấy cấu hình từ file yaml
     config = load_config(args.config, cli_args=extras)
     config.cmd_args = vars(args)
