@@ -93,7 +93,7 @@ class SSNeRF1Model(BaseModel):
         midpoints = (t_starts + t_ends) / 2.
         positions = t_origins + t_dirs * midpoints  # positions [N_rays, 3]  == R_sample
         intervals = t_ends - t_starts
-        
+
         # Step 1: Predict colour point
         # Forward
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
@@ -122,6 +122,7 @@ class SSNeRF1Model(BaseModel):
 
         # Độ sáng
         comp_rgb = real_rgb*bright_ness + self.background_color * (1.0 - opacity) 
+        real_rgb = real_rgb + self.background_color * (1.0 - opacity) 
 
         # Export 
         out = {
