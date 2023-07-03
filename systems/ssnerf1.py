@@ -145,9 +145,11 @@ class SSNeRF1System(BaseSystem):
         
          
         file_path = "./bright_ness.txt"
-        with open(file_path, 'w') as file:
+        with open(file_path, 'r') as file:
             content = file.read()
-            content = content + "\n" + str(out["bright_ness"][0])
+        with open(file_path, 'w') as file:
+            content = content + "\n" + str(shutter_speed_predict)
+            file.write(content)
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             # {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
