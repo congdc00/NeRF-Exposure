@@ -75,7 +75,7 @@ class BlenderDatasetBase():
                 img.convert("F")
                 enhancer = ImageEnhance.Brightness(img)
                 img = enhancer.enhance(factor)
-                self.all_factor.append([factor])
+                self.all_factor.append(torch.tensor(factor))
             except:
                 pass
 
