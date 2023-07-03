@@ -41,13 +41,13 @@ class SSNeRF1System(BaseSystem):
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)
         
         if stage in ['train']:
-            bright_ness = []
-            for i in index.tolist():
-                bright_ness.append(self.dataset.all_factor[i])
+            # bright_ness = []
+            # for i in index.tolist():
+            #     bright_ness.append(self.dataset.all_factor[i])
                 
-            batch.update({
-                'bright_ness': bright_ness
-            })
+            # batch.update({
+            #     'bright_ness': bright_ness
+            # })
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
             
             # Khởi tạo meshgrid
