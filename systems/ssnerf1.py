@@ -32,7 +32,7 @@ class SSNeRF1System(BaseSystem):
     def preprocess_data(self, batch, stage):
         if 'index' in batch: # validation / testing
             index = batch['index']
-            print(f"index {batch['index']}")
+            print(f"index {batch.keys()}")
         else:
             if self.config.model.batch_image_sampling:
                 index = torch.randint(0, len(self.dataset.all_images), size=(self.train_num_rays,), device=self.dataset.all_images.device)
