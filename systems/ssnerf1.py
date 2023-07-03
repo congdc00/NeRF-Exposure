@@ -5,6 +5,7 @@ from torch_efficient_distloss import flatten_eff_distloss
 import imageio
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_debug
+import os
 
 import models
 from models.ray_utils import get_rays
@@ -154,8 +155,10 @@ class SSNeRF1System(BaseSystem):
         
          
         file_path = "./log.txt"
-        with open(file_path, 'r') as file:
-            content = file.read()
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                content = file.read()
+                
         with open(file_path, 'w') as file:
             content = content + "\n" + str(psnr)
             file.write(content)
