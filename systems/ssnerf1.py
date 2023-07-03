@@ -32,7 +32,7 @@ class SSNeRF1System(BaseSystem):
     def preprocess_data(self, batch, stage):
         if 'index' in batch: # validation / testing
             index = batch['index']
-            print(f"index {index}")
+            print(f"index {batch['index']}")
         else:
             if self.config.model.batch_image_sampling:
                 index = torch.randint(0, len(self.dataset.all_images), size=(self.train_num_rays,), device=self.dataset.all_images.device)
@@ -135,17 +135,19 @@ class SSNeRF1System(BaseSystem):
         image_predict = out['comp_rgb']
         color_predict = out["real_rgb"]
         density_predict = out['depth']
+        shutter_speed_predict = out['bright_ness'][0]
 
         psnr = self.criterions['psnr'](image_predict.to(image_origin), image_origin)
         W, H = self.dataset.img_wh
 
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
-        print(f"bright_ness {out['bright_ness'][0]}")
-        content = str(out["bright_ness"][0]) 
+        
+         
         file_path = "./bright_ness.txt"
         with open(file_path, 'w') as file:
-            file.write(content)
+            content = file.read()
+            content = content + "\n" + str(out["bright_ness"][0])
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             # {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
