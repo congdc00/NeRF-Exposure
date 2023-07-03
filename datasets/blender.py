@@ -7,7 +7,7 @@ import cv2
 import torch
 from torch.utils.data import Dataset, DataLoader, IterableDataset
 import torchvision.transforms.functional as TF
-import imageio
+import imageio.v3 as iio
 import pytorch_lightning as pl
 
 import datasets
@@ -65,7 +65,7 @@ class BlenderDatasetBase():
             # img = Image.fromarray(color_coverted)
 
             # Dang png 1
-            # img = imageio.imread(img_path, format='EXR-FI')
+            img = iio.imread(img_path)
 
             ## Dang png 2
             img = Image.open(img_path)
