@@ -60,7 +60,7 @@ class BlenderDatasetBase():
             img_path = os.path.join(self.config.root_dir, f"{frame['file_path']}.png")
             
             ## Dang exr
-            # img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+            # img = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH  | cv2.IMREAD_UNCHANGED)
             # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             # img = Image.fromarray(color_coverted)
 
@@ -68,10 +68,16 @@ class BlenderDatasetBase():
             # img = imageio.imread(img_path)
 
             ## Dang png 2
-            factor = 1.2
+            
             img = Image.open(img_path)
-            enhancer = ImageEnhance.Brightness(img)
-            img = enhancer.enhance(factor)
+            try:
+                factor = float(frame['factor'])
+                print(factor)
+                enhancer = ImageEnhance.Brightness(img)
+                img = enhancer.enhance(factor)
+            except:
+                pass
+
             img = img.resize(self.img_wh, Image.BICUBIC)
 
             img = TF.to_tensor(img).permute(1, 2, 0) # (4, h, w) => (h, w, 4)
