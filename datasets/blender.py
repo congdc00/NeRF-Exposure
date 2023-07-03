@@ -86,11 +86,10 @@ class BlenderDatasetBase():
             self.all_fg_masks.append(img[..., -1]) # (h, w)
             self.all_images.append(img[...,:3])
 
-        self.all_c2w, self.all_images, self.all_fg_masks, self.all_factor = \
+        self.all_c2w, self.all_images, self.all_fg_masks = \
             torch.stack(self.all_c2w, dim=0).float().to(self.rank), \
             torch.stack(self.all_images, dim=0).float().to(self.rank), \
-            torch.stack(self.all_fg_masks, dim=0).float().to(self.rank), \
-            torch.stack(self.all_factor, dim=0).float().to(self.rank)
+            torch.stack(self.all_fg_masks, dim=0).float().to(self.rank)
 
 class BlenderDataset(Dataset, BlenderDatasetBase):
     def __init__(self, config, split):
