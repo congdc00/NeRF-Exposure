@@ -232,7 +232,7 @@ class NeuSModel(BaseModel):
             sdf, sdf_grad, feature = self.geometry(positions, with_grad=True, with_feature=True)
         normal = F.normalize(sdf_grad, p=2, dim=-1)
         alpha = self.get_alpha(sdf, normal, t_dirs, dists)[...,None]
-        rgb, _ = self.texture(feature, t_dirs, normal)
+        rgb = self.texture(feature, t_dirs, normal)
 
         weights = render_weight_from_alpha(alpha, ray_indices=ray_indices, n_rays=n_rays)
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
