@@ -72,7 +72,6 @@ class BlenderDatasetBase():
             img = Image.open(img_path)
             try:
                 factor = float(frame['factor'])
-                print(factor)
                 img.convert("F")
                 enhancer = ImageEnhance.Brightness(img)
                 img = enhancer.enhance(factor)
