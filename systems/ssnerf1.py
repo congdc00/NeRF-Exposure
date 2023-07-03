@@ -158,7 +158,9 @@ class SSNeRF1System(BaseSystem):
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
                 content = file.read()
-                
+        else:
+            content = ""
+
         with open(file_path, 'w') as file:
             content = content + "\n" + str(psnr)
             file.write(content)
