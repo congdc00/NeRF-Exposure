@@ -167,7 +167,7 @@ class SSNeRF1System(BaseSystem):
 
         return {
             'psnr': psnr,
-            'ssim':ssim,
+            'ssim': ssim,
             'index': batch['index']
         }
           
@@ -189,8 +189,9 @@ class SSNeRF1System(BaseSystem):
                         out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
             psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
             ssim = torch.mean(torch.stack([o['ssim'] for o in out_set_ssim.values()]))
+            self.log('val/ssim', ssim, prog_bar=True, rank_zero_only=True) 
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
-            self.log('val/ssim', ssim, prog_bar=True, rank_zero_only=True)         
+                    
 
     def test_step(self, batch, batch_idx):  
         out = self(batch)
