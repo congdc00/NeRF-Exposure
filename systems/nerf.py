@@ -146,17 +146,6 @@ class NeRFSystem(BaseSystem):
 
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
-
-        file_path = "./log_psnr.txt"
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as file:
-                content = file.read()
-        else:
-            content = ""
-
-        with open(file_path, 'w') as file:
-            content = content + "\n" + str(psnr.tolist())
-            file.write(content)
         
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
@@ -188,6 +177,17 @@ class NeRFSystem(BaseSystem):
                     for oi, index in enumerate(step_out['index']):
                         out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
             psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
+        
+            file_path = "./log_psnr.txt"
+            if os.path.exists(file_path):
+                with open(file_path, 'r') as file:
+                    content = file.read()
+            else:
+                content = ""
+
+            with open(file_path, 'w') as file:
+                content = content + "\n" + str(psnr.tolist())
+                file.write(content)
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
 
     def test_step(self, batch, batch_idx):  
