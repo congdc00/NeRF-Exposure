@@ -100,7 +100,7 @@ class SSNeRF1Model(BaseModel):
         rgb = self.texture(cor_feature, positions) # Dự đoán ra màu sắc
         
         
-        bright_ness = self.shutter_speed(cor_feature,t_origins)
+        bright_ness = self.shutter_speed(t_origins)
 
         print(f"+++++ {bright_ness[0]} +++++++")
 
