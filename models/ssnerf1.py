@@ -100,9 +100,9 @@ class SSNeRF1Model(BaseModel):
         rgb = self.texture(cor_feature, positions) # Dự đoán ra màu sắc
         print(f"rgb {rgb.shape}")
         
-        bright_ness = self.shutter_speed(t_origins)
+        bright_ness = self.shutter_speed(t_origins[0])
         print(f"bright_ness {bright_ness.shape}")
-        print(f"+++++ {bright_ness[0]} +++++++")
+        print(f"+++++ {bright_ness.shape} +++++++")
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
