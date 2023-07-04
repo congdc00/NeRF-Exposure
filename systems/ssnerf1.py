@@ -145,7 +145,7 @@ class SSNeRF1System(BaseSystem):
         density_predict = out['depth']
         # shutter_speed_predict = out['bright_ness'][0]
 
-        psnr = self.criterions['psnr'](image_predict.to(image_origin), image_origin)
+        psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
         # ssim = self.criterions['ssim'](image_predict.to(image_origin), image_origin)
         W, H = self.dataset.img_wh
 

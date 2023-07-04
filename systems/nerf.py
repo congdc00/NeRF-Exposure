@@ -186,7 +186,7 @@ class NeRFSystem(BaseSystem):
                 content = ""
 
             with open(file_path, 'w') as file:
-                content = content + "\n" + str(psnr.tolist())
+                content = content + "\n" + str(round(psnr.tolist(),2))
                 file.write(content)
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
 
