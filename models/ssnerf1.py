@@ -108,7 +108,7 @@ class SSNeRF1Model(BaseModel):
         # bright_ness torch.Size([97790, 1])
 
         # Step 2: Rendering 
-        real_rgb = real_rgb*bright_ness
+        rgb = rgb*bright_ness
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
         # Độ mờ
