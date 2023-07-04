@@ -108,13 +108,14 @@ class SSNeRF1Model(BaseModel):
         # bright_ness torch.Size([97790, 1])
 
         # Step 2: Rendering 
-        rgb = rgb*bright_ness
+        new_rgb = rgb*bright_ness
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
         # Độ mờ
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         # Màu sắc dự đoán ra
-        comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #([Num_points, 1])
+        real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) 
+        comp_rgb = accumulate_along_rays(weights, ray_indices, values=new_rgb, n_rays=n_rays) #([Num_points, 1])
         # depth
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
 
