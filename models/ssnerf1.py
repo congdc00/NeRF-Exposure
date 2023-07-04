@@ -99,8 +99,10 @@ class SSNeRF1Model(BaseModel):
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(cor_feature, positions) # Dự đoán ra màu sắc
         
+        
         bright_ness_out = self.shutter_speed(t_origins)
         bright_ness = bright_ness_out[0] # lấy ra shutter speed đại diện cho ảnh
+        print(f"+++++ {bright_ness} +++++++")
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
