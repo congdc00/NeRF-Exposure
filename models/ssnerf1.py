@@ -98,10 +98,8 @@ class SSNeRF1Model(BaseModel):
         # Forward
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(cor_feature, positions) # Dự đoán ra màu sắc
-        print(f"rgb {rgb.shape}")
         
         bright_ness = self.shutter_speed(t_origins[0])
-        print(f"bright_ness {bright_ness.shape}")
         print(f"+++++ {bright_ness.shape} +++++++")
 
         # network_inp torch.Size([97790, 32])
@@ -118,18 +116,17 @@ class SSNeRF1Model(BaseModel):
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         # Màu sắc dự đoán ra
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #([Num_points, 1])
-        print(f"real_rgb {real_rgb.shape}")
         # depth
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
 
         # Độ sáng
-        comp_rgb = real_rgb*bright_ness[0] + self.background_color * (1.0 - opacity) 
+        comp_rgb = real_rgb*bright_ness + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity) 
 
         # Export 
         out = {
             'comp_rgb': comp_rgb,
-            'bright_ness':bright_ness[0],
+            'bright_ness':bright_ness,
             "real_rgb": real_rgb,
             'opacity': opacity,
             'depth': depth,
