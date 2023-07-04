@@ -83,8 +83,8 @@ class SSNeRF1Model(BaseModel):
                 near_plane=self.near_plane, far_plane=self.far_plane,
                 render_step_size=self.render_step_size,
                 stratified=self.randomized,
-                cone_angle=self.cone_angle,
-                alpha_thresh=0.0
+                cone_angle=self.cone_angle, 
+                alpha_thre=0.0
             )   
             
         ray_indices = ray_indices.long()
