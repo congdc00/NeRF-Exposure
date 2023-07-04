@@ -84,7 +84,7 @@ class SSNeRF1Model(BaseModel):
                 render_step_size=self.render_step_size,
                 stratified=self.randomized,
                 cone_angle=self.cone_angle,
-                alpha_thre=0.0
+                alpha_thresh=0.0
             )   
             
         ray_indices = ray_indices.long()
