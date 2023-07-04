@@ -24,7 +24,7 @@ class VolumeBrightness(nn.Module):
         self.encoding = encoding
         self.network = network
     
-    def forward(self, cor_feature, origins, *args):
+    def forward(self, origins, *args):
         """
         Args:
             origins torch.Size([97790, 3])
@@ -35,7 +35,8 @@ class VolumeBrightness(nn.Module):
         origins_embd = self.encoding(origins.view(-1, self.n_ori_dims)) # origins_embd torch.Size([97790, 16])
         
         network_inp = torch.cat([origins_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1) #([97790, 32])
-        brightness = (network_inp).view(*cor_feature.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
+        print(f"network_inp {network_inp.shape()}")
+        brightness = (network_inp).view(*origins.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
 
         # Dung cho neus
         if 'brightness_activation' in self.config:
