@@ -151,18 +151,6 @@ class SSNeRF1System(BaseSystem):
 
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
-        
-         
-        file_path = "./log_psnr.txt"
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as file:
-                content = file.read()
-        else:
-            content = ""
-
-        with open(file_path, 'w') as file:
-            content = content + str(round(psnr.tolist(),2)) + "\n"
-            file.write(content)
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             # {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
@@ -195,6 +183,17 @@ class SSNeRF1System(BaseSystem):
                         # out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
             psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
             # ssim = torch.mean(torch.stack([o['ssim'] for o in out_set_ssim.values()]))
+
+            file_path = "./log_psnr.txt"
+            if os.path.exists(file_path):
+                with open(file_path, 'r') as file:
+                    content = file.read()
+            else:
+                content = ""
+            with open(file_path, 'w') as file:
+                content = content + str(round(psnr.tolist(),2)) + "\n"
+                file.write(content)
+
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
             # self.log('val/ssim', ssim, prog_bar=True, rank_zero_only=True)         
 
