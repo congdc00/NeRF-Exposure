@@ -143,7 +143,7 @@ class SSNeRF1System(BaseSystem):
         image_predict = out['comp_rgb']
         color_predict = out["real_rgb"]
         density_predict = out['depth']
-        shutter_speed_predict = out['bright_ness'][0]
+        # shutter_speed_predict = out['bright_ness'][0]
 
         psnr = self.criterions['psnr'](image_predict.to(image_origin), image_origin)
         # ssim = self.criterions['ssim'](image_predict.to(image_origin), image_origin)
@@ -170,7 +170,7 @@ class SSNeRF1System(BaseSystem):
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
             out_set_psnr = {}
-            out_set_ssim = {}
+            # out_set_ssim = {}
             for step_out in out:
                 # DP
                 if step_out['index'].ndim == 1:
