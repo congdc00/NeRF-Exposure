@@ -44,7 +44,7 @@ class SSNeRF1System(BaseSystem):
             # bright_ness = []
             # for i in index.tolist():
             #     bright_ness.append(self.dataset.all_factor[i])
-                
+            
             # batch.update({
             #     'bright_ness': bright_ness
             # })
