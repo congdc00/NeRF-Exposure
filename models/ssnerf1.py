@@ -121,10 +121,10 @@ class SSNeRF1Model(BaseModel):
         bright_ness = accumulate_along_rays(weight_fake, ray_indices, values=bright_ness, n_rays=n_rays) 
 
         # Độ sáng
-        comp_rgb = real_rgb * bright_ness #+ self.background_color * (1.0 - opacity) 
+        comp_rgb = real_rgb * bright_ness + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity) 
         # print(f"+++++++++ {bright_ness[12]} ++++++++")
-        # print(f"--------- {comp_rgb[12]}--------")
+        print(f"--------- {comp_rgb[12]}--------")
         # Export 
         out = {
             'comp_rgb': comp_rgb,
@@ -178,6 +178,6 @@ class SSNeRF1Model(BaseModel):
             _, feature = chunk_batch(self.geometry, export_config.chunk_size, False, mesh['v_pos'].to(self.rank))
             viewdirs = torch.zeros(feature.shape[0], 3).to(feature)
             viewdirs[...,2] = -1. # set the viewing directions to be -z (looking down)
-            rgb, _ = self.texture(feature, viewdirs).clamp(0,1)
+            rgb = self.texture(feature, viewdirs).clamp(0,1)
             mesh['v_rgb'] = rgb.cpu()
         return mesh
