@@ -110,6 +110,10 @@ class SSNeRF1System(BaseSystem):
             train_num_rays = int(self.train_num_rays * (self.train_num_samples / out['num_samples'].sum().item()))        
             self.train_num_rays = min(int(self.train_num_rays * 0.9 + train_num_rays * 0.1), self.config.model.max_train_num_rays)
         
+        
+        print(f"valid 1 {out['comp_rgb'].shape}")
+        print(f"valid 2 {out['comp_rgb'][out['rays_valid']].shape}")
+        print(f"valid 3 {out['comp_rgb'][out['rays_valid'][...,0]].shape}")
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
         self.log('train/loss_rgb', loss_rgb)
         loss += loss_rgb * self.C(self.config.system.loss.lambda_rgb)
