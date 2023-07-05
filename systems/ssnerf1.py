@@ -112,7 +112,7 @@ class SSNeRF1System(BaseSystem):
         
         
         print(f"valid 1 {out['comp_rgb'].shape}")
-        print(f"valid 2 {out['comp_rgb'][out['rays_valid']].shape}")
+        print(f"valid 2 {out['rays_valid'][...,0].shape}")
         print(f"valid 3 {out['comp_rgb'][out['rays_valid'][...,0]].shape}")
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
         self.log('train/loss_rgb', loss_rgb)
