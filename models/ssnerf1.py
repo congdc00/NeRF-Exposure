@@ -109,7 +109,9 @@ class SSNeRF1Model(BaseModel):
 
         # Step 2: Rendering 
         print(f"shape {bright_ness.shape}")
+
         fake_brightness = torch.ones_like(bright_ness)
+        print(f"fake_brightness {fake_brightness.shape}")
         new_rgb = rgb*fake_brightness
        
         # Trọng số
