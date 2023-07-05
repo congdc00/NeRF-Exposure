@@ -112,10 +112,10 @@ class SSNeRF1System(BaseSystem):
         
         
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
-        print(f"loss_rgb {loss_rgb}")
+        # print(f"loss_rgb {loss_rgb}")
         self.log('train/loss_rgb', loss_rgb)
         loss += loss_rgb * self.C(self.config.system.loss.lambda_rgb)
-        print(f"loss_rgb 2 {loss_rgb}")
+        # print(f"loss_rgb 2 {loss_rgb}")
         # distortion loss proposed in MipNeRF360
         if self.C(self.config.system.loss.lambda_distortion) > 0:
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
@@ -123,8 +123,8 @@ class SSNeRF1System(BaseSystem):
             loss += loss_distortion * self.C(self.config.system.loss.lambda_distortion)
 
         losses_model_reg = self.model.regularizations(out)
-        print(f"losses_model_reg {losses_model_reg}")
-        
+        # print(f"losses_model_reg {losses_model_reg}")
+
         for name, value in losses_model_reg.items():
             self.log(f'train/loss_{name}', value)
 
