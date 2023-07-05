@@ -108,6 +108,7 @@ class SSNeRF1Model(BaseModel):
         # bright_ness torch.Size([97790, 1])
 
         # Step 2: Rendering 
+        print(f"shape {bright_ness.shape}")
         fake_brightness = torch.ones_like(bright_ness)
         new_rgb = rgb*fake_brightness
        
