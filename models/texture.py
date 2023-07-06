@@ -23,7 +23,7 @@ class VolumeRadiance(nn.Module):
         self.encoding = encoding
         self.network = network
     
-    def forward(self, features, dirs, *args):
+    def forward(self, features, *args):
         """
         feature [num_points, 16]"""
         # dirs = (dirs + 1.) / 2. # (-1, 1) => (0, 1)
