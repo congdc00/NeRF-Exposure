@@ -101,7 +101,7 @@ class SSNeRF3Model(BaseModel):
         # Forward
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
 
-        if epoch%2==0:
+        if self.epoch%2==0:
             rgb_train = True
             bright_ness_train = False
         else:
