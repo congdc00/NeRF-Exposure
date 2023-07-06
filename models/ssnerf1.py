@@ -130,8 +130,8 @@ class SSNeRF1Model(BaseModel):
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity) 
 
-        print(f"-------------{comp_rgb[12]}----------")
-        print(f"-------------{bright_ness[12]}----------")
+        print(f"------real_rgb-----{real_rgb[12]}----------")
+        print(f"-----comp_rgb-----{comp_rgb[12]}----------")
         
         # Export 
         out = {
