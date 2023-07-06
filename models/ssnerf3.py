@@ -109,7 +109,7 @@ class SSNeRF3Model(BaseModel):
             bright_ness_train = True
 
         rgb = self.texture(rgb_train, cor_feature, positions) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(bright_ness_train, t_origins)
+        bright_ness = self.shutter_speed(t_origins, bright_ness_train)
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
