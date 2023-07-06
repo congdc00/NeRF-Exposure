@@ -23,8 +23,7 @@ class VolumeRadiance(nn.Module):
         self.n_input_dims = self.config.input_feature_dim + encoding.n_output_dims
         
         network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config) 
-        for param in network.parameters():
-            param.requires_grad = False   
+        
         self.encoding = encoding
         self.network = network
     
@@ -38,7 +37,8 @@ class VolumeRadiance(nn.Module):
         network_inp = torch.cat([features.view(-1, features.shape[-1]), dirs_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
 
         # freeze
-        
+        for param in network.parameters():
+            param.requires_grad = False   
         
 
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
