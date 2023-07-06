@@ -42,8 +42,8 @@ class SSNeRF3System(BaseSystem):
             else:
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)
         
-        SSNeRF3System.epoch += 1
-        print(f"epoch {SSNeRF3System.epoch}")
+        self.epoch += 1
+        print(f"epoch {self.epoch}")
 
         if stage in ['train']:
             # bright_ness = []
