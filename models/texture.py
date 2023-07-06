@@ -37,12 +37,15 @@ class VolumeRadiance(nn.Module):
 
         # freeze
         for param in self.network.parameters():
-            param.requires_grad = is_freeze
+            param.requires_grad = False
         
 
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
         if 'color_activation' in self.config:
             color = get_activation(self.config.color_activation)(color)
+
+        for param in self.network.parameters():
+            param.requires_grad = True
         return color
 
     def update_step(self, epoch, global_step):
