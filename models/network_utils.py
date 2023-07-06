@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import tinycudann as tcnn
-
+from loguru import logger
 from pytorch_lightning.utilities.rank_zero import rank_zero_debug, rank_zero_info
 
 from utils.misc import config_to_primitive, get_rank
@@ -175,11 +175,15 @@ def sphere_init_tcnn_network(n_input_dims, n_output_dims, config, network):
 
 def get_mlp(n_input_dims, n_output_dims, config):
     if config.otype == 'VanillaMLP':
+        logger.info("use VanillaMLP ")
         network = VanillaMLP(n_input_dims, n_output_dims, config_to_primitive(config))
     else:
         with torch.cuda.device(get_rank()):
             network = tcnn.Network(n_input_dims, n_output_dims, config_to_primitive(config))
+            logger.info("use MLP cuda ")
+
             if config.get('sphere_init', False):
+                 logger.info("sphere_init")
                 sphere_init_tcnn_network(n_input_dims, n_output_dims, config, network)
     return network
 
