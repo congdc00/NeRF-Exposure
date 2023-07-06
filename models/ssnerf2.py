@@ -101,27 +101,27 @@ class SSNeRF2Model(BaseModel):
         
         # positions [N_rays, 3], density [N_rays], feature [N_rays, 16]16 là số chiều được mã hoá ra
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích
-        rgb, dir_feature = self.texture(cor_feature, t_origins) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed( t_origins)
+        rgb, dir_feature = self.texture(cor_feature, positions) # Dự đoán ra màu sắc
 
+        new_rgb = rgb*0.5
         # Step 2: Rendering 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
         # Độ mờ
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         # Màu sắc dự đoán ra
-        comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #([Num_points, 1])
-        # Độ sáng
-        bright_ness = accumulate_along_rays(weights, ray_indices, values=bright_ness, n_rays=n_rays)
+        real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
+        comp_rgb = accumulate_along_rays(weights, ray_indices, values=new_rgb, n_rays=n_rays) #([Num_points, 1])
 
-        comp_rgb = comp_rgb*bright_ness
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)   
+        real_rgb = real_rgb + self.background_color * (1.0 - opacity)  
 
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
 
         # Export 
         out = {
             'comp_rgb': comp_rgb,
+            'real_rgb': real_rgb,
             'opacity': opacity,
             'depth': depth,
             'rays_valid': opacity > 0,

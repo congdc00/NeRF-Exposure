@@ -129,7 +129,7 @@ class SSNeRF2System(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         out = self(batch)
-        psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
+        psnr = self.criterions['psnr'](out['real_rgb'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
 
         
