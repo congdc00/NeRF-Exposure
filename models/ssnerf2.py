@@ -16,7 +16,6 @@ class SSNeRF2Model(BaseModel):
     def setup(self):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
-        self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
 
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
@@ -164,7 +163,6 @@ class SSNeRF2Model(BaseModel):
         losses = {}
         losses.update(self.geometry.regularizations(out))
         losses.update(self.texture.regularizations(out))
-        losses.update(self.shutter_speed.regularizations(out))
         return losses
 
     @torch.no_grad()
