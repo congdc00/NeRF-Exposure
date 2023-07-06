@@ -11,6 +11,7 @@ from systems.utils import update_module_step
 
 @models.register('volume-radiance')
 class VolumeRadiance(nn.Module):
+    
     def __init__(self, config):
         super(VolumeRadiance, self).__init__()
         self.config = config
@@ -18,7 +19,7 @@ class VolumeRadiance(nn.Module):
         self.n_output_dims = 3
 
         encoding = get_encoding(self.n_dir_dims, self.config.dir_encoding_config)
-
+        self.epoch = 0
         self.n_input_dims = self.config.input_feature_dim + encoding.n_output_dims
         
         network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)    
@@ -29,6 +30,9 @@ class VolumeRadiance(nn.Module):
         """
         feature [num_points, 16]
         """
+        epoch += 1
+        print(f"epoch {epoch}")
+        
         dirs = (dirs + 1.) / 2. # (-1, 1) => (0, 1)
         dirs_embd = self.encoding(dirs.view(-1, self.n_dir_dims)) #[num_points, 16]
         network_inp = torch.cat([features.view(-1, features.shape[-1]), dirs_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
