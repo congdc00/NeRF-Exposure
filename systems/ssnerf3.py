@@ -20,7 +20,7 @@ class SSNeRF3System(BaseSystem):
     1. self.print: correctly handle progress bar
     2. rank_zero_info: use the logging module
     """
-    epoch = 0
+   
 
     def prepare(self):
         self.criterions = {
@@ -42,8 +42,7 @@ class SSNeRF3System(BaseSystem):
             else:
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)
         
-        self.epoch += 1
-        print(f"epoch {self.epoch}")
+        
 
         if stage in ['train']:
             # bright_ness = []

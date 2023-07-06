@@ -13,6 +13,7 @@ from nerfacc import ContractionType, OccupancyGrid, ray_marching, render_weight_
 
 @models.register('ssnerf3')
 class SSNeRF3Model(BaseModel):
+    epoch = 0
     def setup(self):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
@@ -86,7 +87,10 @@ class SSNeRF3Model(BaseModel):
                 cone_angle=self.cone_angle, 
                 alpha_thre=0.0
             )   
-            
+        
+        self.epoch += 1
+        print(f"epoch {self.epoch}")
+
         ray_indices = ray_indices.long()
         t_origins = rays_o[ray_indices]
         t_dirs = rays_d[ray_indices]
