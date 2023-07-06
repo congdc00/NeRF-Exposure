@@ -101,8 +101,8 @@ class SSNeRF2Model(BaseModel):
         
         # positions [N_rays, 3], density [N_rays], feature [N_rays, 16]16 là số chiều được mã hoá ra
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích
-        rgb, dir_feature = self.texture(cor_feature, t_dirs) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(dir_feature, t_origins)
+        rgb, dir_feature = self.texture(cor_feature, t_origins) # Dự đoán ra màu sắc
+        bright_ness = self.shutter_speed( t_origins)
 
         # Step 2: Rendering 
         # Trọng số
