@@ -128,7 +128,6 @@ class SSNeRF1Model(BaseModel):
 
         #Độ sáng
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
-        print(f"comp_rgb {comp_rgb.shape}")
         real_rgb = real_rgb + self.background_color * (1.0 - opacity) 
 
         max_value, max_index = torch.max(new_rgb, dim=0)
