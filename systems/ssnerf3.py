@@ -20,7 +20,7 @@ class SSNeRF3System(BaseSystem):
     1. self.print: correctly handle progress bar
     2. rank_zero_info: use the logging module
     """
-    self.epoch = 0
+    epoch = 0
 
     def prepare(self):
         self.criterions = {
@@ -44,7 +44,7 @@ class SSNeRF3System(BaseSystem):
         
         epoch += 1
         print(f"epoch {epoch}")
-        
+
         if stage in ['train']:
             # bright_ness = []
             # for i in index.tolist():
