@@ -132,10 +132,10 @@ class SSNeRF1Model(BaseModel):
 
         print(f"------real_rgb-----{real_rgb[12]}----------")
         print(f"-----comp_rgb-----{comp_rgb[12]}----------")
-        k = 5067
-        print(f"_-----------------{rgb[5067]}-----------------")
-        print(f"------------------{new_rgb[5067]}---------------")
-        print(f"-----bright_ness--{bright_ness[5067]} and {bright_ness[6001]} ----------------")
+        max_value, max_index = torch.max(new_rgb, dim=0)
+        print(f"_-----------------{rgb[max_index]}-----------------")
+        print(f"-----new_rgb-----{new_rgb[max_index]}---------------")
+        print(f"-----bright_ness--{bright_ness[max_index]} and {bright_ness[6001]} ----------------")
         # Export 
         out = {
             'comp_rgb': comp_rgb,
