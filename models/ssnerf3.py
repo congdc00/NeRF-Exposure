@@ -89,7 +89,6 @@ class SSNeRF3Model(BaseModel):
             )   
         
         self.epoch += 1
-        print(f"epoch {self.epoch}")
 
         ray_indices = ray_indices.long()
         t_origins = rays_o[ray_indices]
@@ -101,8 +100,16 @@ class SSNeRF3Model(BaseModel):
         # Step 1: Predict colour point
         # Forward
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
-        rgb = self.texture(cor_feature, positions) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(t_origins)
+
+        if epoch%2==0:
+            rgb_train = True
+            bright_ness_train = False
+        else:
+            rgb_train = False
+            bright_ness_train = True
+
+        rgb = self.texture(is_freeze = rgb_train, cor_feature, positions) # Dự đoán ra màu sắc
+        bright_ness = self.shutter_speed(is_freeze = bright_ness_train, t_origins)
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
