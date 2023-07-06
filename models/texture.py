@@ -22,11 +22,9 @@ class VolumeRadiance(nn.Module):
         
         self.n_input_dims = self.config.input_feature_dim + encoding.n_output_dims
         
-        network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)  
-        for param in network.parameters():
-            param.requires_grad = False  
+        # network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)    
         self.encoding = encoding
-        self.network = network
+        # self.network = network
     
     def forward(self, is_freeze, features, dirs, *args):
         """
@@ -39,7 +37,7 @@ class VolumeRadiance(nn.Module):
 
         # freeze
         for param in self.network.parameters():
-            param.requires_grad = is_freeze
+            param.requires_grad = False
         
 
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
