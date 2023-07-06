@@ -16,7 +16,7 @@ class SSNeRF1Model(BaseModel):
     def setup(self):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
-        self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
+        # self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
 
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
@@ -49,7 +49,7 @@ class SSNeRF1Model(BaseModel):
         # Lan truyen nguoc
         update_module_step(self.geometry, epoch, global_step)
         update_module_step(self.texture, epoch, global_step)
-        update_module_step(self.shutter_speed, epoch, global_step)
+        # update_module_step(self.shutter_speed, epoch, global_step)
 
         def occ_eval_fn(x):
             density, _ = self.geometry(x)
@@ -98,7 +98,7 @@ class SSNeRF1Model(BaseModel):
         # Forward
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(True, cor_feature, positions) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(False, t_origins)
+        # bright_ness = self.shutter_speed(False, t_origins)
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
@@ -112,7 +112,7 @@ class SSNeRF1Model(BaseModel):
         
         # fake_brightness = torch.ones_like(rgb)
         # print(f"fake_brightness {fake_brightness.shape}")
-        new_rgb = rgb*bright_ness*0.5
+        new_rgb = rgb*0.5
 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
@@ -174,7 +174,7 @@ class SSNeRF1Model(BaseModel):
         losses = {}
         losses.update(self.geometry.regularizations(out))
         losses.update(self.texture.regularizations(out))
-        losses.update(self.shutter_speed.regularizations(out))
+        # losses.update(self.shutter_speed.regularizations(out))
         return losses
 
     @torch.no_grad()
