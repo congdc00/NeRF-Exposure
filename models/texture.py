@@ -22,7 +22,9 @@ class VolumeRadiance(nn.Module):
         
         self.n_input_dims = self.config.input_feature_dim + encoding.n_output_dims
         
-        network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)    
+        network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)  
+        for param in network.parameters():
+            param.requires_grad = False  
         self.encoding = encoding
         self.network = network
     
@@ -37,15 +39,12 @@ class VolumeRadiance(nn.Module):
 
         # freeze
         for param in self.network.parameters():
-            param.requires_grad = False
+            param.requires_grad = is_freeze
         
 
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
         if 'color_activation' in self.config:
             color = get_activation(self.config.color_activation)(color)
-
-        for param in self.network.parameters():
-            param.requires_grad = True
         return color
 
     def update_step(self, epoch, global_step):
