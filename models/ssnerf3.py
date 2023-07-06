@@ -133,13 +133,7 @@ class SSNeRF3Model(BaseModel):
         #Độ sáng
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity) 
-
-        print(f"------real_rgb-----{real_rgb[12]}----------")
-        print(f"-----comp_rgb-----{comp_rgb[12]}----------")
         max_value, max_index = torch.max(new_rgb, dim=0)
-        print(f"_-----------------{rgb[max_index]}-----------------")
-        print(f"-----new_rgb-----{new_rgb[max_index]}---------------")
-        print(f"-----bright_ness--{bright_ness[max_index]} and {bright_ness[6001]} ----------------")
         # Export 
         out = {
             'comp_rgb': comp_rgb,
