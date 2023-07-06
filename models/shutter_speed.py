@@ -40,7 +40,7 @@ class VolumeBrightness(nn.Module):
             for param in self.network.parameters():
                 param.requires_grad = True
         else: 
-            for param in model.parameters():
+            for param in self.network.parameters():
                 param.requires_grad = False
 
         brightness = self.network(network_inp).view(*origins.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
