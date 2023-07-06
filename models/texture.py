@@ -26,7 +26,7 @@ class VolumeRadiance(nn.Module):
         self.encoding = encoding
         self.network = network
     
-    def forward(self, features, dirs, *args):
+    def forward(self, is_freeze, features, dirs, *args):
         """
         feature [num_points, 16]
         """
@@ -36,8 +36,9 @@ class VolumeRadiance(nn.Module):
         network_inp = torch.cat([features.view(-1, features.shape[-1]), dirs_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
 
         #freeze
-        for param in self.network.parameters():
-            param.requires_grad = True
+        if is_freeze:
+            for param in self.network.parameters():
+                param.requires_grad = True
 
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
         if 'color_activation' in self.config:

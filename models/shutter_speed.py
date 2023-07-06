@@ -35,6 +35,11 @@ class VolumeBrightness(nn.Module):
         origins_embd = self.encoding(origins.view(-1, self.n_ori_dims)) # origins_embd torch.Size([97790, 16])
         
         network_inp = torch.cat([origins_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1) #([97790, 32])
+
+        if is_freeze:
+            for param in self.network.parameters():
+                param.requires_grad = True
+
         brightness = self.network(network_inp).view(*origins.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
 
         # Dung cho neus
