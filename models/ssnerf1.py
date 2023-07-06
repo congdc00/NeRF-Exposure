@@ -132,6 +132,8 @@ class SSNeRF1Model(BaseModel):
 
         print(f"------real_rgb-----{real_rgb[12]}----------")
         print(f"-----comp_rgb-----{comp_rgb[12]}----------")
+        print(f"_-----------------{rgb[0]}-----------------")
+        print(f"------------------{new_rgb[0]}---------------")
         print(f"-----bright_ness--{bright_ness[0]} and {bright_ness[12]} ----------------")
         # Export 
         out = {
