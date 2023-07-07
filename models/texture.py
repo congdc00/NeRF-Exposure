@@ -40,6 +40,7 @@ class VolumeRadiance(nn.Module):
         for param in self.network.parameters():
             param.requires_grad = False   
         
+        
 
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
         if 'color_activation' in self.config:
