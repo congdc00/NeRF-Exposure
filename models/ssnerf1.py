@@ -134,7 +134,11 @@ class SSNeRF1Model(BaseModel):
                 # brightness
                 number = "{:.2f}".format(bright_ness[i].item())
                 if old == number:
+                    content += f"rgb {rgb[i].tolist()}" + ", "
+                    content += f"real_rgb {real_rgb[i].tolist()}" + ", "
                     content += f"brightness {number}" + ", "
+                    content += f"rgb {new_rgb[i].tolist()}" + ", "
+                    content += f"real_rgb {comp_rgb[i].tolist()}" + ", "
 
                     content+="\n"
                 else:
