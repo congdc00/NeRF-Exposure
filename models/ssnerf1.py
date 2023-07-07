@@ -127,7 +127,7 @@ class SSNeRF1Model(BaseModel):
 
         print(f"\n rgb {rgb[0].tolist()}")
         print(f"\n bright ness {bright_ness[0].item()}")
-        print(f"\n comp_rgb {comp_rgb[0].item()}")
+        print(f"\n comp_rgb {comp_rgb[0].tolist()}")
         print(f"\n new_rgb {new_rgb[0].tolist()}")
 
         # Export 
