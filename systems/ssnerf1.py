@@ -146,7 +146,7 @@ class SSNeRF1System(BaseSystem):
             content = ""
         with open(file_path, 'w') as file:
             content += "++++++++++++" + str(batch_idx) + "++++++++++++" + "\n"
-            bright_ness = out["bright_ness"].cpu()
+            bright_ness = out["bright_ness"].detach()
             content += str(bright_ness.numpy()) + "\n"
             file.write(content)
         
