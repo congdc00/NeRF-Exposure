@@ -138,26 +138,26 @@ class SSNeRF1System(BaseSystem):
                 self.log(f'train_params/{name}', self.C(value))
 
         # Write info brightness
-        file_path = "./log_brightness.txt"
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as file:
-                content = file.read()
-        else:
-            content = ""
-        with open(file_path, 'w') as file:
-            bright_ness = out["bright_ness"].tolist()
-            content +=  "\n" + "++++++++++++" + f"batch_idx:{str(batch_idx)}" + "---" + f"bright_ness {len(bright_ness)}" + "++++++++++++" +  "\n"
-            old_num = 0
-            for b in bright_ness:
-                number = "{:.2f}".format(b[0])
-                if old_num != number:
-                    content += "\n"
-                    old_num = number
+        # file_path = "./log_brightness.txt"
+        # if os.path.exists(file_path):
+        #     with open(file_path, 'r') as file:
+        #         content = file.read()
+        # else:
+        #     content = ""
+        # with open(file_path, 'w') as file:
+        #     bright_ness = out["bright_ness"].tolist()
+        #     content +=  "\n" + "++++++++++++" + f"batch_idx:{str(batch_idx)}" + "---" + f"bright_ness {len(bright_ness)}" + "++++++++++++" +  "\n"
+        #     old_num = 0
+        #     for b in bright_ness:
+        #         number = "{:.2f}".format(b[0])
+        #         if old_num != number:
+        #             content += "\n"
+        #             old_num = number
                 
-                content += str(number) + ", "
+        #         content += str(number) + ", "
                 
-            content+="\n"
-            file.write(content)
+        #     content+="\n"
+        #     file.write(content)
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
 

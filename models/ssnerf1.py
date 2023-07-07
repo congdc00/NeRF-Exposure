@@ -125,7 +125,7 @@ class SSNeRF1Model(BaseModel):
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
 
-        file_path = "./log_brightness.txt"
+        file_path = "./log_info.txt"
         content = ""
         old = bright_ness[0].item()
         with open(file_path, 'w') as file:
