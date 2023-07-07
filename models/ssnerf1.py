@@ -114,6 +114,7 @@ class SSNeRF1Model(BaseModel):
         # print(f"fake_brightness {fake_brightness.shape}")
         new_rgb = rgb*bright_ness
         print(f"ray_indices {ray_indices.shape}")
+        print(f"rgb {rgb.shape}")
         
 
         # Trọng số
