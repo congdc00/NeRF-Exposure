@@ -147,7 +147,7 @@ class SSNeRF1Model(BaseModel):
             file_path = f"./log_{random.randint(1,10)}.txt"
             content = ""
             with open(file_path, 'w') as file:
-                old = "{:.2f}".format(bright_ness[i].item())
+                old = "{:.2f}".format(bright_ness[0].item())
                 for i in range (bright_ness.shape[0]):
                     # brightness
                     number = "{:.2f}".format(bright_ness[i].item())
