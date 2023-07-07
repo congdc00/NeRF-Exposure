@@ -99,38 +99,28 @@ class SSNeRF3Model(BaseModel):
 
         # Step 1: Predict colour point
         # Forward
-        density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
+        
 
         if self.epoch%2==0:
             rgb_train = True
-            bright_ness_train = False
-        else:
-            rgb_train = False
             bright_ness_train = True
-
-        rgb = self.texture(rgb_train, cor_feature, positions) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(bright_ness_train, t_origins)
+        else:
+            rgb_train = True 
+            bright_ness_train = True
+        
+        density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
+        rgb = self.texture(rgb_train, cor_feature, positions) # Dự đoán ra màu sắc [N_rays, 3]
+        bright_ness = self.shutter_speed(bright_ness_train, t_origins) # [N_rays, 1]
 
         # network_inp torch.Size([97790, 32])
-        # density torch.Size([97790])
-        # cor_feature torch.Size([97790, 16])
-        # rgb torch.Size([97790, 3])
-        # dir_feature torch.Size([97790, 16])
-        # bright_ness torch.Size([97790, 1])
 
         # Step 2: Rendering 
-        # print(f"shape {bright_ness.shape}")
-        
-        # fake_brightness = torch.ones_like(rgb)
-        # print(f"fake_brightness {fake_brightness.shape}")
-        new_rgb = rgb*bright_ness
 
+        new_rgb = rgb*bright_ness
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
-        
         # Độ mờ
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
-        
         # Màu sắc dự đoán ra
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) 
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=new_rgb, n_rays=n_rays) #([Num_points, 1])
