@@ -114,7 +114,7 @@ class SSNeRF1Model(BaseModel):
         # print(f"fake_brightness {fake_brightness.shape}")
         new_rgb = rgb*bright_ness
         print(f"new_rgb {new_rgb.shape}")
-        print(f"bright_ness {bright_ness.shape}")
+        
 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
@@ -124,6 +124,7 @@ class SSNeRF1Model(BaseModel):
         
         # Màu sắc dự đoán ra
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) 
+        print(f"real_rgb {real_rgb.shape}")
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=new_rgb, n_rays=n_rays) #([Num_points, 1])
         # depth
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
