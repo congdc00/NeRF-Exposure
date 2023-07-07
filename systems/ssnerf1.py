@@ -105,10 +105,8 @@ class SSNeRF1System(BaseSystem):
             - batch_idx: index của từng batch
         '''
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
-        # print(f"--------------bright_ness {len(batch['bright_ness'])}-------------")
-        # print(f"--------------out bright_ness {len(out['bright_ness'])}-------------")
         loss = 0.
-        # print(f" out{out['comp_rgb']}")
+
         # update train_num_rays
         if self.config.model.dynamic_ray_sampling:
             train_num_rays = int(self.train_num_rays * (self.train_num_samples / out['num_samples'].sum().item()))        
@@ -138,6 +136,18 @@ class SSNeRF1System(BaseSystem):
         for name, value in self.config.system.loss.items():
             if name.startswith('lambda'):
                 self.log(f'train_params/{name}', self.C(value))
+
+        # Write info brightness
+        file_path = "./log_brightness.txt"
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                content = file.read()
+        else:
+            content = ""
+        with open(file_path, 'w') as file:
+            content += "++++++++++++" + batch_idx + "++++++++++++" + "\n"
+            content += batch["bright_ness"].numpy() + "\n"
+            file.write(content)
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
 
