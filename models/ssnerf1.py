@@ -128,7 +128,7 @@ class SSNeRF1Model(BaseModel):
         old = 0
         i = 0
         bright_ness = 0 
-        while old != bright_ness:
+        while old != bright_ness.tolist():
             print(f"\t rgb {rgb[i].tolist()}")
             print(f"\t real_rgb {real_rgb[i].tolist()}")
             
