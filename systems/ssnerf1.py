@@ -146,7 +146,8 @@ class SSNeRF1System(BaseSystem):
             content = ""
         with open(file_path, 'w') as file:
             content += "++++++++++++" + str(batch_idx) + "++++++++++++" + "\n"
-            content += str(out["bright_ness"].cpu().numpy()) + "\n"
+            bright_ness = out["bright_ness"].cpu()
+            content += str(bright_ness.numpy()) + "\n"
             file.write(content)
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
