@@ -38,8 +38,7 @@ class VolumeRadiance(nn.Module):
 
         # freeze
         for param in self.network.parameters():
-            param.requires_grad = False   
-        
+            param.requires_grad = is_freeze   
         
 
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()

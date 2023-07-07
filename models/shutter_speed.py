@@ -36,12 +36,9 @@ class VolumeBrightness(nn.Module):
         
         network_inp = torch.cat([origins_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1) #([97790, 32])
 
-        if is_freeze:
-            for param in self.network.parameters():
-                param.requires_grad = True
-        else: 
-            for param in self.network.parameters():
-                param.requires_grad = False
+        #freeze
+        for param in self.network.parameters():
+            param.requires_grad = is_freeze   
 
         brightness = self.network(network_inp).view(*origins.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
 
