@@ -113,7 +113,7 @@ class SSNeRF1Model(BaseModel):
         # fake_brightness = torch.ones_like(rgb)
         # print(f"fake_brightness {fake_brightness.shape}")
         new_rgb = rgb*bright_ness
-        print(f"n_rays {n_rays}")
+        print(f"ray_indices {ray_indices.shape}")
         
 
         # Trọng số
