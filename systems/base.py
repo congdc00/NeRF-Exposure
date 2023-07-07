@@ -74,26 +74,8 @@ class BaseSystem(pl.LightningModule, SaverMixin):
     def training_step(self, batch, batch_idx):
         raise NotImplementedError
     
-    """
-    # aggregate outputs from different devices (DP)
-    def training_step_end(self, out):
-        pass
-    """
-    
-    """
-    # aggregate outputs from different iterations
-    def training_epoch_end(self, out):
-        pass
-    """
-    
     def validation_step(self, batch, batch_idx):
         raise NotImplementedError
-    
-    """
-    # aggregate outputs from different devices when using DP
-    def validation_step_end(self, out):
-        pass
-    """
     
     def validation_epoch_end(self, out):
         """
