@@ -129,7 +129,7 @@ class SSNeRF1Model(BaseModel):
         content = ""
         old = bright_ness[0].item()
         with open(file_path, 'w') as file:
-            for i in bright_ness.shape[0]:
+            for i in range (bright_ness.shape[0]):
                 # brightness
                 number = "{:.2f}".format(bright_ness[i].item())
                 if old == number:
