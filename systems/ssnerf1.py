@@ -149,7 +149,8 @@ class SSNeRF1System(BaseSystem):
             content += "++++++++++++" + f"batch_idx:{str(batch_idx)}" + "---" + f"bright_ness {len(bright_ness)}"+ "++++++++++++" + "\n"
            
             for b in bright_ness:
-                content += str(b[0]) + "\n"
+                content += str(b[0])
+            content+="\n"
             file.write(content)
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
