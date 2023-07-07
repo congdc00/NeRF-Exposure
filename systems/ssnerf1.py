@@ -154,7 +154,7 @@ class SSNeRF1System(BaseSystem):
                     content += "\n"
                     old_num = number
                 
-                content += str("{:.2f}".format(number[0])) + ", "
+                content += str(number) + ", "
                 
             content+="\n"
             file.write(content)
