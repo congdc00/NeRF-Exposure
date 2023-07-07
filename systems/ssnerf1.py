@@ -151,9 +151,10 @@ class SSNeRF1System(BaseSystem):
             for b in bright_ness:
                 number = "{:.2f}".format(b[0])
                 if old_num != number:
-                    old_num = number
                     content += "\n"
-                content += str("{:.2f}".format(b[0])) + ", "
+                    old_num = number
+                    
+                content += str("{:.2f}".format(number[0])) + ", "
                 
             content+="\n"
             file.write(content)
