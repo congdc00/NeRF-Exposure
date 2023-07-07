@@ -124,12 +124,16 @@ class SSNeRF1Model(BaseModel):
         #Độ sáng
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
+        print(f"t_starts {t_starts} and t_ends {t_ends}")
+
+        print(f"\n bright ness {bright_ness[0].item()}")
 
         print(f"\n rgb {rgb[0].tolist()}")
-        print(f"\n bright ness {bright_ness[0].item()}")
+        print(f"\n new_rgb {new_rgb[0].tolist()}")
+
         print(f"\n comp_rgb {comp_rgb[0].tolist()}")
         print(f"\n real_rgb {real_rgb[0].tolist()}")
-        print(f"\n new_rgb {new_rgb[0].tolist()}")
+        
 
         # Export 
         out = {
