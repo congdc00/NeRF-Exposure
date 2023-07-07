@@ -146,21 +146,23 @@ class SSNeRF1Model(BaseModel):
             # for check
             file_path = f"./log_{random.randint(1,10)}.txt"
             content = ""
-            old = "{:.2f}".format(bright_ness[0].item())
             with open(file_path, 'w') as file:
+                old = "{:.2f}".format(bright_ness[i].item())
                 for i in range (bright_ness.shape[0]):
                     # brightness
                     number = "{:.2f}".format(bright_ness[i].item())
-                    if old == number:
-                        content += f"rgb {rgb[i].tolist()}" + ", "
-                        content += f"\t real_rgb {real_rgb[0].tolist()}" + ", "
-                        content += f"\t brightness {number}" + ", "
-                        content += f"\t rgb {new_rgb[i].tolist()}" + ", "
-                        content += f"\t real_rgb {comp_rgb[0].tolist()}" + ", "
 
+                    if old != number:
                         content+="\n"
-                    else:
-                        break
+                    
+                    content += f"brightness {number}" + ", "
+
+                    content += f"rgb {rgb[i].tolist()}" + ", "
+                    content += f"real_rgb {real_rgb[0].tolist()}" + ", "
+                    
+                    content += f"rgb {new_rgb[i].tolist()}" + ", "
+                    content += f"real_rgb {comp_rgb[0].tolist()}" + ", "
+                    
                     
                 file.write(content)
 
