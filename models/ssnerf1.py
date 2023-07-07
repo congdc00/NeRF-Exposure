@@ -3,7 +3,7 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import random
 import models
 from models.base import BaseModel
 from models.utils import chunk_batch
@@ -125,7 +125,8 @@ class SSNeRF1Model(BaseModel):
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
 
-        file_path = "./log_info.txt"
+
+        file_path = f"./log_{random.randint(1,8)}.txt"
         content = ""
         old = bright_ness[0].item()
         with open(file_path, 'w') as file:
@@ -141,7 +142,6 @@ class SSNeRF1Model(BaseModel):
                 
             file.write(content)
         
-        files.download("/content/SSNeRF/log_info.txt")
 
         # Export 
         out = {
