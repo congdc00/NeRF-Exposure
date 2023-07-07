@@ -124,7 +124,7 @@ class SSNeRF1Model(BaseModel):
         #Độ sáng
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
-        print(f"t_starts {t_starts} and t_ends {t_ends}")
+        print(f"t_starts {t_starts.shape} and t_ends {t_ends.shape}")
 
         print(f"\n bright ness {bright_ness[0].item()}")
 
