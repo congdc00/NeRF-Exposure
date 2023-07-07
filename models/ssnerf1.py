@@ -113,9 +113,6 @@ class SSNeRF1Model(BaseModel):
         # fake_brightness = torch.ones_like(rgb)
         # print(f"fake_brightness {fake_brightness.shape}")
         new_rgb = rgb*bright_ness
-        print(f"ray_indices {ray_indices.shape}")
-        print(f"rgb {rgb.shape}")
-        
 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])

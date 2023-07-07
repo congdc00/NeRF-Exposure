@@ -153,7 +153,7 @@ class SSNeRF1System(BaseSystem):
                 if old_num != number:
                     content += "\n"
                     old_num = number
-                    
+                
                 content += str("{:.2f}".format(number[0])) + ", "
                 
             content+="\n"
