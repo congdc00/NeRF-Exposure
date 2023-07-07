@@ -149,7 +149,7 @@ class SSNeRF1System(BaseSystem):
             content += "++++++++++++" + f"batch_idx:{str(batch_idx)}" + "---" + f"bright_ness {len(bright_ness)}"+ "++++++++++++" + "\n"
            
             for b in bright_ness:
-                content += str(b[0])
+                content += str(b[0]) + "\t"
             content+="\n"
             file.write(content)
         
