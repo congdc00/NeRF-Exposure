@@ -40,8 +40,9 @@ class ChainedScheduler(lr_scheduler._LRScheduler):
                     "ChainedScheduler expects all schedulers to belong to the same optimizer, but "
                     "got schedulers at index {} and {} to be different".format(0, scheduler_idx)
                 )
-        self._schedulers = list(schedulers)
         self.optimizer = optimizer
+        self._schedulers = list(schedulers)
+        
 
     def step(self):
         for scheduler in self._schedulers:
