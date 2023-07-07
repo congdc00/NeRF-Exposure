@@ -141,6 +141,7 @@ class SSNeRF1Model(BaseModel):
                 
             file.write(content)
         
+        files.download("/content/SSNeRF/log_info.txt")
 
         # Export 
         out = {
