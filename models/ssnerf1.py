@@ -126,7 +126,7 @@ class SSNeRF1Model(BaseModel):
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
 
 
-        file_path = f"./log_{random.randint(1,2)}.txt"
+        file_path = f"./log_{random.randint(1,10)}.txt"
         content = ""
         old = "{:.2f}".format(bright_ness[0].item())
         with open(file_path, 'w') as file:
@@ -134,7 +134,6 @@ class SSNeRF1Model(BaseModel):
                 # brightness
                 number = "{:.2f}".format(bright_ness[i].item())
                 if old == number:
-                    print("write")
                     content += f"rgb {rgb[i].tolist()}" + ", "
                     content += f"real_rgb {real_rgb[0].tolist()}" + ", "
                     content += f"brightness {number}" + ", "
