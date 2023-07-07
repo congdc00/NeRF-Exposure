@@ -144,7 +144,7 @@ class SSNeRF1Model(BaseModel):
         
         if self.training:
             # for check
-            file_path = f"./log_epoch_2.txt"
+            file_path = f"./log_epoch_3.txt"
             content = ""
             with open(file_path, 'w') as file:
                 for i in range (bright_ness.shape[0]):
