@@ -145,8 +145,9 @@ class SSNeRF1System(BaseSystem):
         else:
             content = ""
         with open(file_path, 'w') as file:
-            content += "++++++++++++" + str(batch_idx) + "++++++++++++" + "\n"
             bright_ness = out["bright_ness"].tolist()
+            content += "++++++++++++" + f"batch_idx:{str(batch_idx)}" + "---" + f"bright_ness {len(bright_ness)}"+ "++++++++++++" + "\n"
+           
             for b in bright_ness:
                 content += str(b[0]) + "\n"
             file.write(content)
