@@ -37,8 +37,8 @@ class VolumeRadiance(nn.Module):
         network_inp = torch.cat([features.view(-1, features.shape[-1]), dirs_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
 
         # freeze
-        for param in self.network.parameters():
-            param.requires_grad = is_freeze   
+        for param in range (len(self.network.parameters()) - 1):
+            self.network.parameters()[param].requires_grad = is_freeze   
         
 
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
