@@ -146,10 +146,14 @@ class SSNeRF1System(BaseSystem):
             content = ""
         with open(file_path, 'w') as file:
             bright_ness = out["bright_ness"].tolist()
-            content += "++++++++++++" + f"batch_idx:{str(batch_idx)}" + "---" + f"bright_ness {len(bright_ness)}"+ "++++++++++++" + "\n"
-           
+            content += "++++++++++++" + f"batch_idx:{str(batch_idx)}" + "---" + f"bright_ness {len(bright_ness)}" + "++++++++++++" + "\n"
+           old_num = 0
             for b in bright_ness:
-                content += str(b[0]) + "\t"
+                number = "{:.2f}".format(b[0])
+                content += str("{:.2f}".format(b[0])) + ", "
+                if old_num != number:
+                    old_num = number
+                    content += "\n"
             content+="\n"
             file.write(content)
         
