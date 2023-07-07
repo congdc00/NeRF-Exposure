@@ -125,20 +125,22 @@ class SSNeRF1Model(BaseModel):
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
 
-        old = 0
-        i = 0
-        bright_ness_new = 0
-        while old == bright_ness_new:
-            old = bright_ness_new
-            print(f"\t rgb {rgb[i].tolist()}")
-            print(f"\t real_rgb {real_rgb[i].tolist()}")
+        file_path = "./log_brightness.txt"
+        content = ""
+        old = bright_ness[0].item()
+        with open(file_path, 'w') as file:
+            bright_ness = bright_ness.tolist()
+            for i in len(bright_ness):
+                # brightness
+                number = "{:.2f}".format(bright_ness[i].item())
+                if old == number:
+                    content += f"brightness {number}" + ", "
 
-            bright_ness_new = bright_ness[i].item()
-            print(f"\t bright ness {bright_ness_new}")
-            print(f"\t new_rgb {new_rgb[i].tolist()}")
-            print(f"\t comp_rgb {comp_rgb[i].tolist()} \n")
-            
-            i+=1
+                    content+="\n"
+                else:
+                    break
+                
+            file.write(content)
         
 
         # Export 
