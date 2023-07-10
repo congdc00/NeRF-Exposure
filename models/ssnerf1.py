@@ -167,7 +167,7 @@ class SSNeRF1Model(BaseModel):
                         k+=1
                         bright_ness_old = number
 
-                    content_line.append(new_brightness[k].item())
+                    content_line.append(new_brightness[k].tolist())
                     content_line.append(real_rgb[k].tolist())
                     content_line.append(comp_rgb[k].tolist())
                     content.append(content_line)
