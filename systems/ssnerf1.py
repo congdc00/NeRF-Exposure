@@ -148,7 +148,6 @@ class SSNeRF1System(BaseSystem):
         image_predict = out['comp_rgb']
         color_predict = out["real_rgb"]
         density_predict = out['depth']
-        bright_ness_predict = out["bright_ness"]
         # shutter_speed_predict = out['bright_ness'][0]
 
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
