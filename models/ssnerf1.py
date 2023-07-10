@@ -100,14 +100,7 @@ class SSNeRF1Model(BaseModel):
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(True, cor_feature, positions) # Dự đoán ra màu sắc
 
-        smart_ray_indices = torch.unique(ray_indices)
-        t_origins_camera = rays_o[smart_ray_indices]
-        print(f"smart_ray_indices {smart_ray_indices.shape}")
-        print(f"n_rays {n_rays} ")
-        print(f"t_origins {t_origins.shape}") 
-        print(f"t_origins_camera {t_origins_camera.shape}")
-        bright_ness = self.shutter_speed(True, t_origins_camera)
-        print(f"bright_ness {bright_ness.shape}")
+        
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
@@ -125,6 +118,16 @@ class SSNeRF1Model(BaseModel):
 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
+
+        smart_ray_indices = torch.ones_like(weights)
+        t_origins_camera =  accumulate_along_rays(smart_ray_indices, ray_indices, values=t_origins, n_rays=n_rays)
+        print(f"smart_ray_indices {smart_ray_indices.shape}")
+        print(f"n_rays {n_rays} ")
+        print(f"t_origins {t_origins.shape}") 
+        print(f"t_origins_camera {t_origins_camera.shape}")
+        bright_ness = self.shutter_speed(True, t_origins_camera)
+        print(f"bright_ness {bright_ness.shape}")
+
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=new_rgb, n_rays=n_rays) #([n_rays, 1])
