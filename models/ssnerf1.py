@@ -142,7 +142,6 @@ class SSNeRF1Model(BaseModel):
             'positions':positions
         }
         
-        print(f"background {self.background_color}")
         if self.training:
             
             # for check
