@@ -100,8 +100,8 @@ class SSNeRF1Model(BaseModel):
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(True, cor_feature, positions) # Dự đoán ra màu sắc
 
-        tmp = torch.ones(n_rays, 1)
-        t_origins_camera = accumulate_along_rays(tmp, ray_indices, values=t_origins, n_rays=n_rays)
+        tmp = torch.ones(n_rays, 1).cuda()
+        t_origins_camera = accumulate_along_rays(tmp, ray_indices, values=t_origins, n_rays=n_rays).cuda()
         print(f"t_origins {t_origins.shape}") 
         print(f"t_origins_camera {t_origins_camera.shape}")
         bright_ness = self.shutter_speed(True, t_origins_camera)
