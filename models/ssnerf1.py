@@ -119,7 +119,8 @@ class SSNeRF1Model(BaseModel):
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
 
-        t_origins_camera =  accumulate_along_rays(torch.ones_like(weights), ray_indices, values=t_origins, n_rays=n_rays)
+        new_weight = torch.full(weights, 0.002)
+        t_origins_camera =  accumulate_along_rays(new_weight, ray_indices, values=t_origins, n_rays=n_rays)
         print(f"t_origins_camera {t_origins_camera[0]}")
         print(f"t_origins {t_origins[0]}")
         bright_ness = self.shutter_speed(True, t_origins_camera)
