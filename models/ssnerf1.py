@@ -119,6 +119,10 @@ class SSNeRF1Model(BaseModel):
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=new_rgb, n_rays=n_rays) #([Num_points, 1])
+
+        print(f"rgb {rgb.shape}")
+        print(f"n_rays {n_rays.shape}")
+        print(f"comp_rgb {comp_rgb.shape}")
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
         
         weights_fake = torch.full_like(weights, 0.001)
