@@ -154,14 +154,12 @@ class SSNeRF1System(BaseSystem):
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
         # ssim = self.criterions['ssim'](image_predict.to(image_origin), image_origin)
         W, H = self.dataset.img_wh
-        print(f"image_predict {image_predict.shape}")
-
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             # {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'rgb', 'img': bright_ness_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
         ])
