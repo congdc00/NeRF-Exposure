@@ -106,7 +106,7 @@ class SSNeRF1Model(BaseModel):
         print(f"n_rays {n_rays} ")
         print(f"t_origins {t_origins.shape}") 
         print(f"t_origins_camera {t_origins_camera.shape}")
-        bright_ness = self.shutter_speed(True, t_origins)
+        bright_ness = self.shutter_speed(True, t_origins_camera)
         print(f"bright_ness {bright_ness.shape}")
 
         # network_inp torch.Size([97790, 32])
