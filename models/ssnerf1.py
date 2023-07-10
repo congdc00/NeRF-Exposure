@@ -171,6 +171,7 @@ class SSNeRF1Model(BaseModel):
                     content_line.append(bright_ness_fake[k].tolist())
                     content_line.append(real_rgb[k].tolist())
                     content_line.append(comp_rgb[k].tolist())
+                    content_line.append(self.background_color[k].tolist())
                     content.append(content_line)
                 
                 table = tabulate(content, headers, tablefmt="grid")
