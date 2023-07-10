@@ -155,11 +155,11 @@ class SSNeRF1Model(BaseModel):
             #     table = tabulate(content, headers, tablefmt="grid")
             #     file.write(table)
 
-            # out.update({
-            #     'weights': weights.view(-1),
-            #     'points': midpoints.view(-1),
-            #     'intervals': intervals.view(-1),
-            #     'ray_indices': ray_indices.view(-1)
+            out.update({
+                'weights': weights.view(-1),
+                'points': midpoints.view(-1),
+                'intervals': intervals.view(-1),
+                'ray_indices': ray_indices.view(-1)
             })
 
         

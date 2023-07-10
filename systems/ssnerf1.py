@@ -156,6 +156,8 @@ class SSNeRF1System(BaseSystem):
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
 
+        print(f"bright_ness {out["bright_ness"]}")
+
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             # {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
