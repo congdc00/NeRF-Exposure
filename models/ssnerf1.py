@@ -149,7 +149,7 @@ class SSNeRF1Model(BaseModel):
                 for i in range (bright_ness.shape[0]):
 
                     # brightness
-                    number = "{:.2f}".format(bright_ness[i].item())
+                    number = bright_ness[i].item()
                     content_line = []
                     content_line.append(number)
                     content_line.append(rgb[i].tolist())
