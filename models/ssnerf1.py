@@ -140,9 +140,9 @@ class SSNeRF1Model(BaseModel):
         
         if self.training:
             # for check
-            file_path = f"./log_epoch_21.txt"
+            file_path = f"./log_epoch_1.txt"
             content = []
-            headers = ["brightness", "rgb", "new_rgb", "real_rgb", "comp_rgb"]
+            headers = ["brightness", "rgb", "rgb*brightness","weights", "volume_rendering rgb", "volume_rendering rgb*brightness"]
             k = 0
             bright_ness_old = bright_ness[0].item()
             with open(file_path, 'w') as file:
@@ -154,6 +154,7 @@ class SSNeRF1Model(BaseModel):
                     content_line.append(number)
                     content_line.append(rgb[i].tolist())
                     content_line.append(new_rgb[i].tolist())
+                    content_line.append(weights[i].item())
 
                     if number != bright_ness_old and k < real_rgb.shape[0] -1:
                         k+=1
