@@ -154,11 +154,12 @@ class SSNeRF1Model(BaseModel):
                 for i in range (bright_ness.shape[0]):
 
                     content_line = []
-                    content_line.append(bright_ness[i].item())
+                    
                     content_line.append(rgb[i].tolist())
                     content_line.append(new_rgb[i].tolist())
                     content_line.append(weights[i].item())
                     k = int(ray_indices[i])
+                    content_line.append(bright_ness[k].item())
                     content_line.append(real_rgb[k].tolist())
                     content_line.append(comp_rgb[k].tolist())
                     content_line.append(opacity[k].tolist())
