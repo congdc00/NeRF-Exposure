@@ -119,8 +119,7 @@ class SSNeRF1Model(BaseModel):
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
 
-        smart_ray_indices = torch.ones_like(weights)
-        t_origins_camera =  accumulate_along_rays(smart_ray_indices, ray_indices, values=t_origins, n_rays=n_rays)
+        t_origins_camera =  accumulate_along_rays(torch.ones_like(weights), ray_indices, values=t_origins, n_rays=n_rays)
         bright_ness = self.shutter_speed(True, t_origins_camera)
 
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
@@ -147,27 +146,26 @@ class SSNeRF1Model(BaseModel):
         
         if self.training:
             
-            # # for check
-            # file_path = f"./log_epoch_3.txt"
-            # content = []
-            # headers = ["brightness", "rgb", "rgb*brightness","weights", "bright_ness_fake","volume_rendering rgb", "volume_rendering rgb*brightness", "opacity"]
-            # with open(file_path, 'w',newline="\n") as file:
-            #     for i in range (bright_ness.shape[0]):
+            # for check
+            file_path = f"./log_epoch_3.txt"
+            content = []
+            headers = ["brightness", "rgb", "rgb*brightness","weights","volume_rendering rgb", "volume_rendering rgb*brightness", "opacity"]
+            with open(file_path, 'w',newline="\n") as file:
+                for i in range (bright_ness.shape[0]):
 
-            #         content_line = []
-            #         content_line.append(bright_ness[i].item())
-            #         content_line.append(rgb[i].tolist())
-            #         content_line.append(new_rgb[i].tolist())
-            #         content_line.append(weights[i].item())
-            #         k = int(ray_indices[i])
-            #         content_line.append(bright_ness_fake[k].tolist())
-            #         content_line.append(real_rgb[k].tolist())
-            #         content_line.append(comp_rgb[k].tolist())
-            #         content_line.append(opacity[k].tolist())
-            #         content.append(content_line)
+                    content_line = []
+                    content_line.append(bright_ness[i].item())
+                    content_line.append(rgb[i].tolist())
+                    content_line.append(new_rgb[i].tolist())
+                    content_line.append(weights[i].item())
+                    k = int(ray_indices[i])
+                    content_line.append(real_rgb[k].tolist())
+                    content_line.append(comp_rgb[k].tolist())
+                    content_line.append(opacity[k].tolist())
+                    content.append(content_line)
                 
-            #     table = tabulate(content, headers, tablefmt="grid")
-            #     file.write(table)
+                table = tabulate(content, headers, tablefmt="grid")
+                file.write(table)
 
             out.update({
                 'weights': weights.view(-1),
