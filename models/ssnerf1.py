@@ -123,7 +123,7 @@ class SSNeRF1Model(BaseModel):
         
 
         #Độ sáng
-        comp_rgb = comp_rgb_out # + self.background_color * (1.0 - opacity) 
+        comp_rgb = comp_rgb_out + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb_out + self.background_color * (1.0 - opacity)
 
         # Export 
