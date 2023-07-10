@@ -96,10 +96,7 @@ class SSNeRF1Model(BaseModel):
         intervals = t_ends - t_starts
 
         # Step 1: Predict colour point
-        # Forward
-        file_path = "./info.txt"
-        with open(file_path, 'w',newline="\n") as file:
-            file.write(str(ray_indices))
+
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(True, cor_feature, positions) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(True, rays_o)
@@ -120,7 +117,7 @@ class SSNeRF1Model(BaseModel):
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
 
-        comp_rgb = real_rgb*bright_ness #+ self.background_color * (1.0 - opacity)
+        comp_rgb = real_rgb*bright_ness + self.background_color * (1.0 - opacity)
 
         # Export 
         out = {
