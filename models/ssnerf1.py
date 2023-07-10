@@ -155,7 +155,7 @@ class SSNeRF1Model(BaseModel):
                     content_line.append(rgb[i].tolist())
                     content_line.append(new_rgb[i].tolist())
 
-                    if number != bright_ness[i].item() and k < real_rgb.shape[0]:
+                    if number != bright_ness[i].item() and k < real_rgb.shape[0] -1:
                         k+=1
 
                     content_line.append(real_rgb[k].tolist())
