@@ -121,6 +121,7 @@ class SSNeRF1Model(BaseModel):
 
         t_origins_camera =  accumulate_along_rays(torch.ones_like(weights), ray_indices, values=t_origins, n_rays=n_rays)
         print(f"t_origins_camera {t_origins_camera[0]}")
+        print(f"t_origins {t_origins[0]}")
         bright_ness = self.shutter_speed(True, t_origins_camera)
         print(f"bright_ness {bright_ness[0]}")
 
