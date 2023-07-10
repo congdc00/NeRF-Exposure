@@ -149,7 +149,7 @@ class SSNeRF1Model(BaseModel):
             # for check
             file_path = f"./log_epoch_3.txt"
             content = []
-            headers = ["brightness", "rgb", "rgb*brightness","weights","volume_rendering rgb", "volume_rendering rgb*brightness", "opacity"]
+            headers = ["rgb", "rgb*brightness","weights","brightness","volume_rendering rgb", "volume_rendering rgb*brightness", "opacity"]
             with open(file_path, 'w',newline="\n") as file:
                 for i in range (bright_ness.shape[0]):
 
