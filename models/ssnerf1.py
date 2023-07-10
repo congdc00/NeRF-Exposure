@@ -124,7 +124,7 @@ class SSNeRF1Model(BaseModel):
         weights_fake = torch.full_like(weights, 0.001)
         bright_ness_fake = accumulate_along_rays(weights_fake, ray_indices, values=bright_ness, n_rays=n_rays)    
         #Độ sáng
-        comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
+        comp_rgb = comp_rgb + #self.background_color * (1.0 - opacity) 
         # comp_rgb = comp_rgb*bright_ness_fake
         # comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)
         
