@@ -135,31 +135,31 @@ class SSNeRF1Model(BaseModel):
         if self.training:
             
             # for check
-            file_path = f"./log_epoch_3.txt"
-            content = []
-            headers = ["rgb","weights","brightness","volume_rendering rgb", "volume_rendering rgb*brightness", "opacity"]
-            with open(file_path, 'w',newline="\n") as file:
-                for i in range (bright_ness.shape[0]):
+            # file_path = f"./log_epoch_3.txt"
+            # content = []
+            # headers = ["rgb","weights","brightness","volume_rendering rgb", "volume_rendering rgb*brightness", "opacity"]
+            # with open(file_path, 'w',newline="\n") as file:
+            #     for i in range (bright_ness.shape[0]):
 
-                    content_line = []
+            #         content_line = []
                     
-                    content_line.append(rgb[i].tolist())
-                    content_line.append(weights[i].item())
-                    k = int(ray_indices[i])
-                    content_line.append(bright_ness[k].item())
-                    content_line.append(real_rgb[k].tolist())
-                    content_line.append(comp_rgb[k].tolist())
-                    content_line.append(opacity[k].tolist())
-                    content.append(content_line)
+            #         content_line.append(rgb[i].tolist())
+            #         content_line.append(weights[i].item())
+            #         k = int(ray_indices[i])
+            #         content_line.append(bright_ness[k].item())
+            #         content_line.append(real_rgb[k].tolist())
+            #         content_line.append(comp_rgb[k].tolist())
+            #         content_line.append(opacity[k].tolist())
+            #         content.append(content_line)
                 
-                table = tabulate(content, headers, tablefmt="grid")
-                file.write(table)
+            #     table = tabulate(content, headers, tablefmt="grid")
+            #     file.write(table)
 
-            out.update({
-                'weights': weights.view(-1),
-                'points': midpoints.view(-1),
-                'intervals': intervals.view(-1),
-                'ray_indices': ray_indices.view(-1)
+            # out.update({
+            #     'weights': weights.view(-1),
+            #     'points': midpoints.view(-1),
+            #     'intervals': intervals.view(-1),
+            #     'ray_indices': ray_indices.view(-1)
             })
 
         
