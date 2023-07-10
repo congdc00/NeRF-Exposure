@@ -117,16 +117,16 @@ class SSNeRF1Model(BaseModel):
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
-        real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
-        comp_rgb = accumulate_along_rays(weights, ray_indices, values=new_rgb, n_rays=n_rays) #([Num_points, 1])
+        real_rgb_out = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
+        comp_rgb_out = accumulate_along_rays(weights, ray_indices, values=new_rgb, n_rays=n_rays) #([Num_points, 1])
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
         
         # fake_weight = torch.zeros_like(weights)
         # new_brightness = accumulate_along_rays(fake_weight, ray_indices, values=new_rgb, n_rays=n_rays)
 
         #Độ sáng
-        #comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
-        real_rgb = real_rgb + self.background_color * (1.0 - opacity)
+        comp_rgb = comp_rgb_out + self.background_color * (1.0 - opacity) 
+        real_rgb = real_rgb_out + self.background_color * (1.0 - opacity)
 
         # Export 
         out = {
@@ -168,8 +168,8 @@ class SSNeRF1Model(BaseModel):
                         bright_ness_old = number
 
                     # content_line.append(new_brightness[k].tolist())
-                    content_line.append(real_rgb[k].tolist())
-                    content_line.append(comp_rgb[k].tolist())
+                    content_line.append(real_rgb_out[k].tolist())
+                    content_line.append(comp_rgb_out[k].tolist())
                     content.append(content_line)
                 
                 table = tabulate(content, headers, tablefmt="grid")
