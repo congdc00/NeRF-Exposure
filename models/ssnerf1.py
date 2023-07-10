@@ -126,6 +126,7 @@ class SSNeRF1Model(BaseModel):
         new_ray_indices = torch.unique(ray_indices)
         t_origins_new = rays_o[new_ray_indices]
         print(f"t_origins {t_origins.shape}")
+        print(f"n_rays {n_rays}")
         print(f"t_origins_new {t_origins_new.shape}")
         print(f"real_rgb {real_rgb.shape}")
         bright_ness = self.shutter_speed(True, t_origins_new)
