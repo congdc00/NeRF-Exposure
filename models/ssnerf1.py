@@ -121,12 +121,7 @@ class SSNeRF1Model(BaseModel):
 
         smart_ray_indices = torch.ones_like(weights)
         t_origins_camera =  accumulate_along_rays(smart_ray_indices, ray_indices, values=t_origins, n_rays=n_rays)
-        print(f"smart_ray_indices {smart_ray_indices.shape}")
-        print(f"n_rays {n_rays} ")
-        print(f"t_origins {t_origins.shape}") 
-        print(f"t_origins_camera {t_origins_camera.shape}")
         bright_ness = self.shutter_speed(True, t_origins_camera)
-        print(f"bright_ness {bright_ness.shape}")
 
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
@@ -134,7 +129,6 @@ class SSNeRF1Model(BaseModel):
 
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
         
-        print(f"comp_rgb {comp_rgb.shape}")
         comp_rgb = comp_rgb*bright_ness + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
 
