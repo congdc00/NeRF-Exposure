@@ -114,27 +114,29 @@ class SSNeRF1Model(BaseModel):
         
         # fake_brightness = torch.ones_like(rgb)
         # print(f"fake_brightness {fake_brightness.shape}")
-        new_rgb = rgb #* bright_ness
 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
+        real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
+        depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
 
-        tmp = torch.ones_like(weights)
-        shape_tmp = weights.shape[0]
-        print(f"shape {shape_tmp}")
-
-        print(f"t_origins {t_origins}")
-        bright_ness = self.shutter_speed(True, t_origins)
+        # shape_tmp = real_rgb.shape[0]
+        # for i in range(shape_tmp):
+        new_ray_indices = torch.unique(ray_indices)
+        t_origins_new = rays_o[new_ray_indices]
+        print(f"t_origins {t_origins.shape}")
+        print(f"t_origins_new {t_origins_new.shape}")
+        print(f"real_rgb {real_rgb.shape}")
+        bright_ness = self.shutter_speed(True, t_origins_new)
   
 
         
-        real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
-        comp_rgb = accumulate_along_rays(weights, ray_indices, values=new_rgb, n_rays=n_rays) #([n_rays, 1])
-
-        depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
         
-        comp_rgb = (comp_rgb + self.background_color * (1.0 - opacity))* bright_ness
+
+        
+        
+        comp_rgb = (real_rgb + self.background_color * (1.0 - opacity))* bright_ness
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
 
         # Export 
