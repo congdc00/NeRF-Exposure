@@ -144,9 +144,10 @@ class SSNeRF1Model(BaseModel):
             content = []
             headers = ["brightness", "rgb", "real_rgb", "new_rgb", "comp_rgb"]
             k = 0
-            bright_ness_old = bright_ness[0]
+            bright_ness_old = bright_ness[0].item()
             with open(file_path, 'w') as file:
                 for i in range (bright_ness.shape[0]):
+
                     # brightness
                     number = "{:.2f}".format(bright_ness[i].item())
                     content_line = []
@@ -154,9 +155,9 @@ class SSNeRF1Model(BaseModel):
                     content_line.append(rgb[i].tolist())
                     content_line.append(new_rgb[i].tolist())
 
-                    if number != bright_ness_old:
+                    if number != bright_ness[i].item():
                         k+=1
-                        
+
                     content_line.append(real_rgb[k].tolist())
                     content_line.append(comp_rgb[k].tolist())
                     content.append(content_line)
