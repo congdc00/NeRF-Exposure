@@ -100,7 +100,7 @@ class SSNeRF1Model(BaseModel):
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(True, cor_feature, positions) # Dự đoán ra màu sắc
 
-        smart_ray_indices = torch.uniform(ray_indices)
+        smart_ray_indices = torch.unique(ray_indices)
         t_origins_camera = rays_o[smart_ray_indices]
         print(f"smart_ray_indices {smart_ray_indices.shape}")
         print(f"n_rays {n_rays} ")
