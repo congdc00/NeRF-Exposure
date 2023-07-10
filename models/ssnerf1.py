@@ -120,7 +120,9 @@ class SSNeRF1Model(BaseModel):
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=new_rgb, n_rays=n_rays) #([Num_points, 1])
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
-
+        
+        fake_weight = torch.one_like(weights)
+        new_brightness = accumulate_along_rays(fake_weight, ray_indices, values=midpoints, n_rays=n_rays)
         #Độ sáng
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
@@ -146,35 +148,37 @@ class SSNeRF1Model(BaseModel):
                 'intervals': intervals.view(-1),
                 'ray_indices': ray_indices.view(-1)
             })
-        else:
-            # for check
-            file_path = f"./log_epoch_1000.txt"
-            content = []
-            headers = ["brightness", "rgb", "rgb*brightness","weights", "volume_rendering rgb", "volume_rendering rgb*brightness"]
-            k = 0
-            bright_ness_old = bright_ness[0].item()
-            with open(file_path, 'w') as file:
-                for i in range (bright_ness.shape[0]):
 
-                    # brightness
-                    number = bright_ness[i].item()
-                    content_line = []
-                    content_line.append(number)
-                    content_line.append(rgb[i].tolist())
-                    content_line.append(new_rgb[i].tolist())
-                    content_line.append(weights[i].item())
+        # for check
+        file_path = f"./log_epoch_1.txt"
+        content = []
+        headers = ["brightness", "rgb", "rgb*brightness","weights", "volume_rendering rgb", "volume_rendering rgb*brightness"]
+        k = 0
+        bright_ness_old = bright_ness[0].item()
+        with open(file_path, 'w') as file:
+            for i in range (bright_ness.shape[0]):
 
-                    if number != bright_ness_old and k < real_rgb.shape[0] -1:
-                        k+=1
-                        bright_ness_old = number
-
-
-                    content_line.append(real_rgb[k].tolist())
-                    content_line.append(comp_rgb[k].tolist())
-                    content.append(content_line)
+                # brightness
+                number = bright_ness[i].item()
+                content_line = []
+                content_line.append(number)
+                content_line.append(rgb[i].tolist())
+                content_line.append(new_rgb[i].tolist())
+                content_line.append(weights[i].item())
                 
-                table = tabulate(content, headers, tablefmt="grid")
-                file.write(table)
+                content_line.append(new_brightness[i].item())
+
+                if number != bright_ness_old and k < real_rgb.shape[0] -1:
+                    k+=1
+                    bright_ness_old = number
+
+                
+                content_line.append(real_rgb[k].tolist())
+                content_line.append(comp_rgb[k].tolist())
+                content.append(content_line)
+            
+            table = tabulate(content, headers, tablefmt="grid")
+            file.write(table)
         
         return out
 
