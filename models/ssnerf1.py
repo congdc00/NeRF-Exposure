@@ -121,7 +121,8 @@ class SSNeRF1Model(BaseModel):
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
 
         tmp = torch.ones_like(weights)
-        print(f"weights.shape {weights.shape}")
+        shape_tmp = weights.shape.tolist()[0]
+        print(f"shape {shape_tmp}")
 
         print(f"t_origins {t_origins}")
         bright_ness = self.shutter_speed(True, t_origins)
