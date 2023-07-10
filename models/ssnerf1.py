@@ -120,12 +120,13 @@ class SSNeRF1Model(BaseModel):
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
 
-        new_weight = torch.ones_like(opacity)
+        new_origin = torch.ones_like(opacity)
         t_origins_camera = []
-        for i in range(t_origins.shape):
+        print(f"t_origins.shape {t_origins.shape}")
+        for i in range(t_origins.shape[0]):
             if ray_indices[i] != ray_indices[i-1]:
                 k = ray_indices[i]
-                t_origins_camera[i] = t_origins[k]
+                new_origin[k] = t_origins[k]
 
         # print(f"t_origins_camera {t_origins_camera}")
         # print(f"t_origins {t_origins}")
