@@ -122,7 +122,7 @@ class SSNeRF1Model(BaseModel):
 
         print(f"rgb {rgb.shape}")
         print(f"n_rays {n_rays}")
-        print(f"ray_indices {ray_indices.shape}")
+        print(f"ray_indices {ray_indices}")
         print(f"comp_rgb {comp_rgb.shape}")
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
         
