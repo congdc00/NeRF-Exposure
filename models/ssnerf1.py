@@ -102,7 +102,9 @@ class SSNeRF1Model(BaseModel):
 
 
         t_origins_camera = torch.unique(t_origins)
-        bright_ness = self.shutter_speed(True, t_origins_camera)
+        print(f"t_origins {t_origins.shape}")
+        print(f"t_origins_camera {t_origins_camera.shape}")
+        bright_ness = self.shutter_speed(True, t_origins)
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
@@ -116,7 +118,7 @@ class SSNeRF1Model(BaseModel):
         
         # fake_brightness = torch.ones_like(rgb)
         # print(f"fake_brightness {fake_brightness.shape}")
-        new_rgb = rgb #* bright_ness
+        new_rgb = rgb * bright_ness
 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
@@ -126,7 +128,8 @@ class SSNeRF1Model(BaseModel):
 
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
         
-        comp_rgb = comp_rgb*bright_ness + self.background_color * (1.0 - opacity) 
+        comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
+        print(f"comp_rgb {comp_rgb.shape}")
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
 
         # Export 
