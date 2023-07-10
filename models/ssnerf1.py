@@ -121,7 +121,7 @@ class SSNeRF1Model(BaseModel):
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=new_rgb, n_rays=n_rays) #([Num_points, 1])
 
         print(f"rgb {rgb.shape}")
-        print(f"n_rays {n_rays.shape}")
+        print(f"n_rays {n_rays}")
         print(f"comp_rgb {comp_rgb.shape}")
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
         
