@@ -142,18 +142,21 @@ class SSNeRF1Model(BaseModel):
             # for check
             file_path = f"./log_epoch_1.txt"
             content = []
+            headers = ["brightness", "rgb", "real_rgb", "new_rgb", "comp_rgb"]
             with open(file_path, 'w') as file:
                 for i in range (bright_ness.shape[0]):
                     # brightness
                     number = "{:.2f}".format(bright_ness[i].item())
                     content_line = []
-                    content_line.append(f"brightness {number}")
-                    content_line.append(f"rgb {rgb[i].tolist()}")
-                    content_line.append(f"real_rgb {real_rgb[i].tolist()}")
-                    content_line.append(f"new_rgb {new_rgb[i].tolist()}")
-                    content_line.append(f"comp_rgb {comp_rgb[i].tolist()}")
+                    content_line.append(number)
+                    content_line.append(rgb[i].tolist())
+                    content_line.append(real_rgb[i].tolist())
+                    content_line.append(new_rgb[i].tolist())
+                    content_line.append(comp_rgb[i].tolist())
                     content.append(content_line)
-                file.write(content)
+                
+                table = tabulate(content, headers, tablefmt="grid")
+                file.write(table)
 
             out.update({
                 'weights': weights.view(-1),
