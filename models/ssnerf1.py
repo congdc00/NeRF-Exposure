@@ -120,7 +120,9 @@ class SSNeRF1Model(BaseModel):
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
 
         t_origins_camera =  accumulate_along_rays(torch.ones_like(weights), ray_indices, values=t_origins, n_rays=n_rays)
+        print(f"t_origins_camera {t_origins_camera[0]}")
         bright_ness = self.shutter_speed(True, t_origins_camera)
+        print(f"bright_ness {bright_ness[0]}")
 
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
