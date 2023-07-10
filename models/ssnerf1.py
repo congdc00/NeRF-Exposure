@@ -140,7 +140,7 @@ class SSNeRF1Model(BaseModel):
         
         if self.training:
             # for check
-            file_path = f"./log_epoch_2.txt"
+            file_path = f"./log_epoch_3.txt"
             content = []
             headers = ["brightness", "rgb", "new_rgb", "real_rgb", "comp_rgb"]
             k = 0
