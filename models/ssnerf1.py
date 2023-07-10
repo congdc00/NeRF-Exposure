@@ -142,7 +142,7 @@ class SSNeRF1Model(BaseModel):
             'positions':positions
         }
         
-        # if self.training:
+        if self.training:
             
         #     # for check
         #     file_path = f"./log_epoch_3.txt"
