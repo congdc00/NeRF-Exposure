@@ -142,7 +142,7 @@ class SSNeRF1Model(BaseModel):
             # for check
             file_path = f"./log_epoch_1.txt"
             content = []
-            headers = ["brightness", "rgb", "real_rgb", "new_rgb", "comp_rgb"]
+            headers = ["brightness", "rgb", "new_rgb", "real_rgb", "comp_rgb"]
             k = 0
             bright_ness_old = bright_ness[0].item()
             with open(file_path, 'w') as file:
@@ -155,7 +155,7 @@ class SSNeRF1Model(BaseModel):
                     content_line.append(rgb[i].tolist())
                     content_line.append(new_rgb[i].tolist())
 
-                    if number != bright_ness[i].item():
+                    if number != bright_ness[i].item() and k < real_rgb.shape:
                         k+=1
 
                     content_line.append(real_rgb[k].tolist())
