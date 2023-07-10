@@ -123,11 +123,12 @@ class SSNeRF1Model(BaseModel):
 
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
         
-        weights_fake = torch.full_like(weights, 0.001)
-        bright_ness_fake = accumulate_along_rays(weights_fake, ray_indices, values=bright_ness, n_rays=n_rays)    
+
         #Độ sáng
+        for i in range(comp_rgb.shape[0]):
+            k = int(ray_indices[i])
+            comp_rgb[i] = comp_rgb[i]*bright_ness[k]
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
-        comp_rgb = comp_rgb*bright_ness_fake
         # comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)
         
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
