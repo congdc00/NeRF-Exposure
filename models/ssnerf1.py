@@ -147,35 +147,29 @@ class SSNeRF1Model(BaseModel):
         
         if self.training:
             
-            # # for check
-            # file_path = f"./log_epoch_3.txt"
-            # content = []
-            # headers = ["brightness", "rgb", "rgb*brightness","weights", "bright_ness_fake","volume_rendering rgb", "volume_rendering rgb*brightness", "opacity"]
-            # k = 0
-            # bright_ness_old = bright_ness[0].item()
-            # with open(file_path, 'w') as file:
-            #     for i in range (bright_ness.shape[0]):
+            # for check
+            file_path = f"./log_epoch_3.txt"
+            content = []
+            headers = ["brightness", "rgb", "rgb*brightness","weights", "bright_ness_fake","volume_rendering rgb", "volume_rendering rgb*brightness", "opacity"]
+            k = 0
+            bright_ness_old = bright_ness[0].item()
+            with open(file_path, 'w') as file:
+                for i in range (bright_ness.shape[0]):
 
-            #         # brightness
-            #         number = bright_ness[i].item()
-            #         content_line = []
-            #         content_line.append(number)
-            #         content_line.append(rgb[i].tolist())
-            #         content_line.append(new_rgb[i].tolist())
-            #         content_line.append(weights[i].item())
-
-            #         if number != bright_ness_old and k < real_rgb.shape[0] -1:
-            #             k+=1
-            #             bright_ness_old = number
-
-            #         content_line.append(bright_ness_fake[k].tolist())
-            #         content_line.append(real_rgb[k].tolist())
-            #         content_line.append(comp_rgb[k].tolist())
-            #         content_line.append(opacity[k].tolist())
-            #         content.append(content_line)
+                    content_line = []
+                    content_line.append(bright_ness[i].item())
+                    content_line.append(rgb[i].tolist())
+                    content_line.append(new_rgb[i].tolist())
+                    content_line.append(weights[i].item())
+                    k = int(ray_indices[i])
+                    content_line.append(bright_ness_fake[k].tolist())
+                    content_line.append(real_rgb[k].tolist())
+                    content_line.append(comp_rgb[k].tolist())
+                    content_line.append(opacity[k].tolist())
+                    content.append(content_line)
                 
-            #     table = tabulate(content, headers, tablefmt="grid")
-            #     file.write(table)
+                table = tabulate(content, headers, tablefmt="grid")
+                file.write(table)
 
             out.update({
                 'weights': weights.view(-1),
