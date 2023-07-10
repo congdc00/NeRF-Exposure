@@ -127,6 +127,8 @@ class SSNeRF1Model(BaseModel):
         #Độ sáng
         for i in range(comp_rgb.shape[0]):
             k = int(ray_indices[i])
+            print(f"brightness = {bright_ness[k]}")
+            print(f"comp_rgb[i] = {comp_rgb[i]}")
             comp_rgb[i] = comp_rgb[i]*bright_ness[k]
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
         # comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)
