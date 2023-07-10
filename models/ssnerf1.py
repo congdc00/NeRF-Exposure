@@ -9,7 +9,7 @@ from models.base import BaseModel
 from models.utils import chunk_batch
 from systems.utils import update_module_step
 from nerfacc import ContractionType, OccupancyGrid, ray_marching, render_weight_from_density, accumulate_along_rays
-
+from tabulate import tabulate
 
 @models.register('ssnerf1')
 class SSNeRF1Model(BaseModel):
@@ -125,10 +125,6 @@ class SSNeRF1Model(BaseModel):
         comp_rgb = comp_rgb + self.background_color * (1.0 - opacity) 
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
 
-
-       
-        
-
         # Export 
         out = {
             'comp_rgb': comp_rgb,
@@ -144,23 +140,19 @@ class SSNeRF1Model(BaseModel):
         
         if self.training:
             # for check
-            file_path = f"./log_epoch_4.txt"
-            content = ""
+            file_path = f"./log_epoch_1.txt"
+            content = []
             with open(file_path, 'w') as file:
                 for i in range (bright_ness.shape[0]):
                     # brightness
                     number = "{:.2f}".format(bright_ness[i].item())
-
-                    content += f"brightness {number}" + ", "
-
-                    content += f"rgb {rgb[i].tolist()}" + ", "
-                    content += f"real_rgb {real_rgb[0].tolist()}" + ", "
-                    
-                    content += f"rgb {new_rgb[i].tolist()}" + ", "
-                    content += f"real_rgb {comp_rgb[0].tolist()}" + ", "
-                    
-                    content+="\n"
-                    
+                    content_line = []
+                    content_line.append(f"brightness {number}")
+                    content_line.append(f"rgb {rgb[i].tolist()}")
+                    content_line.append(f"real_rgb {real_rgb[i].tolist()}")
+                    content_line.append(f"new_rgb {new_rgb[i].tolist()}")
+                    content_line.append(f"comp_rgb {comp_rgb[i].tolist()}")
+                    content.append(content_line)
                 file.write(content)
 
             out.update({
