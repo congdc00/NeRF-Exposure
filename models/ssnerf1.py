@@ -129,6 +129,7 @@ class SSNeRF1Model(BaseModel):
         print(f"n_rays {n_rays}")
         print(f"t_origins_new {t_origins_new.shape}")
         print(f"real_rgb {real_rgb.shape}")
+        print(f"rays_o {rays_o.shape}")
         bright_ness = self.shutter_speed(True, t_origins_new)
   
 
