@@ -99,7 +99,7 @@ class SSNeRF1Model(BaseModel):
         # Forward
         file_path = "./info.txt"
         with open(file_path, 'w',newline="\n") as file:
-            file.write(ray_indices)
+            file.write(str(ray_indices))
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(True, cor_feature, positions) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(True, rays_o)
