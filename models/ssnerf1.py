@@ -102,6 +102,7 @@ class SSNeRF1Model(BaseModel):
 
 
         t_origins_camera = torch.unique(t_origins)
+        print(f"t_origins_camera {t_origins_camera}")
         bright_ness = self.shutter_speed(True, t_origins_camera)
 
         # network_inp torch.Size([97790, 32])
