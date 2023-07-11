@@ -118,7 +118,7 @@ class SSNeRF1Model(BaseModel):
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
 
         # print(f"self.background_color {self.background_color}")
-        comp_rgb = real_rgb*bright_ness  + self.background_color * (1.0 - opacity)
+        comp_rgb = (real_rgb  + self.background_color * (1.0 - opacity))*bright_ness
         # print(f"bright_ness {bright_ness[0].item()}")
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
 
