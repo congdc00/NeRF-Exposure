@@ -117,7 +117,7 @@ class SSNeRF1Model(BaseModel):
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
 
-        print(f"self.background_color {self.background_color}")
+        self.background_color = torch.tensor([1,1,1])
         comp_rgb = real_rgb*bright_ness  + self.background_color * (1.0 - opacity)
         print(f"bright_ness {bright_ness[0].item()}")
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
