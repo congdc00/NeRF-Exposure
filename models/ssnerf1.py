@@ -99,6 +99,7 @@ class SSNeRF1Model(BaseModel):
 
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(True, cor_feature, positions) # Dự đoán ra màu sắc
+        
         bright_ness = self.shutter_speed(True, rays_o)
         
 
@@ -116,7 +117,7 @@ class SSNeRF1Model(BaseModel):
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
-
+        print(f"bright_ness {bright_ness[0].item()}")
         # print(f"self.background_color {self.background_color}")
         comp_rgb = real_rgb*bright_ness  + self.background_color * (1.0 - opacity)
         # print(f"bright_ness {bright_ness[0].item()}")
