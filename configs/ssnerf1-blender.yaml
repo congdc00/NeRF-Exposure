@@ -85,9 +85,11 @@ system:
     lambda_rgb: 1.
     lambda_distortion: 0.
   optimizer:
-    name: SGD
+    name: AdamW
     args:
       lr: 0.001
+      betas: [0.9, 0.99]
+      eps: 1.e-15
 
   scheduler:
     name: MultiStepLR
