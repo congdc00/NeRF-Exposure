@@ -156,7 +156,7 @@ class SSNeRF1System(BaseSystem):
             with open(file_path, 'r') as file:
                 content_line = file.readlines()
                 print(f"content 1 {content_line}")
-                content = [line for line in content_line]
+                content = [line for line in list(content_line)]
                 print(f"content {content}")
         else:
             content = []
