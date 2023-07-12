@@ -34,7 +34,6 @@ class SSNeRF1System(BaseSystem):
     def preprocess_data(self, batch, stage):
         if 'index' in batch: # validation / testing
             index = batch['index']
-        
         else:
             if self.config.model.batch_image_sampling:
                 index = torch.randint(0, len(self.dataset.all_images), size=(self.train_num_rays,), device=self.dataset.all_images.device)
@@ -155,12 +154,10 @@ class SSNeRF1System(BaseSystem):
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
                 content = file.read()
-                print(f"content 1 {content}")
         else:
             content = ""
         with open(file_path, 'w',newline="\n") as file:
             content += str(expore_sure_predict) +"\n"
-            print(f"content2 {content}")
             file.write(str(content))
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
