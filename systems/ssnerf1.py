@@ -154,10 +154,10 @@ class SSNeRF1System(BaseSystem):
         file_path = f"./log_bright_ness.txt"
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
-                content_line = file.readlines()
-                print(f"content 1 {content_line}")
+                content = file.readlines()
+                print(f"content 1 {content}")
         else:
-            content_line = ""
+            content = ""
         with open(file_path, 'w',newline="\n") as file:
             content += str(expore_sure_predict) +"\n"
             print(f"content2 {content}")
