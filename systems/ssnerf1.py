@@ -12,6 +12,7 @@ from models.ray_utils import get_rays
 import systems
 from systems.base import BaseSystem
 from systems.criterions import PSNR, SSIM
+from tabulate import tabulate
 
 @systems.register('ssnerf1-system')
 class SSNeRF1System(BaseSystem):
@@ -148,15 +149,25 @@ class SSNeRF1System(BaseSystem):
         image_predict = out['comp_rgb']
         color_predict = out["real_rgb"]
         density_predict = out['depth']
-        # shutter_speed_predict = out['bright_ness'][0]
+        expore_sure_predict = out['bright_ness'][0]
 
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
-        # ssim = self.criterions['ssim'](image_predict.to(image_origin), image_origin)
+
         W, H = self.dataset.img_wh
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
 
-        # print(f"bright_ness {out['bright_ness']}")
+        # Save difference brightness 
+        file_path = f"./log_bright_ness.txt"
+        with open(file_path, 'r', newline="\n") as file:
+            content_line = file.readlines()
+            content = [line.strip() for line in content_line]
+
+        headers = ["expore_sure_predict"]
+        with open(file_path, 'w',newline="\n") as file:
+            content.append(expore_sure_predict)
+            table = tabulate(content, headers, tablefmt="grid")
+            file.write(table)
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             # {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
