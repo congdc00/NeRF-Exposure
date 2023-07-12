@@ -162,6 +162,7 @@ class SSNeRF1System(BaseSystem):
 
         with open(file_path, 'w',newline="\n") as file:
             content.append(expore_sure_predict)
+            print(f"content2 {content}")
             file.write(content)
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
