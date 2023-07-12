@@ -156,13 +156,10 @@ class SSNeRF1System(BaseSystem):
             with open(file_path, 'r') as file:
                 content_line = file.readlines()
                 print(f"content 1 {content_line}")
-                content = [line for line in list(content_line)]
-                print(f"content {content}")
         else:
-            content = []
-
+            content_line = ""
         with open(file_path, 'w',newline="\n") as file:
-            content.append(expore_sure_predict)
+            content += str(expore_sure_predict) +"\n"
             print(f"content2 {content}")
             file.write(str(content))
 
