@@ -157,7 +157,7 @@ class SSNeRF1System(BaseSystem):
                 content_line = file.readlines()
                 content = [line.strip() for line in content_line]
         else:
-            content
+            content = []
 
         headers = ["expore_sure_predict"]
         with open(file_path, 'w',newline="\n") as file:
