@@ -142,7 +142,7 @@ class SSNeRF1System(BaseSystem):
         image_predict = out['comp_rgb']
         color_predict = out["real_rgb"]
         density_predict = out['depth']
-        expore_sure_predict = out['bright_ness'][0]
+        expore_sure_predict = out['bright_ness'][0].item()
 
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
 
@@ -153,7 +153,7 @@ class SSNeRF1System(BaseSystem):
         # Save difference brightness 
         file_path = f"./log_bright_ness.txt"
         if os.path.exists(file_path):
-            with open(file_path, 'r', newline="\n") as file:
+            with open(file_path, 'r') as file:
                 content_line = file.readlines()
                 content = [line.strip() for line in content_line]
                 print(f"content {content}")
