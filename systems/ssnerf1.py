@@ -159,7 +159,6 @@ class SSNeRF1System(BaseSystem):
         else:
             content
 
-
         headers = ["expore_sure_predict"]
         with open(file_path, 'w',newline="\n") as file:
             content.append(expore_sure_predict)
