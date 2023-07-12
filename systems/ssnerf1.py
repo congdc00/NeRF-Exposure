@@ -155,7 +155,7 @@ class SSNeRF1System(BaseSystem):
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
                 content_line = file.readlines()
-                content = [line.strip() for line in content_line]
+                content = [line for line in content_line]
                 print(f"content {content}")
         else:
             content = []
