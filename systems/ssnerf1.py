@@ -163,7 +163,7 @@ class SSNeRF1System(BaseSystem):
         with open(file_path, 'w',newline="\n") as file:
             content.append(expore_sure_predict)
             print(f"content2 {content}")
-            file.write(content)
+            file.write(str(content))
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             # {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
