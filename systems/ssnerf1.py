@@ -159,11 +159,9 @@ class SSNeRF1System(BaseSystem):
         else:
             content = []
 
-        headers = ["expore_sure_predict"]
         with open(file_path, 'w',newline="\n") as file:
             content.append(expore_sure_predict)
-            table = tabulate(content, headers, tablefmt="grid")
-            file.write(table)
+            file.write(content)
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             # {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
