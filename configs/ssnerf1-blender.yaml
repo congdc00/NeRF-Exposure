@@ -87,7 +87,7 @@ system:
   optimizer:
     name: AdamW
     args:
-      lr: 0.009 #0.0006 -> random
+      lr: 0.005 #0.0006 -> random
       betas: [0.9, 0.99]
       eps: 1.e-15
 
