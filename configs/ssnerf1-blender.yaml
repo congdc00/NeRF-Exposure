@@ -64,7 +64,7 @@ model:
       activation: ReLU
       output_activation: Sigmoid
       n_neurons: 32
-      n_hidden_layers: 1
+      n_hidden_layers: 2
   shutter_speed:
     name: volume-brightness
     input_feature_dim: ${model.geometry.feature_dim}
@@ -76,7 +76,7 @@ model:
       activation: ReLU
       output_activation: Sigmoid
       n_neurons: 32
-      n_hidden_layers: 1
+      n_hidden_layers: 2
 
 
 system:
