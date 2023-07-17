@@ -38,7 +38,7 @@ model:
     isosurface:
       method: mc
       resolution: 256
-      chunk: 2097152
+      chunk: 262144
       threshold: 5.0
     xyz_encoding_config:
       otype: HashGrid
