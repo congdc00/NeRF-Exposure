@@ -172,6 +172,7 @@ class NeuSSystem(BaseSystem):
         out = self(batch)
         psnr = self.criterions['psnr'](out['comp_rgb_full'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
+        
         torch.save(out['theta'], "theta_neus.pt")
         torch.save(out['positions'], "positions_neus.pt")
 
