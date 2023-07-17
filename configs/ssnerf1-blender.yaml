@@ -28,7 +28,7 @@ model:
   randomized: true
   ray_chunk: 32768
   learned_background: false
-  background_color: random # white giúp giảm bộ nhớ nhẹ hơn
+  background_color: white # white giúp giảm bộ nhớ nhẹ hơn
   geometry:
     name: volume-density
     radius: ${model.radius}
