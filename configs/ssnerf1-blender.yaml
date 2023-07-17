@@ -38,7 +38,7 @@ model:
     isosurface:
       method: mc
       resolution: 256
-      chunk: 2097152
+      chunk: 262144
       threshold: 5.0
     xyz_encoding_config:
       otype: HashGrid
@@ -87,7 +87,7 @@ system:
   optimizer:
     name: AdamW
     args:
-      lr: 0.0006  #0.0006 -> lego_random
+      lr: 0.0003  #0.0006 -> lego_random
       betas: [0.9, 0.99]
       eps: 1.e-15
 
