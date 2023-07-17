@@ -32,7 +32,9 @@ class VolumeRadiance(nn.Module):
         feature [num_points, 16]
         """
 
-        network_inp = torch.cat([features.view(-1, features.shape[-1])] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
+        dirs = (dirs + 1.) / 2. # (-1, 1) => (0, 1)
+        dirs_embd = self.encoding(dirs.view(-1, self.n_dir_dims)) #[num_points, 16]
+        network_inp = torch.cat([features.view(-1, features.shape[-1]), dirs_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1)
 
         # freeze
         color = self.network(network_inp).view(*features.shape[:-1], self.n_output_dims).float()
