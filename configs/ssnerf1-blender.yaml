@@ -21,12 +21,12 @@ model:
   radius: 1.5
   num_samples_per_ray: 1024
   train_num_rays: 256
-  max_train_num_rays: 8192 # số lượng điểm được đưa vào huấn luyện 1 batch
+  max_train_num_rays: 4096 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
   dynamic_ray_sampling: true
   batch_image_sampling: true
   randomized: true
-  ray_chunk: 65536
+  ray_chunk: 32768
   learned_background: false
   background_color: white # white giúp giảm bộ nhớ nhẹ hơn
   geometry:
@@ -75,7 +75,7 @@ model:
       otype: FullyFusedMLP
       activation: ReLU
       output_activation: Sigmoid
-      n_neurons: 64
+      n_neurons: 32
       n_hidden_layers: 2
 
 
