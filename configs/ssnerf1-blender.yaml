@@ -76,7 +76,7 @@ model:
       activation: ReLU
       output_activation: Sigmoid
       n_neurons: 32
-      n_hidden_layers: 2
+      n_hidden_layers: 1
 
 
 system:
