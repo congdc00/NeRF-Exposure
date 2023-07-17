@@ -63,7 +63,7 @@ model:
       otype: FullyFusedMLP
       activation: ReLU
       output_activation: Sigmoid
-      n_neurons: 32 
+      n_neurons: 64 
       n_hidden_layers: 2
   shutter_speed:
     name: volume-brightness
