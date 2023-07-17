@@ -192,6 +192,11 @@ class NeuSModel(BaseModel):
             'num_samples': torch.as_tensor([len(t_starts)], dtype=torch.int32, device=rays.device)
         }
 
+        out.update({
+            'theta': weights,
+            'positions':positions
+        })
+
         if self.training:
             out.update({
                 'weights': weights.view(-1),
