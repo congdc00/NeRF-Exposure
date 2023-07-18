@@ -98,8 +98,44 @@ class SSNeRF1System(BaseSystem):
             - batch_idx: index của từng batch
         '''
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
+        print(f"batch['index'] {batch['index']} \t batch['rays'] {batch['rays'].shape} \t batch['rgb'] {batch['rgb'].shape} \t batch['fg_mask'] {batch['fg_mask'].shape}")
         loss = 0.
-
+        """true
+        {'index': tensor([0], device='cuda:0'), 
+        'rays': tensor([[ 0.2047,  0.7417,  3.9570,  0.1800, -0.5525, -0.8138],
+        [ 0.2047,  0.7417,  3.9570,  0.1793, -0.5525, -0.8140],
+        [ 0.2047,  0.7417,  3.9570,  0.1785, -0.5524, -0.8142],
+        ...,
+        [ 0.2047,  0.7417,  3.9570, -0.2691,  0.2242, -0.9366],
+        [ 0.2047,  0.7417,  3.9570, -0.2698,  0.2244, -0.9364],
+        [ 0.2047,  0.7417,  3.9570, -0.2705,  0.2245, -0.9362]],
+       device='cuda:0'), 'rgb': tensor([[1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.],
+        ...,
+        [1., 1., 1.],
+        [1., 1., 1.],
+        [1., 1., 1.]], device='cuda:0'), 
+        'fg_mask': tensor([0., 0., 0.,  ..., 0., 0., 0.], device='cuda:0')}
+        """
+        """{false
+            'index': tensor([0], device='cuda:0'), 
+            'rays': tensor([[-3.6003,  0.0467,  1.8126,  0.9444,  0.3083, -0.1145],
+                        [-3.6003,  0.0467,  1.8126,  0.9446,  0.3076, -0.1146],
+                        [-3.6003,  0.0467,  1.8126,  0.9448,  0.3068, -0.1146],
+                        ...,
+                        [-3.6003,  0.0467,  1.8126,  0.6482, -0.3275, -0.6874],
+                        [-3.6003,  0.0467,  1.8126,  0.6480, -0.3282, -0.6873],
+                        [-3.6003,  0.0467,  1.8126,  0.6479, -0.3289, -0.6871]],
+                    device='cuda:0'), 
+            'rgb': tensor([[1., 1., 1.],
+                    [1., 1., 1.],
+                    [1., 1., 1.],
+                    ...,
+                    [1., 1., 1.],
+                    [1., 1., 1.],
+                    [1., 1., 1.]], device='cuda:0'), 
+            'fg_mask': tensor([0., 0., 0.,  ..., 0., 0., 0.], device='cuda:0')}"""
         # update train_num_rays
         if self.config.model.dynamic_ray_sampling:
             train_num_rays = int(self.train_num_rays * (self.train_num_samples / out['num_samples'].sum().item()))        
