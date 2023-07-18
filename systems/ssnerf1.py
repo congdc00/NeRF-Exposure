@@ -150,7 +150,7 @@ class SSNeRF1System(BaseSystem):
         logger.info(f"validation_step")
         try:
             out = self(batch)
-
+            print(f"run here ..")
             image_origin = batch['rgb'] 
             image_predict = out['comp_rgb']
             color_predict = out["real_rgb"]
