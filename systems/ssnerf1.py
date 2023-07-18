@@ -148,50 +148,44 @@ class SSNeRF1System(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         logger.info(f"validation_step")
-        try:
-            out = self(batch)
-            print(f"run here ..")
-            image_origin = batch['rgb'] 
-            image_predict = out['comp_rgb']
-            color_predict = out["real_rgb"]
-            density_predict = out['depth']
-            expore_sure_predict = out['bright_ness'][0].item()
 
-            psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
+        out = self(batch)
+        print(f"run here ..")
+           
+        image_origin = batch['rgb'] 
+        image_predict = out['comp_rgb']
+        color_predict = out["real_rgb"]
+        density_predict = out['depth']
+        expore_sure_predict = out['bright_ness'][0].item()
 
-            W, H = self.dataset.img_wh
-            torch.save(out['theta'], "theta.pt")
-            torch.save(out['positions'], "positions.pt")
+        psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
 
-            # Save difference brightness 
-            file_path = f"./log_bright_ness.txt"
-            if os.path.exists(file_path):
-                with open(file_path, 'r') as file:
-                    content = file.read()
-            else:
-                content = ""
-            with open(file_path, 'w',newline="\n") as file:
-                content += str(expore_sure_predict) +"\n"
-                file.write(str(content))
+        W, H = self.dataset.img_wh
+        torch.save(out['theta'], "theta.pt")
+        torch.save(out['positions'], "positions.pt")
 
-            self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-                {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
-            ])
+        # Save difference brightness 
+        file_path = f"./log_bright_ness.txt"
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                content = file.read()
+        else:
+            content = ""
+        with open(file_path, 'w',newline="\n") as file:
+            content += str(expore_sure_predict) +"\n"
+            file.write(str(content))
 
-            return {
-                'psnr': psnr,
-                # 'ssim': ssim,
-                'index': batch['index']
-            }
-        except:
-            return {
-                'psnr': 0,
-                # 'ssim': ssim,
-                'index': batch['index']
-            }
-          
+        self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
+            {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
+        ])
+
+        return {
+            'psnr': psnr,
+            # 'ssim': ssim,
+            'index': batch['index']
+        }
     
     def validation_epoch_end(self, out):
         out = self.all_gather(out)
