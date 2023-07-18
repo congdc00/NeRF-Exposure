@@ -21,7 +21,7 @@ model:
   radius: 1.5
   num_samples_per_ray: 1024
   train_num_rays: 256
-  max_train_num_rays: 2048 # số lượng điểm được đưa vào huấn luyện 1 batch
+  max_train_num_rays: 1024 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
   dynamic_ray_sampling: true
   batch_image_sampling: true
