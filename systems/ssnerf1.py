@@ -148,8 +148,9 @@ class SSNeRF1System(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         logger.info(f"validation_step")
-        print(f"batch {batch.keys()}")
-        out = self(batch)
+        print(f"batch {batch}")
+        out = self(batch) 
+        # failse: ['index', 'rays', 'rgb', 'fg_mask']
         print(f"run here ..")
            
         image_origin = batch['rgb'] 
