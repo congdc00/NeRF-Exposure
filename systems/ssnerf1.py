@@ -107,7 +107,8 @@ class SSNeRF1System(BaseSystem):
         
         
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
-        print(f" out['bright_ness'] {out['bright_ness']}")
+        print(f" out['bright_ness'] {loss_rgb.shape}")
+        print(f" out['bright_ness'] {out['bright_ness'].shape}")
         total_loss = loss_rgb
         # print(f"loss_rgb {loss_rgb}")
         self.log('train/loss_rgb', loss_rgb)
