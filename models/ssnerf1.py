@@ -16,7 +16,9 @@ class SSNeRF1Model(BaseModel):
     def setup(self):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
+        import torch.distributed as dist
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
+        dist.init_process_group(backend='nccl', init_method='tcp://localhost:FREE_PORT', rank=0, world_size=0)
         self.shutter_speed = DistributedDataParallel(self.shutter_speed, find_unused_parameters=True)
 
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
