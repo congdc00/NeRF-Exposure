@@ -111,7 +111,11 @@ class SSNeRF1System(BaseSystem):
         print(f" out['bright_ness'] {out['bright_ness'].shape}")
         ex_predict = out['bright_ness']
         ex_template = torch.ones(out['bright_ness'].shape)
-        print(f" ex_template {ex_template.shape}")
+        
+        ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
+        print(f" ex_delta_matrix {ex_delta_matrix.shape}")
+        ex_delta = torch.sum(ex_delta_matrix)
+        print(f" ex_delta {ex_delta}")
         total_loss = loss_rgb
 
         self.log('train/loss_rgb', loss_rgb)
