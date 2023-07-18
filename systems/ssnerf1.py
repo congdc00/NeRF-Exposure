@@ -110,7 +110,8 @@ class SSNeRF1System(BaseSystem):
         
         print(f" out['bright_ness'] {out['bright_ness'].shape}")
         ex_predict = out['bright_ness']
-        ex_template = torch.ones(out['bright_ness'].shape)
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        ex_template = torch.ones(out['bright_ness'].shape).to(device)
         
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
         print(f" ex_delta_matrix {ex_delta_matrix.shape}")
