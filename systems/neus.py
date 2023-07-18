@@ -173,8 +173,8 @@ class NeuSSystem(BaseSystem):
         psnr = self.criterions['psnr'](out['comp_rgb_full'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
         
-        torch.save(out['theta'], "theta_neus.pt")
-        torch.save(out['positions'], "positions_neus.pt")
+        # torch.save(out['theta'], "theta_neus.pt")
+        # torch.save(out['positions'], "positions_neus.pt")
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
