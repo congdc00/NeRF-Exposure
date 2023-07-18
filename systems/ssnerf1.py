@@ -98,7 +98,7 @@ class SSNeRF1System(BaseSystem):
             - batch_idx: index của từng batch
         '''
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
-        print(f"batch['index'] {batch['index']} \t batch['rays'] {batch['rays'].shape} \t batch['rgb'] {batch['rgb'].shape} \t batch['fg_mask'] {batch['fg_mask'].shape}")
+        print(f"batch['rays'] {batch['rays'].shape} \t batch['rgb'] {batch['rgb'].shape} \t batch['fg_mask'] {batch['fg_mask'].shape}")
         loss = 0.
         """true
         {'index': tensor([0], device='cuda:0'), 
