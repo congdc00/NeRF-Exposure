@@ -166,8 +166,6 @@ class SSNeRF1System(BaseSystem):
         return {'loss': loss}
     
     def validation_step(self, batch, batch_idx):
-        logger.info(f"validation_step")
-    
         try:
             out = self(batch) 
         except:
