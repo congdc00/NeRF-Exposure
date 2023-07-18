@@ -16,10 +16,7 @@ class SSNeRF1Model(BaseModel):
     def setup(self):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
-        import torch.distributed as dist
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
-        dist.init_process_group(backend='nccl', init_method='tcp://localhost:2909', rank=0, world_size=0)
-        self.shutter_speed = DistributedDataParallel(self.shutter_speed, find_unused_parameters=True)
 
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
@@ -52,7 +49,7 @@ class SSNeRF1Model(BaseModel):
         # Lan truyen nguoc
         update_module_step(self.geometry, epoch, global_step)
         update_module_step(self.texture, epoch, global_step)
-        # update_module_step(self.shutter_speed, epoch, global_step)
+        update_module_step(self.shutter_speed, epoch, global_step)
 
         def occ_eval_fn(x):
             density, _ = self.geometry(x)
@@ -102,7 +99,7 @@ class SSNeRF1Model(BaseModel):
 
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(True, cor_feature, positions) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(False, rays_o) * 2
+        bright_ness = self.shutter_speed(True, rays_o) * 2
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
