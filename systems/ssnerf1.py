@@ -167,11 +167,15 @@ class SSNeRF1System(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         logger.info(f"validation_step")
-        print(f"\n batch['batch_idx'] {batch['index'].item()} \t batch['rays'] {batch['rays'].shape} \t batch['rgb'] {batch['rgb'].shape} \t batch['fg_mask'] {batch['fg_mask'].shape}")
-        out = self(batch) 
-        #['index', 'rays', 'rgb', 'fg_mask']
-        # True:     batch['rays'] torch.Size([640000, 6]) 	 batch['rgb'] torch.Size([640000, 3]) 	 batch['fg_mask'] torch.Size([640000])
-        # False:    batch['rays'] torch.Size([640000, 6]) 	 batch['rgb'] torch.Size([640000, 3]) 	 batch['fg_mask'] torch.Size([640000])
+    
+        try:
+            out = self(batch) 
+        except:
+            return {
+                'psnr': 0.0,
+                # 'ssim': ssim,
+                'index': batch['index']
+            }
            
         image_origin = batch['rgb'] 
         image_predict = out['comp_rgb']
