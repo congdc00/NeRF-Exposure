@@ -167,7 +167,7 @@ class SSNeRF1System(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         logger.info(f"validation_step")
-        print(f"\n batch['batch_idx'] {batch['index'].shape} \t batch['rays'] {batch['rays'].shape} \t batch['rgb'] {batch['rgb'].shape} \t batch['fg_mask'] {batch['fg_mask'].shape}")
+        print(f"\n batch['batch_idx'] {batch['index'].item()} \t batch['rays'] {batch['rays'].shape} \t batch['rgb'] {batch['rgb'].shape} \t batch['fg_mask'] {batch['fg_mask'].shape}")
         out = self(batch) 
         #['index', 'rays', 'rgb', 'fg_mask']
         # True:     batch['rays'] torch.Size([640000, 6]) 	 batch['rgb'] torch.Size([640000, 3]) 	 batch['fg_mask'] torch.Size([640000])
