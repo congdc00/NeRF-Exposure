@@ -113,8 +113,9 @@ class SSNeRF1System(BaseSystem):
         ex_template = torch.ones(out['bright_ness'].shape).to(device)
         
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
-        ex_delta = torch.sum(ex_delta_matrix)
-        print(f"loss_rgb {loss_rgb} & ex {0.0001*ex_delta}")
+
+        ex_delta = torch.mean(ex_delta_matrix)
+        print(f"loss_rgb {loss_rgb} & ex {ex_delta}")
         
         total_loss = loss_rgb + 0.0001*ex_delta
         print(f"total_loss {total_loss}")
