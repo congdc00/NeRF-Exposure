@@ -148,46 +148,52 @@ class SSNeRF1System(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         logger.info(f"validation_step")
-        out = self(batch)
+        try:
+            out = self(batch)
 
-        image_origin = batch['rgb'] 
-        image_predict = out['comp_rgb']
-        color_predict = out["real_rgb"]
-        density_predict = out['depth']
-        expore_sure_predict = out['bright_ness'][0].item()
+            image_origin = batch['rgb'] 
+            image_predict = out['comp_rgb']
+            color_predict = out["real_rgb"]
+            density_predict = out['depth']
+            expore_sure_predict = out['bright_ness'][0].item()
 
-        psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
+            psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
 
-        W, H = self.dataset.img_wh
-        torch.save(out['theta'], "theta.pt")
-        torch.save(out['positions'], "positions.pt")
+            W, H = self.dataset.img_wh
+            torch.save(out['theta'], "theta.pt")
+            torch.save(out['positions'], "positions.pt")
 
-        # Save difference brightness 
-        file_path = f"./log_bright_ness.txt"
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as file:
-                content = file.read()
-        else:
-            content = ""
-        with open(file_path, 'w',newline="\n") as file:
-            content += str(expore_sure_predict) +"\n"
-            file.write(str(content))
+            # Save difference brightness 
+            file_path = f"./log_bright_ness.txt"
+            if os.path.exists(file_path):
+                with open(file_path, 'r') as file:
+                    content = file.read()
+            else:
+                content = ""
+            with open(file_path, 'w',newline="\n") as file:
+                content += str(expore_sure_predict) +"\n"
+                file.write(str(content))
 
-        self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-            {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
-        ])
+            self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
+                {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
+            ])
 
-        return {
-            'psnr': psnr,
-            # 'ssim': ssim,
-            'index': batch['index']
-        }
+            return {
+                'psnr': psnr,
+                # 'ssim': ssim,
+                'index': batch['index']
+            }
+        except:
+            return {
+                'psnr': 0,
+                # 'ssim': ssim,
+                'index': batch['index']
+            }
           
     
     def validation_epoch_end(self, out):
-        logger.info(f"Validation end")
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
             out_set_psnr = {}
