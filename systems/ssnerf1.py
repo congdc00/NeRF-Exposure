@@ -6,7 +6,7 @@ import imageio
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_debug
 import os
-
+from loguru import logger
 import models
 from models.ray_utils import get_rays
 import systems
@@ -173,7 +173,6 @@ class SSNeRF1System(BaseSystem):
             file.write(str(content))
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-            # {'type': 'rgb', 'img': image_origin.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
@@ -187,6 +186,7 @@ class SSNeRF1System(BaseSystem):
           
     
     def validation_epoch_end(self, out):
+        logger.info(f"Validation end")
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
             out_set_psnr = {}
