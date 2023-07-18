@@ -150,7 +150,9 @@ class SSNeRF1System(BaseSystem):
         logger.info(f"validation_step")
         print(f"batch {batch}")
         out = self(batch) 
+        print(f"out {out}")
         # failse: ['index', 'rays', 'rgb', 'fg_mask']
+
         print(f"run here ..")
            
         image_origin = batch['rgb'] 
