@@ -120,8 +120,8 @@ class SSNeRF1System(BaseSystem):
         total_loss = loss_rgb + 10*ex_delta
         # print(f"total_loss {total_loss}")
 
-        self.log('train/loss_rgb', loss_rgb)
-        loss += loss_rgb * self.C(self.config.system.loss.lambda_rgb)
+        self.log('train/loss_rgb', total_loss)
+        loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
         # print(f"loss_rgb 2 {loss_rgb}")
         # distortion loss proposed in MipNeRF360
         if self.C(self.config.system.loss.lambda_distortion) > 0:
