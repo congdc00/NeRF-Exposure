@@ -48,7 +48,7 @@ class SSNeRF1Model(BaseModel):
         # Lan truyen nguoc
         update_module_step(self.geometry, epoch, global_step)
         update_module_step(self.texture, epoch, global_step)
-        # update_module_step(self.shutter_speed, epoch, global_step)
+        update_module_step(self.shutter_speed, epoch, global_step)
 
         def occ_eval_fn(x):
             density, _ = self.geometry(x)
@@ -98,7 +98,7 @@ class SSNeRF1Model(BaseModel):
 
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(True, cor_feature, positions) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(False, rays_o) * 2
+        bright_ness = self.shutter_speed(True, rays_o)
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
@@ -113,7 +113,7 @@ class SSNeRF1Model(BaseModel):
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
-
+        print(f"bright_ness {bright_ness[0].item()}")
         comp_rgb = real_rgb*bright_ness  + self.background_color * (1.0 - opacity)
         # print(f"bright_ness {bright_ness[0].item()}     --      brightness_mean {torch.mean(bright_ness)}")
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
