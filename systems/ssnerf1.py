@@ -98,7 +98,6 @@ class SSNeRF1System(BaseSystem):
             - batch_idx: index của từng batch
         '''
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
-        print(f"\n batch['rays'] {batch['rays'].shape} \t batch['rgb'] {batch['rgb'].shape} \t batch['fg_mask'] {batch['fg_mask'].shape}")
         loss = 0.
         """true
         {'index': tensor([0], device='cuda:0'), 
@@ -119,23 +118,7 @@ class SSNeRF1System(BaseSystem):
         'fg_mask': tensor([0., 0., 0.,  ..., 0., 0., 0.], device='cuda:0')}
         """
         """{false
-            'index': tensor([0], device='cuda:0'), 
-            'rays': tensor([[-3.6003,  0.0467,  1.8126,  0.9444,  0.3083, -0.1145],
-                        [-3.6003,  0.0467,  1.8126,  0.9446,  0.3076, -0.1146],
-                        [-3.6003,  0.0467,  1.8126,  0.9448,  0.3068, -0.1146],
-                        ...,
-                        [-3.6003,  0.0467,  1.8126,  0.6482, -0.3275, -0.6874],
-                        [-3.6003,  0.0467,  1.8126,  0.6480, -0.3282, -0.6873],
-                        [-3.6003,  0.0467,  1.8126,  0.6479, -0.3289, -0.6871]],
-                    device='cuda:0'), 
-            'rgb': tensor([[1., 1., 1.],
-                    [1., 1., 1.],
-                    [1., 1., 1.],
-                    ...,
-                    [1., 1., 1.],
-                    [1., 1., 1.],
-                    [1., 1., 1.]], device='cuda:0'), 
-            'fg_mask': tensor([0., 0., 0.,  ..., 0., 0., 0.], device='cuda:0')}"""
+            batch['rays'] torch.Size([8192, 6]) 	 batch['rgb'] torch.Size([8192, 3]) 	 batch['fg_mask'] torch.Size([8192])"""
         # update train_num_rays
         if self.config.model.dynamic_ray_sampling:
             train_num_rays = int(self.train_num_rays * (self.train_num_samples / out['num_samples'].sum().item()))        
@@ -184,7 +167,7 @@ class SSNeRF1System(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         logger.info(f"validation_step")
-        print(f"batch {batch}")
+        print(f"\n batch['rays'] {batch['rays'].shape} \t batch['rgb'] {batch['rgb'].shape} \t batch['fg_mask'] {batch['fg_mask'].shape}")
         out = self(batch) 
         print(f"out {out}")
         # failse: ['index', 'rays', 'rgb', 'fg_mask']
