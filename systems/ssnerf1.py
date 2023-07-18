@@ -148,7 +148,7 @@ class SSNeRF1System(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         logger.info(f"validation_step")
-        print(f"batch {batch.key()}")
+        print(f"batch {batch.keys()}")
         out = self(batch)
         print(f"run here ..")
            
