@@ -201,7 +201,7 @@ class SSNeRF1System(BaseSystem):
             {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
         ])
-
+        print(f"psnr: {psnr}")
         return {
             'psnr': psnr,
             # 'ssim': ssim,
