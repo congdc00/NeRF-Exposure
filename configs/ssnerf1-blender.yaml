@@ -70,7 +70,7 @@ model:
     input_feature_dim: ${model.geometry.feature_dim}
     dir_encoding_config:
       otype: SphericalHarmonics
-      degree: 8
+      degree: 4
     mlp_network_config:
       otype: FullyFusedMLP
       activation: ReLU

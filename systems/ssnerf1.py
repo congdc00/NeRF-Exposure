@@ -204,7 +204,7 @@ class SSNeRF1System(BaseSystem):
             {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
         ])
-        print(f"PSNR image val r_{batch['index']}.png: {psnr}")
+        print(f"\n PSNR image val r_{batch['index']}.png: {psnr}")
         return {
             'psnr': psnr,
             # 'ssim': ssim,
