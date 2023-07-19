@@ -11,7 +11,7 @@ from models.ray_utils import get_rays
 import systems
 from systems.base import BaseSystem
 from systems.criterions import PSNR
-
+from loguru import logger
 
 @systems.register('nerf-system')
 class NeRFSystem(BaseSystem):
@@ -140,7 +140,17 @@ class NeRFSystem(BaseSystem):
     """
     
     def validation_step(self, batch, batch_idx):
-        out = self(batch)
+        
+        try:
+            out = self(batch) 
+        except:
+            logger.warning(f"Validation Failed")
+            return {
+                'psnr': 0.0,
+                # 'ssim': ssim,
+                'index': batch['index']
+            }
+
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
 
