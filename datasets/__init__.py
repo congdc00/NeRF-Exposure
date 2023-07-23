@@ -9,6 +9,7 @@ def register(name):
 
 
 def make(name, config):
+    print(f"name {name} config {config}")
     dataset = datasets[name](config)
     return dataset
 
