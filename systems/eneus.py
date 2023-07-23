@@ -86,6 +86,7 @@ class ENeuSSystem(BaseSystem):
         })      
     
     def training_step(self, batch, batch_idx):
+        print("ENeuS")
         out = self(batch)
 
         loss = 0.
