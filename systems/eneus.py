@@ -169,6 +169,7 @@ class ENeuSSystem(BaseSystem):
     """
     
     def validation_step(self, batch, batch_idx):
+        print(f"------------batch {batch.keys()}")
         batch["comp_rgb"] = batch["real_rgb"]
         out = self(batch)
 
