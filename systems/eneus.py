@@ -169,7 +169,9 @@ class ENeuSSystem(BaseSystem):
     """
     
     def validation_step(self, batch, batch_idx):
+        batch["comp_rgb"] = batch["real_rgb"]
         out = self(batch)
+
         psnr = self.criterions['psnr'](out['comp_rgb_full'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
         

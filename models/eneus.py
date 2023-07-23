@@ -48,6 +48,8 @@ class ENeuSModel(BaseModel):
     def setup(self):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry)
         self.texture = models.make(self.config.texture.name, self.config.texture)
+        self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
+
         self.geometry.contraction_type = ContractionType.AABB
 
         if self.config.learned_background:
@@ -82,7 +84,9 @@ class ENeuSModel(BaseModel):
         if self.config.learned_background:
             update_module_step(self.geometry_bg, epoch, global_step)
             update_module_step(self.texture_bg, epoch, global_step)
+        update_module_step(self.shutter_speed, epoch, global_step)
         update_module_step(self.variance, epoch, global_step)
+        
 
         cos_anneal_end = self.config.get('cos_anneal_end', 0)
         self.cos_anneal_ratio = 1.0 if cos_anneal_end == 0 else min(1.0, global_step / cos_anneal_end)
@@ -176,16 +180,19 @@ class ENeuSModel(BaseModel):
         intervals = t_ends - t_starts
 
         density, feature = self.geometry_bg(positions) 
-        rgb = self.texture_bg(feature, t_dirs)
+        rgb = self.texture_bg(feature, positions)
+        real_rgb = self.shutter_speed(True, rays_o) * 2
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
-        comp_rgb = comp_rgb + self.background_color * (1.0 - opacity)       
+        comp_rgb = comp_rgb*real_rgb + self.background_color * (1.0 - opacity)      
+        real_rgb = comp_rgb + self.background_color * (1.0 - opacity)     
 
         out = {
             'comp_rgb': comp_rgb,
+            'real_rgb': real_rgb,
             'opacity': opacity,
             'depth': depth,
             'rays_valid': opacity > 0,
@@ -237,18 +244,23 @@ class ENeuSModel(BaseModel):
             sdf, sdf_grad, feature = self.geometry(positions, with_grad=True, with_feature=True)
         normal = F.normalize(sdf_grad, p=2, dim=-1)
         alpha = self.get_alpha(sdf, normal, t_dirs, dists)[...,None]
-        rgb = self.texture(True, feature, t_dirs, normal)
+        rgb = self.texture(True, feature, positions, normal)
+        bright_ness = self.shutter_speed(True, rays_o) * 2
 
         weights = render_weight_from_alpha(alpha, ray_indices=ray_indices, n_rays=n_rays)
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)
-        comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
+        comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) * bright_ness
+        real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
 
         comp_normal = accumulate_along_rays(weights, ray_indices, values=normal, n_rays=n_rays)
         comp_normal = F.normalize(comp_normal, p=2, dim=-1)
 
+
+
         out = {
             'comp_rgb': comp_rgb,
+            'real_rgb':real_rgb,
             'comp_normal': comp_normal,
             'opacity': opacity,
             'depth': depth,
