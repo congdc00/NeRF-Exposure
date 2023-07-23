@@ -48,6 +48,7 @@ class ENeuSModel(BaseModel):
     def setup(self):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry)
         self.texture = models.make(self.config.texture.name, self.config.texture)
+        print(f"shutter_speed name {self.config.shutter_speed.name}")
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
 
         self.geometry.contraction_type = ContractionType.AABB
