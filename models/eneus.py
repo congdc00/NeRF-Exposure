@@ -181,18 +181,19 @@ class ENeuSModel(BaseModel):
 
         density, feature = self.geometry_bg(positions) 
         rgb = self.texture_bg(feature, positions)
-        shutter_speed = self.shutter_speed(True, rays_o) * 2
+        bright_ness = self.bright_ness(True, rays_o) * 2
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)
         comp_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays)
-        comp_rgb = comp_rgb*shutter_speed + self.background_color * (1.0 - opacity)      
+        comp_rgb = comp_rgb*bright_ness + self.background_color * (1.0 - opacity)      
         real_rgb = comp_rgb + self.background_color * (1.0 - opacity)     
 
         out = {
             'comp_rgb': comp_rgb,
             'real_rgb': real_rgb,
+            'bright_ness': bright_ness,
             'opacity': opacity,
             'depth': depth,
             'rays_valid': opacity > 0,
