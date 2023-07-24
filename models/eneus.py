@@ -287,12 +287,14 @@ class ENeuSModel(BaseModel):
         else:
             out_bg = {
                 'comp_rgb': self.background_color[None,:].expand(*comp_rgb.shape),
+                'real_rgb': self.background_color[None,:].expand(*real_rgb.shape),
                 'num_samples': torch.zeros_like(out['num_samples']),
                 'rays_valid': torch.zeros_like(out['rays_valid'])
             }
 
         out_full = {
             'comp_rgb': out['comp_rgb'] + out_bg['comp_rgb'] * (1.0 - out['opacity']),
+            'real_rgb': out['real_rgb'] + out_bg['real_rgb'] * (1.0 - out['opacity']),
             'num_samples': out['num_samples'] + out_bg['num_samples'],
             'rays_valid': out['rays_valid'] | out_bg['rays_valid']
         }
