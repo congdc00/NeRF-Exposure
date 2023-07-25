@@ -251,6 +251,7 @@ class SSNeRF1System(BaseSystem):
             
             if num_imgs == 0:
                 logger.warning(f"Validation False")
+                psnr = 0
             else: 
                 logger.info(f"Validation on {num_imgs}/{num_all_imgs} images")
                 psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
