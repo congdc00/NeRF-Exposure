@@ -203,6 +203,8 @@ class NeRFSystem(BaseSystem):
                         if int(step_out['psnr'][oi]) != 0.0:
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
                             num_imgs += 1
+                        # out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
+            
             if num_imgs == 0:
                 logger.error(f"Validation False")
                 psnr = 0
@@ -211,9 +213,7 @@ class NeRFSystem(BaseSystem):
                 psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
             else:
                 logger.info(f"Validation on {num_imgs}/{num_all_imgs} images")
-                psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
-
-            self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
+                psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))         
 
     def test_step(self, batch, batch_idx):  
         try:
