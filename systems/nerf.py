@@ -142,6 +142,7 @@ class NeRFSystem(BaseSystem):
     def validation_step(self, batch, batch_idx):
         
         try:
+            logger.success(f"Validation Done")
             out = self(batch) 
         except:
             logger.warning(f"Validation Failed")
@@ -152,14 +153,14 @@ class NeRFSystem(BaseSystem):
             }
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
 
-        mask_object = batch['fg_mask'].view(-1, 1)
-        rgb_non_bg= (batch['rgb']*mask_object)
-        psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_object, rgb_non_bg)
+        # mask_object = batch['fg_mask'].view(-1, 1)
+        # rgb_non_bg= (batch['rgb']*mask_object)
+        # psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_object, rgb_non_bg)
         
-        mask_bg = torch.ones_like(mask_object) - mask_object
-        background_rgb = (batch['rgb']*mask_bg)
-        psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
-        print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
+        # mask_bg = torch.ones_like(mask_object) - mask_object
+        # background_rgb = (batch['rgb']*mask_bg)
+        # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
+        # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
         W, H = self.dataset.img_wh
 
         torch.save(out['theta'], "theta.pt")
@@ -168,7 +169,7 @@ class NeRFSystem(BaseSystem):
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img':batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'rgb', 'img':out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'rgb', 'img':rgb_non_bg.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
+            {'type': 'rgb', 'img':batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
         ])
         return {
             'psnr': psnr,

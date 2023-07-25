@@ -167,10 +167,10 @@ class SSNeRF1System(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         try:
-            logger.success(f"Validation Done")
             out = self(batch) 
+            print(f"r_{batch_idx}.png -> Done", end = " ")
         except:
-            logger.warning(f"Validation Failed")
+            print(f"r_{batch_idx}.png -> Done", end = " ")
             return {
                 'psnr': 0.0,
                 # 'ssim': ssim,
