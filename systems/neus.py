@@ -12,7 +12,7 @@ from models.ray_utils import get_rays
 import systems
 from systems.base import BaseSystem
 from systems.criterions import PSNR, binary_cross_entropy
-
+from loguru import logger
 
 @systems.register('neus-system')
 class NeuSSystem(BaseSystem):
@@ -201,17 +201,42 @@ class NeuSSystem(BaseSystem):
     def validation_epoch_end(self, out):
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
-            out_set = {}
+            out_set_psnr = {}
+            num_imgs = 0
+            num_all_imgs = 0
             for step_out in out:
+                num_all_imgs += 1
+                if int(step_out['index'].item()) == 0:
+                    print(f"\n\nr_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
                 # DP
                 if step_out['index'].ndim == 1:
-                    out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                    if int(step_out['psnr']) != 0.0:
+                        out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                        num_imgs += 1
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
-                        out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-            psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
-            self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
+                        if int(step_out['psnr'][oi]) != 0.0:
+                            out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+                            num_imgs += 1
+                        # out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
+            
+            if num_imgs == 0:
+                logger.error(f"Validation False")
+                psnr = 0
+            else: 
+                
+
+                list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
+                psnr = torch.mean(list_psnr) 
+                psnr_standard= torch.std(list_psnr) 
+
+                if num_imgs<num_all_imgs:
+                    logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
+                else:
+                    logger.info(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
+
+            self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)       
 
     def test_step(self, batch, batch_idx):
         out = self(batch)
