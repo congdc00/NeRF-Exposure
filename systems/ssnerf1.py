@@ -170,7 +170,7 @@ class SSNeRF1System(BaseSystem):
             out = self(batch) 
             print(f"r_{batch_idx}.png -> Done", end = " ")
         except:
-            print(f"r_{batch_idx}.png -> Done", end = " ")
+            print(f"r_{batch_idx}.png -> False", end = " ")
             return {
                 'psnr': 0.0,
                 # 'ssim': ssim,
