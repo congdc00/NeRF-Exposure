@@ -219,7 +219,7 @@ class NeRFSystem(BaseSystem):
                 else:
                     logger.info(f"Validation on {num_imgs}/{num_all_imgs} images -- Variance PSNR: {psnr_variance}")
     
-            self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)      
+            self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)      
     def test_step(self, batch, batch_idx):  
         try:
             out = self(batch) 
