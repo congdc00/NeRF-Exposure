@@ -233,18 +233,23 @@ class SSNeRF1System(BaseSystem):
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
             out_set_psnr = {}
-            # out_set_ssim = {}
+            num_imgs = 0
             for step_out in out:
                 print(f"r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}", end = '; ')
                 # DP
                 if step_out['index'].ndim == 1:
-                    out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                    if int(step_out['psnr']) != 0.0:
+                        out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                        num_imgs += 1
                     # out_set_ssim[step_out['index'].item()] = {'ssim': step_out['ssim']}
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
-                        out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+                        if int(step_out['psnr'][oi]) != 0.0:
+                            out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+                            num_imgs += 1
                         # out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
+            logger.info(f"Validation on {num_imgs} images")
             psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
             # ssim = torch.mean(torch.stack([o['ssim'] for o in out_set_ssim.values()]))
 
