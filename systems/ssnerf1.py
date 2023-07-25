@@ -167,6 +167,7 @@ class SSNeRF1System(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         try:
+            logger.success(f"Validation Done")
             out = self(batch) 
         except:
             logger.warning(f"Validation Failed")
