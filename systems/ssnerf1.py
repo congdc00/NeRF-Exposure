@@ -181,7 +181,7 @@ class SSNeRF1System(BaseSystem):
         except:
             print(f"r_{batch_idx}.png -> False", end = " ")
             return {
-                'psnr': compute_psnr(out["real_rgb"],batch['rgb']),
+                'psnr': 0.0,
                 # 'ssim': ssim,
                 'index': batch['index']
             }
@@ -235,7 +235,7 @@ class SSNeRF1System(BaseSystem):
             out_set_psnr = {}
             # out_set_ssim = {}
             for step_out in out:
-                print(f"index : {step_out['index'].item()} with psnr {step_out['psnr'].item()}")
+                print(f"r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}", end = '; ')
                 # DP
                 if step_out['index'].ndim == 1:
                     out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
