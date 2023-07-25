@@ -152,13 +152,18 @@ class NeRFSystem(BaseSystem):
             }
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
 
+        batch['fg_mask'] = batch['fg_mask'].view(-1, 1)
+        rgb_non_bg= (batch['rgb']*batch['fg_mask'])
+        psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*batch['fg_mask'], rgb_non_bg)
+        # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*batch['fg_mask'], rgb_non_bg)
+        print(f"\n psnr object {psnr_object}")
         W, H = self.dataset.img_wh
 
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
-        batch['fg_mask'] = batch['fg_mask'].view(-1, 1)
+        
         print(f"batch['rgb'] {batch['rgb'].shape} batch['fg_mask']. {batch['fg_mask'].shape}")
-        batch['rgb'] = (batch['rgb']*batch['fg_mask'])
+        
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img':batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
