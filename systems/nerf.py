@@ -206,11 +206,12 @@ class NeRFSystem(BaseSystem):
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
                             num_imgs += 1
             if num_imgs == 0:
-                print("\n")
-                logger.warning(f"Validation False")
+                logger.error(f"Validation False")
                 psnr = 0
-            else: 
-                print("\n")
+            elif num_imgs < num_all_imgs: 
+                logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images")
+                psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
+            else:
                 logger.info(f"Validation on {num_imgs}/{num_all_imgs} images")
                 psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
 

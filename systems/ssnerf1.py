@@ -251,11 +251,12 @@ class SSNeRF1System(BaseSystem):
                         # out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
             
             if num_imgs == 0:
-                print("\n")
-                logger.warning(f"Validation False")
+                logger.error(f"Validation False")
                 psnr = 0
-            else: 
-                print("\n")
+            elif num_imgs < num_all_imgs: 
+                logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images")
+                psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
+            else:
                 logger.info(f"Validation on {num_imgs}/{num_all_imgs} images")
                 psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
             # ssim = torch.mean(torch.stack([o['ssim'] for o in out_set_ssim.values()]))
