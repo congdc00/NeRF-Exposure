@@ -176,22 +176,22 @@ class SSNeRF1System(BaseSystem):
                 'index': batch['index']
             }
            
-        image_origin = batch['rgb'] 
-        image_predict = out['comp_rgb']
-        color_predict = out["real_rgb"]
-        density_predict = out['depth']
-        expore_sure_predict = out['bright_ness'][0].item()
+        # image_origin = batch['rgb'] 
+        # image_predict = out['comp_rgb']
+        # color_predict = out["real_rgb"]
+        # density_predict = out['depth']
+        # expore_sure_predict = out['bright_ness'][0].item()
 
-        psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
+        # psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
 
-        mask_object = batch['fg_mask'].view(-1, 1)
-        rgb_non_bg= (batch['rgb']*mask_object)
-        psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_object, rgb_non_bg)
+        # mask_object = batch['fg_mask'].view(-1, 1)
+        # rgb_non_bg= (batch['rgb']*mask_object)
+        # psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_object, rgb_non_bg)
         
-        mask_bg = torch.ones_like(mask_object) - mask_object
-        background_rgb = (batch['rgb']*mask_bg)
-        psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
-        print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
+        # mask_bg = torch.ones_like(mask_object) - mask_object
+        # background_rgb = (batch['rgb']*mask_bg)
+        # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
+        # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
 
         W, H = self.dataset.img_wh
         torch.save(out['theta'], "theta.pt")
@@ -213,7 +213,6 @@ class SSNeRF1System(BaseSystem):
             {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
         ])
-        print(f"\n PSNR image val r_{batch['index'].item()}.png: {psnr}")
         return {
             'psnr': psnr,
             # 'ssim': ssim,
