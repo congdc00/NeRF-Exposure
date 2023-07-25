@@ -150,7 +150,7 @@ class NeRFSystem(BaseSystem):
                 # 'ssim': ssim,
                 'index': batch['index']
             }
-
+        batch["fg_mask"]
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
 
@@ -158,7 +158,7 @@ class NeRFSystem(BaseSystem):
         torch.save(out['positions'], "positions.pt")
         
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-            {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            {'type': 'rgb', 'img': batch["fg_mask"].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}}
         ])
@@ -201,7 +201,15 @@ class NeRFSystem(BaseSystem):
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
 
     def test_step(self, batch, batch_idx):  
-        out = self(batch)
+        try:
+            out = self(batch) 
+        except:
+            logger.warning(f"Validation Failed")
+            return {
+                'psnr': 0.0,
+                # 'ssim': ssim,
+                'index': batch['index']
+            }
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
         self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
