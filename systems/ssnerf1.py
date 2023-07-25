@@ -177,9 +177,7 @@ class SSNeRF1System(BaseSystem):
     def validation_step(self, batch, batch_idx):
         try:
             out = self(batch) 
-            print(f"r_{batch_idx}.png -> Done", end = " ")
         except:
-            print(f"r_{batch_idx}.png -> False", end = " ")
             return {
                 'psnr': 0.0,
                 # 'ssim': ssim,
@@ -234,7 +232,9 @@ class SSNeRF1System(BaseSystem):
         if self.trainer.is_global_zero:
             out_set_psnr = {}
             num_imgs = 0
+            num_all_imgs = 0
             for step_out in out:
+                num_all_imgs += 1
                 print(f"r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}", end = '; ')
                 # DP
                 if step_out['index'].ndim == 1:
@@ -252,7 +252,7 @@ class SSNeRF1System(BaseSystem):
             if num_imgs == 0:
                 logger.warning(f"Validation False")
             else: 
-                logger.info(f"Validation on {num_imgs} images")
+                logger.info(f"Validation on {num_imgs}/{num_all_imgs} images")
                 psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
             # ssim = torch.mean(torch.stack([o['ssim'] for o in out_set_ssim.values()]))
 
