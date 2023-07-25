@@ -152,12 +152,14 @@ class NeRFSystem(BaseSystem):
             }
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
 
-        batch['fg_mask'] = batch['fg_mask'].view(-1, 1)
-        rgb_non_bg= (batch['rgb']*batch['fg_mask'])
-        psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*batch['fg_mask'], rgb_non_bg)
-        #psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*batch['fg_mask'], rgb_non_bg)
-        print(f"\n ------ batch['fg_mask'] {torch.max(batch['fg_mask'])}")
-        print(f"\n -------- psnr object {psnr_object}")
+        mask_object = batch['fg_mask'].view(-1, 1)
+        rgb_non_bg= (batch['rgb']*mask_object)
+        psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_object, rgb_non_bg)
+        
+        mask_bg = torch.ones_like(mask_object) - mask_object
+        background_rgb = (batch['rgb']*mask_bg)
+        psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
+        print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
         W, H = self.dataset.img_wh
 
         torch.save(out['theta'], "theta.pt")
