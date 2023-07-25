@@ -142,10 +142,8 @@ class NeRFSystem(BaseSystem):
     def validation_step(self, batch, batch_idx):
         
         try:
-            logger.success(f"Validation Done")
             out = self(batch) 
         except:
-            logger.warning(f"Validation Failed")
             return {
                 'psnr': 0.0,
                 # 'ssim': ssim,
