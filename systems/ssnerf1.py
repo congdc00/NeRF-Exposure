@@ -241,7 +241,6 @@ class SSNeRF1System(BaseSystem):
                     if int(step_out['psnr']) != 0.0:
                         out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
                         num_imgs += 1
-                    # out_set_ssim[step_out['index'].item()] = {'ssim': step_out['ssim']}
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
@@ -249,19 +248,13 @@ class SSNeRF1System(BaseSystem):
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
                             num_imgs += 1
                         # out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
-            logger.info(f"Validation on {num_imgs} images")
-            psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
+            
+            if num_imgs == 0:
+                logger.warning(f"Validation False")
+            else: 
+                logger.info(f"Validation on {num_imgs} images")
+                psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
             # ssim = torch.mean(torch.stack([o['ssim'] for o in out_set_ssim.values()]))
-
-            file_path = "./log_psnr.txt"
-            if os.path.exists(file_path):
-                with open(file_path, 'r') as file:
-                    content = file.read()
-            else:
-                content = ""
-            with open(file_path, 'w') as file:
-                content = content + str(round(psnr.tolist(),2)) + "\n"
-                file.write(content)
 
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
             # self.log('val/ssim', ssim, prog_bar=True, rank_zero_only=True)         
