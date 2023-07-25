@@ -208,14 +208,17 @@ class NeRFSystem(BaseSystem):
             if num_imgs == 0:
                 logger.error(f"Validation False")
                 psnr = 0
-            elif num_imgs < num_all_imgs: 
-                logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images")
-                psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
-            else:
-                logger.info(f"Validation on {num_imgs}/{num_all_imgs} images")
-                psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))  
+            else: 
+                if num_imgs<num_all_imgs:
+                    logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images")
+                else:
+                    logger.info(f"Validation on {num_imgs}/{num_all_imgs} images")
 
-            print(f"\nVariance PSNR: ")       
+                list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
+                psnr = torch.mean(list_psnr) 
+                psnr_variance = torch.var(list_psnr) 
+
+            print(f"\nVariance PSNR: {psnr_variance}")       
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)      
     def test_step(self, batch, batch_idx):  
         try:
