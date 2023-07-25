@@ -155,6 +155,7 @@ class NeRFSystem(BaseSystem):
 
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
+        print(batch["fg_mask"])
         
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img': batch["rgb"].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
