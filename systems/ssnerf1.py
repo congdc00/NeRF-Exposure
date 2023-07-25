@@ -226,6 +226,7 @@ class SSNeRF1System(BaseSystem):
             # out_set_ssim = {}
             for step_out in out:
                 # DP
+                print(f"step_out['index'] {step_out['index']}")
                 if step_out['index'].ndim == 1:
                     out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
                     # out_set_ssim[step_out['index'].item()] = {'ssim': step_out['ssim']}
