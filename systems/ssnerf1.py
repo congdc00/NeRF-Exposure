@@ -254,17 +254,16 @@ class SSNeRF1System(BaseSystem):
                 logger.error(f"Validation False")
                 psnr = 0
             else: 
-                if num_imgs<num_all_imgs:
-                    logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images")
-                else:
-                    logger.info(f"Validation on {num_imgs}/{num_all_imgs} images")
+                
 
                 list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
                 psnr = torch.mean(list_psnr) 
                 psnr_variance = torch.var(list_psnr) 
 
-            print(f"\nVariance PSNR: {psnr_variance}")  
-            # ssim = torch.mean(torch.stack([o['ssim'] for o in out_set_ssim.values()]))
+                if num_imgs<num_all_imgs:
+                    logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images -- Variance PSNR: {psnr_variance}")
+                else:
+                    logger.info(f"Validation on {num_imgs}/{num_all_imgs} images -- Variance PSNR: {psnr_variance}")
 
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
             # self.log('val/ssim', ssim, prog_bar=True, rank_zero_only=True)         
