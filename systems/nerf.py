@@ -12,7 +12,7 @@ import systems
 from systems.base import BaseSystem
 from systems.criterions import PSNR
 from loguru import logger
-
+import numpy as np
 @systems.register('nerf-system')
 class NeRFSystem(BaseSystem):
     """
@@ -156,11 +156,11 @@ class NeRFSystem(BaseSystem):
 
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
-        print(f"psnr2 {self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])}")
+        print(f"psnr2 {self.criterions['psnr']((np.matmul(out['comp_rgb'],batch['fg_mask'])).to(batch['rgb']), batch['rgb'])}")
         
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img': batch["rgb"].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'rgb', 'img': out['comp_rgb']*batch["fg_mask"].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             {'type': 'grayscale', 'img': batch["fg_mask"].view(H, W), 'kwargs': {}}
         ])
         return {
