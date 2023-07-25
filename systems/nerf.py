@@ -187,27 +187,31 @@ class NeRFSystem(BaseSystem):
     def validation_epoch_end(self, out):
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
-            out_set = {}
+            out_set_psnr = {}
+            num_imgs = 0
+            num_all_imgs = 0
             for step_out in out:
+                num_all_imgs += 1
                 # DP
                 if step_out['index'].ndim == 1:
-                    out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                    if int(step_out['psnr']) != 0.0:
+                        out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                        num_imgs += 1
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
-                        out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-            psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
-        
-            file_path = "./log_psnr.txt"
-            if os.path.exists(file_path):
-                with open(file_path, 'r') as file:
-                    content = file.read()
-            else:
-                content = ""
+                        if int(step_out['psnr'][oi]) != 0.0:
+                            out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+                            num_imgs += 1
+            if num_imgs == 0:
+                print("\n")
+                logger.warning(f"Validation False")
+                psnr = 0
+            else: 
+                print("\n")
+                logger.info(f"Validation on {num_imgs}/{num_all_imgs} images")
+                psnr = torch.mean(torch.stack([o['psnr'] for o in out_set_psnr.values()]))
 
-            with open(file_path, 'w') as file:
-                content = content + "\n" + str(round(psnr.tolist(),2))
-                file.write(content)
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
 
     def test_step(self, batch, batch_idx):  
