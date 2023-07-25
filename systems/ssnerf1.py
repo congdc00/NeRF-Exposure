@@ -235,7 +235,8 @@ class SSNeRF1System(BaseSystem):
             num_all_imgs = 0
             for step_out in out:
                 num_all_imgs += 1
-                print(f"r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}", end = '; ')
+                if int(step_out['index'].item()) == 0:
+                    print(f"\n r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
                 # DP
                 if step_out['index'].ndim == 1:
                     if int(step_out['psnr']) != 0.0:
