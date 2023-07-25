@@ -191,7 +191,7 @@ class NeRFSystem(BaseSystem):
             for step_out in out:
                 num_all_imgs += 1
                 if int(step_out['index'].item()) == 0:
-                    print(f"\n r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
+                    print(f"\n\nr_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
                 # DP
                 if step_out['index'].ndim == 1:
                     if int(step_out['psnr']) != 0.0:
@@ -212,12 +212,12 @@ class NeRFSystem(BaseSystem):
 
                 list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
                 psnr = torch.mean(list_psnr) 
-                psnr_variance = torch.var(list_psnr) 
+                psnr_standard= torch.std(list_psnr) 
 
                 if num_imgs<num_all_imgs:
-                    logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images -- Variance PSNR: {psnr_variance}")
+                    logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
                 else:
-                    logger.info(f"Validation on {num_imgs}/{num_all_imgs} images -- Variance PSNR: {psnr_variance}")
+                    logger.info(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
     
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)      
     def test_step(self, batch, batch_idx):  
