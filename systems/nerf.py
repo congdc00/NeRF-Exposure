@@ -155,8 +155,9 @@ class NeRFSystem(BaseSystem):
         batch['fg_mask'] = batch['fg_mask'].view(-1, 1)
         rgb_non_bg= (batch['rgb']*batch['fg_mask'])
         psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*batch['fg_mask'], rgb_non_bg)
-        # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*batch['fg_mask'], rgb_non_bg)
-        print(f"\n psnr object {psnr_object}")
+        psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*batch['fg_mask'], rgb_non_bg)
+        print(f"------ batch['fg_mask'] {batch['fg_mask']}")
+        print(f"\n -------- psnr object {psnr_object}")
         W, H = self.dataset.img_wh
 
         torch.save(out['theta'], "theta.pt")
@@ -166,8 +167,8 @@ class NeRFSystem(BaseSystem):
         
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img':batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'grayscale', 'img': batch["fg_mask"].view(H, W), 'kwargs': {}}
+            {'type': 'rgb', 'img':out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            {'type': 'rgb', 'img':rgb_non_bg.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
         ])
         return {
             'psnr': psnr,
