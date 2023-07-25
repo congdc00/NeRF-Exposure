@@ -156,7 +156,7 @@ class NeRFSystem(BaseSystem):
         rgb_non_bg= (batch['rgb']*batch['fg_mask'])
         psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*batch['fg_mask'], rgb_non_bg)
         #psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*batch['fg_mask'], rgb_non_bg)
-        print(f"\n ------ batch['fg_mask'] {batch['fg_mask']}")
+        print(f"\n ------ batch['fg_mask'] {torch.max(batch['fg_mask'])}")
         print(f"\n -------- psnr object {psnr_object}")
         W, H = self.dataset.img_wh
 
