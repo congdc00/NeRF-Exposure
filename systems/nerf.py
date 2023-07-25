@@ -167,9 +167,10 @@ class NeRFSystem(BaseSystem):
         torch.save(out['positions'], "positions.pt")
         
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-            {'type': 'rgb', 'img':batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'rgb', 'img':out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'rgb', 'img':batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
+            {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
+            {'type': 'grayscale', 'img': out['opacity'].view(H, W), 'kwargs': {'cmap': None, 'data_range': (0, 1)}}
         ])
         return {
             'psnr': psnr,
