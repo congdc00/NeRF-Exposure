@@ -14,6 +14,15 @@ from systems.base import BaseSystem
 from systems.criterions import PSNR, SSIM
 from tabulate import tabulate
 
+def compute_psnr(img1, img2):
+    mse = F.mse_loss(img1, img2)
+    if mse == 0:
+        return float('inf')
+    max_pixel = 1.0  
+    psnr = 20 * torch.log10(max_pixel) - 10 * torch.log10(mse)
+
+    return psnr
+
 @systems.register('ssnerf1-system')
 class SSNeRF1System(BaseSystem):
     """
@@ -172,7 +181,7 @@ class SSNeRF1System(BaseSystem):
         except:
             print(f"r_{batch_idx}.png -> False", end = " ")
             return {
-                'psnr': 0.0,
+                'psnr': compute_psnr(out["real_rgb"],batch['rgb']),
                 # 'ssim': ssim,
                 'index': batch['index']
             }
