@@ -176,13 +176,13 @@ class SSNeRF1System(BaseSystem):
                 'index': batch['index']
             }
            
-        # image_origin = batch['rgb'] 
-        # image_predict = out['comp_rgb']
-        # color_predict = out["real_rgb"]
-        # density_predict = out['depth']
-        # expore_sure_predict = out['bright_ness'][0].item()
+        image_origin = batch['rgb'] 
+        image_predict = out['comp_rgb']
+        color_predict = out["real_rgb"]
+        density_predict = out['depth']
+        expore_sure_predict = out['bright_ness'][0].item()
 
-        # psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
+        psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
         # rgb_non_bg= (batch['rgb']*mask_object)
