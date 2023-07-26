@@ -13,4 +13,4 @@ def make(name, config):
     return model
 
 
-from . import nerf, bnerf, ssnerf1, ssnerf2, ssnerf3, neus, geometry, texture, shutter_speed, eneus
+from . import nerf, bnerf, ssnerf1, neus, geometry, texture, shutter_speed, eneus
