@@ -108,26 +108,6 @@ class SSNeRF1System(BaseSystem):
         '''
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
         loss = 0.
-        """true
-        {'index': tensor([0], device='cuda:0'), 
-        'rays': tensor([[ 0.2047,  0.7417,  3.9570,  0.1800, -0.5525, -0.8138],
-        [ 0.2047,  0.7417,  3.9570,  0.1793, -0.5525, -0.8140],
-        [ 0.2047,  0.7417,  3.9570,  0.1785, -0.5524, -0.8142],
-        ...,
-        [ 0.2047,  0.7417,  3.9570, -0.2691,  0.2242, -0.9366],
-        [ 0.2047,  0.7417,  3.9570, -0.2698,  0.2244, -0.9364],
-        [ 0.2047,  0.7417,  3.9570, -0.2705,  0.2245, -0.9362]],
-       device='cuda:0'), 'rgb': tensor([[1., 1., 1.],
-        [1., 1., 1.],
-        [1., 1., 1.],
-        ...,
-        [1., 1., 1.],
-        [1., 1., 1.],
-        [1., 1., 1.]], device='cuda:0'), 
-        'fg_mask': tensor([0., 0., 0.,  ..., 0., 0., 0.], device='cuda:0')}
-        """
-        """{false
-            batch['rays'] torch.Size([8192, 6]) 	 batch['rgb'] torch.Size([8192, 3]) 	 batch['fg_mask'] torch.Size([8192])"""
         # update train_num_rays
         if self.config.model.dynamic_ray_sampling:
             train_num_rays = int(self.train_num_rays * (self.train_num_samples / out['num_samples'].sum().item()))        
@@ -143,15 +123,12 @@ class SSNeRF1System(BaseSystem):
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
 
         ex_delta = torch.mean(ex_delta_matrix)
-        # print(f"loss_rgb {loss_rgb} & ex {ex_delta}")
         k = 0.001
         total_loss = loss_rgb + k*ex_delta
-        # print(f"total_loss {total_loss}")
 
         self.log('train/loss_rgb', total_loss)
         loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
-        # print(f"loss_rgb 2 {loss_rgb}")
-        # distortion loss proposed in MipNeRF360
+
         if self.C(self.config.system.loss.lambda_distortion) > 0:
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
             self.log('train/loss_distortion', loss_distortion)
@@ -188,7 +165,6 @@ class SSNeRF1System(BaseSystem):
         image_predict = out['comp_rgb']
         color_predict = out["real_rgb"]
         density_predict = out['depth']
-        expore_sure_predict = out['bright_ness'][0].item()
 
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
 
@@ -205,16 +181,6 @@ class SSNeRF1System(BaseSystem):
         torch.save(out['theta'], "theta.pt")
         torch.save(out['positions'], "positions.pt")
 
-        # Save difference brightness 
-        file_path = f"./log_bright_ness.txt"
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as file:
-                content = file.read()
-        else:
-            content = ""
-        with open(file_path, 'w',newline="\n") as file:
-            content += str(expore_sure_predict) +"\n"
-            file.write(str(content))
 
         self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
             {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
@@ -236,7 +202,7 @@ class SSNeRF1System(BaseSystem):
             for step_out in out:
                 num_all_imgs += 1
                 if int(step_out['index'].item()) == 0:
-                    print(f"\n\nr_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
+                    print(f"\n\n[Val] r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
                 # DP
                 if step_out['index'].ndim == 1:
                     if int(step_out['psnr']) != 0.0:
@@ -272,19 +238,21 @@ class SSNeRF1System(BaseSystem):
         try:
             out = self(batch) 
         except:
-            logger.warning(f"Validation Failed")
             return {
                 'psnr': 0.0,
                 # 'ssim': ssim,
                 'index': batch['index']
             }
+        
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
-        self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
-            {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
-        ])
+        if batch_idx == 0:
+            self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
+                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
+            ])
+
         return {
             'psnr': psnr,
             'index': batch['index']
@@ -293,27 +261,50 @@ class SSNeRF1System(BaseSystem):
     def test_epoch_end(self, out):
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
-            out_set = {}
+            out_set_psnr = {}
+            num_imgs = 0
+            num_all_imgs = 0
+            
             for step_out in out:
-                # DP
+                num_all_imgs += 1
+                if int(step_out['index'].item()) == 0:
+                    print(f"\n\n[Test] r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
+
                 if step_out['index'].ndim == 1:
-                    out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
-                # DDP
+                    if int(step_out['psnr']) != 0.0:
+                        out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                        num_imgs += 1
                 else:
                     for oi, index in enumerate(step_out['index']):
-                        out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-            psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
-            self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)    
+                        if int(step_out['psnr'][oi]) != 0.0:
+                            out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+                            num_imgs += 1
 
-            self.save_img_sequence(
-                f"it{self.global_step}-test",
-                f"it{self.global_step}-test",
-                '(\d+)\.png',
-                save_format='mp4',
-                fps=30
-            )
-            
+            if num_imgs == 0:
+                logger.error(f"Test False")
+                psnr = 0
+            else: 
+                list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
+                psnr = torch.mean(list_psnr) 
+                psnr_standard= torch.std(list_psnr) 
+
+                if num_imgs<num_all_imgs:
+                    logger.warning(f"Test on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
+                else:
+                    logger.info(f"Test on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
+            self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)
             self.export()
+            
+            # Lưu video
+            # self.save_img_sequence(
+            #     f"it{self.global_step}-test",
+            #     f"it{self.global_step}-test",
+            #     '(\d+)\.png',
+            #     save_format='mp4',
+            #     fps=30
+            # )
+            
+            
 
     def export(self):
         mesh = self.model.export(self.config.export)
