@@ -166,7 +166,7 @@ class SSNeRF1System(BaseSystem):
         color_predict = out["real_rgb"]
 
         mask_object = batch['fg_mask'].view(-1, 1)
-        print(f"out['depth'].shape {out['depth'].shape}")
+        print(f"out['depth'].shape {out['depth'].shape} and mask_object {mask_object.shape}")
         density_predict = out['depth']
         density_predict= (density_predict*mask_object)
 
