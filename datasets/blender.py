@@ -72,7 +72,7 @@ class BlenderDatasetBase():
             
             img = Image.open(img_path)
             try:
-                print(f"Thay đổi độ sáng ảnh từ 1 -> {frame['factor']}")
+                # print(f"Thay đổi độ sáng ảnh từ 1 -> {frame['factor']}")
                 factor = float(frame['factor'])
                 img.convert("F")
                 enhancer = ImageEnhance.Brightness(img)
