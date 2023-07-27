@@ -166,6 +166,7 @@ class SSNeRF1System(BaseSystem):
         color_predict = out["real_rgb"]
 
         mask_object = batch['fg_mask'].view(-1, 1)
+        print(f"out['depth'].shape {out['depth'].shape}")"
         density_predict = out['depth']
         density_predict= (density_predict*mask_object)
 
@@ -181,9 +182,7 @@ class SSNeRF1System(BaseSystem):
         # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
 
         W, H = self.dataset.img_wh
-        if batch_idx == 20000:
-            torch.save(out['theta'], "theta_enerf.pt")
-            torch.save(out['positions'], "positions_enerf.pt")
+            
 
         if batch_idx == 0:
             self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
@@ -191,6 +190,8 @@ class SSNeRF1System(BaseSystem):
                 {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
                 {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
             ])
+            torch.save(out['theta'], "theta_enerf.pt")
+            torch.save(out['positions'], "positions_enerf.pt")
         return {
             'psnr': psnr,
             # 'ssim': ssim,
