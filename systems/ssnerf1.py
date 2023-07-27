@@ -164,7 +164,10 @@ class SSNeRF1System(BaseSystem):
         image_origin = batch['rgb'] 
         image_predict = out['comp_rgb']
         color_predict = out["real_rgb"]
+
+        mask_object = batch['fg_mask'].view(-1, 1)
         density_predict = out['depth']
+        density_predict= (density_predict*mask_object)
 
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
 
