@@ -36,7 +36,7 @@ class VolumeBrightness(nn.Module):
         network_inp = torch.cat([origins_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1) #([97790, 32])
 
         #freeze
-        print(f"frezee {self.network.named_parameters()}")
+        print(f"forward")
         for param in self.network.parameters():
             # param.requires_grad = False
             print(f"param {param.requires_grad}")
