@@ -17,7 +17,7 @@ class SSNeRF1Model(BaseModel):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
-        
+        self.shutter_speed.requires_grad = False
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
         if self.config.learned_background:
