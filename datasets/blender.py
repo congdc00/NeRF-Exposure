@@ -86,12 +86,12 @@ class BlenderDatasetBase():
                 
 
             img = img.resize(self.img_wh, Image.BICUBIC)
-
+            
             img = TF.to_tensor(img).permute(1, 2, 0) # (4, h, w) => (h, w, 4)
             self.all_fg_masks.append(img[..., -1]) # (h, w)
             self.all_images.append(img[...,:3])
         
-
+        print(f"self.all_factor {self.all_factor}")
         self.all_c2w, self.all_images, self.all_fg_masks, self.all_factor = \
             torch.stack(self.all_c2w, dim=0).float().to(self.rank), \
             torch.stack(self.all_images, dim=0).float().to(self.rank), \
