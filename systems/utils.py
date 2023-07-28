@@ -327,6 +327,7 @@ def parse_optimizer(config, model):
         print(f"params {params}")
         optim = getattr(apex.optimizers, config.name)(params, **config.args)
     else:
+        print(f"params {params}")
         optim = getattr(torch.optim, config.name)(params, **config.args)
     return optim
 
