@@ -77,7 +77,8 @@ class BlenderDatasetBase():
                 img.convert("F")
                 enhancer = ImageEnhance.Brightness(img)
                 img = enhancer.enhance(exposure_factor)
-                exposure_factor = torch.Tensor(exposure_factor)
+                exposure_factor = torch.Tensor([exposure_factor])
+                
                 
             except:
                 k = float(1.0)
