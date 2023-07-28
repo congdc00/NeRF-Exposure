@@ -113,17 +113,17 @@ class SSNeRF1Model(BaseModel):
         # rgb torch.Size([97790, 3])
         # dir_feature torch.Size([97790, 16])
         # bright_ness torch.Size([97790, 1])
-
+        kkk = bright_ness.clone()
         # Step 2: Rendering 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
-        comp_rgb = real_rgb*bright_ness  + self.background_color * (1.0 - opacity)
+        comp_rgb = real_rgb*kkk  + self.background_color * (1.0 - opacity)
         # print(f"bright_ness {bright_ness[0].item()}     --      brightness_mean {torch.mean(bright_ness)}")
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
-        kkk = bright_ness.clone()
+        
         # Export 
         out = {
             'comp_rgb': comp_rgb,
