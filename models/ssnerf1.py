@@ -120,14 +120,15 @@ class SSNeRF1Model(BaseModel):
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
-        comp_rgb = real_rgb  + self.background_color * (1.0 - opacity)
+        bright_ness = torch.ones_like(real_rgb)
+        comp_rgb = real_rgb*bright_ness  + self.background_color * (1.0 - opacity)
         # print(f"bright_ness {bright_ness[0].item()}     --      brightness_mean {torch.mean(bright_ness)}")
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
     
         # Export 
         out = {
             'comp_rgb': comp_rgb,
-            'bright_ness':0,
+            'bright_ness':bright_ness,
             "real_rgb": real_rgb,
             'opacity': opacity,
             'depth': depth,
