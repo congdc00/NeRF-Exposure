@@ -21,6 +21,7 @@ class VolumeBrightness(nn.Module):
 
         self.n_input_dims = encoding.n_output_dims #+ self.config.input_feature_dim #16 +16
         self.encoding = encoding
+        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[torch.cuda.current_device()], output_device=torch.cuda.current_device(), find_unused_parameters=True,)
         self.network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)   
     
     def forward(self,is_freeze, origins, *args):
@@ -38,7 +39,7 @@ class VolumeBrightness(nn.Module):
         #freeze
         print(f"forward")
         for param in self.network.parameters():
-            # param.requires_grad = False
+            param.requires_grad = False
             print(f"param {param.requires_grad}")
 
         brightness = self.network(network_inp).view(*origins.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
