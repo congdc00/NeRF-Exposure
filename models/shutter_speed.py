@@ -37,7 +37,8 @@ class VolumeBrightness(nn.Module):
         
         network_inp = torch.cat([origins_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1) #([97790, 32])
 
-        #freeze
+        # Update: Althernative learning
+        # freeze
         print(f"forward")
 
         def dfs_freeze(model):
@@ -49,7 +50,9 @@ class VolumeBrightness(nn.Module):
         
 
         dfs_freeze(self.network)
-        print(f"supper star {self.network.requires_grad}")
+
+        for param in self.network.parameters():
+             print(f"param {param.requires_grad}")
 
         brightness = self.network(network_inp).view(*origins.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
 
