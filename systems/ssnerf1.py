@@ -2,8 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_efficient_distloss import flatten_eff_distloss
-from torchvision.transforms.functional import to_pil_image
-import torchvision
+from torchmetrics.image import StructuralSimilarityIndexMeasure
 import imageio
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_debug
@@ -35,7 +34,7 @@ class SSNeRF1System(BaseSystem):
     def prepare(self):
         self.criterions = {
             'psnr': PSNR(),
-            'ssim': SSIM()
+            'ssim': StructuralSimilarityIndexMeasure(data_range=1.0)
         }
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
@@ -189,10 +188,7 @@ class SSNeRF1System(BaseSystem):
         density_predict= (density_predict*mask_object)
 
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
-
-        pil_image1 = to_pil_image(color_predict.to(image_origin))
-        pil_image2 = to_pil_image(image_origin)
-        ssim = torchvision.transforms.functional.ssim(pil_image1, pil_image2)
+        ssim = self.criterions['ssim'](color_predict.to(image_origin), image_origin)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
         # rgb_non_bg= (batch['rgb']*mask_object)
