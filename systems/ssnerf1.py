@@ -261,7 +261,7 @@ class SSNeRF1System(BaseSystem):
                 psnr = torch.mean(list_psnr) 
                 psnr_standard= torch.std(list_psnr) 
 
-                list_ssim = torch.stack([o['ssim'] for o in out_set_psnr.values()])
+                list_ssim = torch.stack([o['ssim'] for o in out_set_ssim.values()])
                 ssim_score = torch.mean(list_ssim) 
                 ssim_standard= torch.std(list_ssim) 
 
