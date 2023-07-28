@@ -20,9 +20,8 @@ class VolumeBrightness(nn.Module):
         encoding = get_encoding(self.n_ori_dims, self.config.dir_encoding_config)
 
         self.n_input_dims = encoding.n_output_dims #+ self.config.input_feature_dim #16 +16
-        network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)    
         self.encoding = encoding
-        self.network = network
+        self.network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)   
     
     def forward(self,is_freeze, origins, *args):
         """
@@ -37,7 +36,7 @@ class VolumeBrightness(nn.Module):
         network_inp = torch.cat([origins_embd] + [arg.view(-1, arg.shape[-1]) for arg in args], dim=-1) #([97790, 32])
 
         #freeze
-        print(f"self.network {self.network.requires_grad}")
+        print(f"self.network {self.network.requires_grad_}")
         for param in self.network.parameters():
             param.requires_grad = is_freeze   
 
