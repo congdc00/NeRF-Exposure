@@ -90,7 +90,7 @@ def main():
         loggers += [TensorBoardLogger(args.runs_dir, name=config.name, version=config.trial_name),CSVLogger(config.exp_dir, name=config.trial_name, version='csv_logs')]
     
     
-    strategy = 'ddp_find_unused_parameters_false'
+    strategy = 'ddp'
     
     # Step 5: Bắt đầu train
     trainer = Trainer(
@@ -99,6 +99,7 @@ def main():
         callbacks=callbacks,
         logger=loggers,
         strategy=strategy,
+        find_unused_parameters = True,
         **config.trainer
     )
 
