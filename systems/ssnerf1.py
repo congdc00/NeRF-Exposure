@@ -240,14 +240,14 @@ class SSNeRF1System(BaseSystem):
                 if step_out['index'].ndim == 1:
                     if int(step_out['psnr']) != 0.0:
                         out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
-                        out_set_ssim[step_out['index'].item()] = {'ssim': step_out['ssim']}
+                        out_set_ssim[step_out['index'].item()] = {'ssim': torch.tensor(step_out['ssim'])}
                         num_imgs += 1
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
                         if int(step_out['psnr'][oi]) != 0.0:
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-                            out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
+                            out_set_ssim[index[0].item()] = {'ssim': torch.tensor(step_out['ssim'][oi])}
                             num_imgs += 1
             
             
@@ -259,7 +259,6 @@ class SSNeRF1System(BaseSystem):
                 ssim_score = 0
                 ssim_standard = 0
             else: 
-                print(f"out_set_ssim {[o['ssim'] for o in out_set_ssim.values()]}")
                 list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
                 psnr = torch.mean(list_psnr) 
                 psnr_standard= torch.std(list_psnr) 
