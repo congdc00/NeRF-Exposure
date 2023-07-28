@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_efficient_distloss import flatten_eff_distloss
-from torchmetrics.image import StructuralSimilarityIndexMeasure
 from skimage.metrics import structural_similarity as ssim
 import imageio
 import pytorch_lightning as pl
@@ -73,8 +72,8 @@ class SSNeRF1System(BaseSystem):
             rays_o, rays_d = get_rays(directions, c2w) # Khởi tạo tia [8192,3], [8192,3]
             rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank) # Khởi tạo nhãn [8192, 3]
             fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank) 
+        
         else:
-            
             bright_ness = self.dataset.all_factor[index][0]
             c2w = self.dataset.all_c2w[index][0]
             if self.dataset.directions.ndim == 3: # (H, W, 3)

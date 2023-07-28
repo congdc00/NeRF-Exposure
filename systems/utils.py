@@ -313,6 +313,10 @@ def get_parameters(model, name):
 
 
 def parse_optimizer(config, model):
+    '''
+    Load hàm optimizer 
+    tương đương với torch.optim.Adam(self.G.parameters(), lr=1e-5)
+    '''
     if hasattr(config, 'params'):
         params = [{'params': get_parameters(model, name), 'name': name, **args} for name, args in config.params.items()]
         rank_zero_debug('Specify optimizer params:', config.params)
