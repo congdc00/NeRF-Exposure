@@ -77,7 +77,7 @@ class BlenderDatasetBase():
                 img.convert("F")
                 enhancer = ImageEnhance.Brightness(img)
                 img = enhancer.enhance(exposure_factor)
-                print(f"exposure_factor {exposure_factor}")
+                print(f"exposure_factor {type(exposure_factor)}")
                 self.all_factor.append(exposure_factor)
             except:
                 self.all_factor.append(float(1))
