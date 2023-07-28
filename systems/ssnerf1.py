@@ -53,7 +53,7 @@ class SSNeRF1System(BaseSystem):
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
 
             bright_ness = self.dataset.all_factor[index]
-            print(f"c2w {type(c2w)} and bright_ness{type(bright_ness)}")
+            print(f"bright_ness{bright_ness.value()}")
             # Khởi tạo meshgrid
             x = torch.randint(
                 0, self.dataset.w, size=(self.train_num_rays,), device=self.dataset.all_images.device
