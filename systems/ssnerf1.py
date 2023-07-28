@@ -118,9 +118,9 @@ class SSNeRF1System(BaseSystem):
 
         bright_ness_predict = out["bright_ness"]
         bright_ness_label = batch["bright_ness"]
-        delta_exposure = bright_ness_predict - bright_ness_label
+        delta_exposure = abs(bright_ness_predict - bright_ness_label)*100/bright_ness_label
         delta_exposure = torch.std(delta_exposure)
-        # print(f"delta_exposure {delta_exposure};")
+        # print(f"delta_exposure {delta_exposure} %;")
         loss = 0.
         # update train_num_rays
         if self.config.model.dynamic_ray_sampling:
