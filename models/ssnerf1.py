@@ -102,6 +102,7 @@ class SSNeRF1Model(BaseModel):
 
         with torch.no_grad():
             bright_ness = self.shutter_speed(True, rays_o) * 2
+            
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
