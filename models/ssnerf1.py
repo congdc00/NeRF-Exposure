@@ -102,7 +102,9 @@ class SSNeRF1Model(BaseModel):
 
         # self.shutter_speed.requires_grad_(False)
         # os.environ['TORCH_DISTRIBUTED_DEBUG'] = 'DETAIL'
+        self.shutter_speed.requires_grad = False
         bright_ness = self.shutter_speed(True, rays_o) * 2
+        self.shutter_speed.requires_grad = True
             
 
         # network_inp torch.Size([97790, 32])

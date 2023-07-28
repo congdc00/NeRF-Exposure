@@ -39,8 +39,6 @@ class VolumeBrightness(nn.Module):
 
         # Update: Althernative learning
         # freeze
-        self.network.weight.requires_grad = False
-        self.network.bias.requires_grad = False
         # for param in self.network.parameters():
         #     # param.requires_grad = False
         #     print(f"param {param.requires_grad}")
