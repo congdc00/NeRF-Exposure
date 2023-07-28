@@ -198,7 +198,7 @@ class SSNeRF1System(BaseSystem):
         # Điều chỉnh định dạng của tensor để phù hợp với hàm SSIM
         image_array1 = np.transpose(image_array1, (1, 2, 0))
         image_array2 = np.transpose(image_array2, (1, 2, 0))
-        ssim = self.criterions['ssim'](image_array1, image_array2)
+        ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
         # rgb_non_bg= (batch['rgb']*mask_object)
