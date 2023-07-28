@@ -79,7 +79,7 @@ class BlenderDatasetBase():
                 img = enhancer.enhance(exposure_factor)
                 self.all_factor.append(exposure_factor)
             except:
-                pass
+                self.all_factor.append(1)
 
             img = img.resize(self.img_wh, Image.BICUBIC)
 
