@@ -46,7 +46,10 @@ class VolumeBrightness(nn.Module):
                     param.requires_grad = False
                 dfs_freeze(child)
 
+        
+
         dfs_freeze(self.network)
+        print(f"supper star {self.network.requires_grad}")
 
         brightness = self.network(network_inp).view(*origins.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
 
