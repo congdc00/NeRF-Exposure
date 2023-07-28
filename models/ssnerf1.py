@@ -61,10 +61,6 @@ class SSNeRF1Model(BaseModel):
     def isosurface(self):
         mesh = self.geometry.isosurface()
         return mesh
-    
-    def freeze_model(self, model, is_freeze=True):
-        for param in model.parameters():
-            param.requires_grad = not is_freeze
 
     def forward_(self, rays):
         n_rays = rays.shape[0]
@@ -104,8 +100,7 @@ class SSNeRF1Model(BaseModel):
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(True, cor_feature, t_dirs) # Dự đoán ra màu sắc
 
-        self.freeze_model(self.shutter_speed, is_freeze=True)
-        bright_ness = self.shutter_speed(True, rays_o) * 2
+        bright_ness = self.shutter_speed(False, rays_o) * 2
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
