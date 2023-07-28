@@ -170,7 +170,7 @@ class SSNeRF1System(BaseSystem):
         except:
             return {
                 'psnr': 0.0,
-                # 'ssim': ssim,
+                'ssim': 0.0,
                 'delta_exposure': 0,
                 'index': batch['index']
             }
@@ -187,6 +187,7 @@ class SSNeRF1System(BaseSystem):
         density_predict= (density_predict*mask_object)
 
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
+        ssim = self.criterions['ssim'](color_predict.to(image_origin), image_origin)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
         # rgb_non_bg= (batch['rgb']*mask_object)
@@ -210,7 +211,7 @@ class SSNeRF1System(BaseSystem):
             torch.save(out['positions'], "positions_enerf.pt")
         return {
             'psnr': psnr,
-            # 'ssim': ssim,
+            'ssim': ssim,
             'index': batch['index'],
             "delta_exposure": delta_exposure
         }
