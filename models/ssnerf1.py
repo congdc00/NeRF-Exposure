@@ -123,11 +123,11 @@ class SSNeRF1Model(BaseModel):
         comp_rgb = real_rgb*bright_ness  + self.background_color * (1.0 - opacity)
         # print(f"bright_ness {bright_ness[0].item()}     --      brightness_mean {torch.mean(bright_ness)}")
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
-
+        kkk = bright_ness.clone()
         # Export 
         out = {
             'comp_rgb': comp_rgb,
-            'bright_ness':0,
+            'bright_ness':kkk,
             "real_rgb": real_rgb,
             'opacity': opacity,
             'depth': depth,
