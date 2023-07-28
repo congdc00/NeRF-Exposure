@@ -102,6 +102,7 @@ class SSNeRF1Model(BaseModel):
 
         # self.shutter_speed.requires_grad_(False)
         # os.environ['TORCH_DISTRIBUTED_DEBUG'] = 'DETAIL'
+        self.freeze(self.shutter_speed)
         bright_ness = self.shutter_speed(True, rays_o) * 2
             
 
