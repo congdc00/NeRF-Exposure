@@ -250,7 +250,7 @@ class SSNeRF1System(BaseSystem):
                             out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
                             num_imgs += 1
             
-            print(f"out_set_ssim {out_set_ssim}")
+            print(f"out_set_ssim {[o['ssim'] for o in out_set_ssim.values()]}")
             if num_imgs == 0:
                 logger.error(f"Validation False")
                 psnr = 0
