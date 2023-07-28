@@ -177,7 +177,7 @@ class SSNeRF1System(BaseSystem):
                 'delta_exposure': 0,
                 'index': batch['index']
             }
-           
+        W, H = self.dataset.img_wh
         image_origin = batch['rgb'] 
         image_predict = out['comp_rgb']
         color_predict = out["real_rgb"]
@@ -192,6 +192,7 @@ class SSNeRF1System(BaseSystem):
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
 
         # Chuyển đổi tensor thành NumPy array
+        
         image_array1 = color_predict.to(image_origin).cpu().numpy().view(H, W, 3)
         image_array2 = image_origin.cpu().numpy().view(H, W, 3)
 
@@ -211,7 +212,7 @@ class SSNeRF1System(BaseSystem):
         # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
         # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
 
-        W, H = self.dataset.img_wh
+        
             
 
         if batch_idx == 0:
