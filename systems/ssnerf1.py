@@ -184,7 +184,8 @@ class SSNeRF1System(BaseSystem):
 
         exposure_predict = out["bright_ness"][0].item()
         exposure_label = batch["bright_ness"].item()
-        delta_exposure = exposure_predict - exposure_label
+        delta_exposure = abs(exposure_predict - exposure_label)*100/exposure_label
+
         mask_object = batch['fg_mask'].view(-1, 1)
         density_predict = out['depth'].to(mask_object.device)
         density_predict= (density_predict*mask_object)
@@ -270,7 +271,7 @@ class SSNeRF1System(BaseSystem):
                 list_delta_exposure = torch.Tensor(list_delta_exposure)
                 delta_exposure_std = torch.std(list_delta_exposure)
                 
-                log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- SSIM {ssim_score} -- std PSNR: {psnr_standard} -- std SSIM: {ssim_standard} -- std Exposure: {delta_exposure_std}"
+                log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- SSIM {ssim_score} -- std PSNR: {psnr_standard} -- std SSIM: {ssim_standard} -- std %Exposure: {delta_exposure_std}"
                 if num_imgs<num_all_imgs:
                     logger.warning(log_text)
                 else:
