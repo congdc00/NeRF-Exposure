@@ -80,7 +80,8 @@ class BlenderDatasetBase():
                 exposure_factor = torch.Tensor(exposure_factor)
                 
             except:
-                exposure_factor = torch.Tensor(1)
+                k = 1.0
+                exposure_factor = torch.Tensor(k)
             finally:
                 self.all_factor.append(exposure_factor)
                 
