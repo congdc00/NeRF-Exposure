@@ -194,7 +194,6 @@ class SSNeRF1System(BaseSystem):
         # Chuyển đổi tensor thành NumPy array
         image_array1 = color_predict.view(H, W, 3).cpu().numpy()
         image_array2 = image_origin.view(H, W, 3).cpu().numpy()
-        
         ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
@@ -228,6 +227,7 @@ class SSNeRF1System(BaseSystem):
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
             out_set_psnr = {}
+            out_set_ssim = {}
             num_imgs = 0
             num_all_imgs = 0
             list_delta_exposure = []
@@ -240,12 +240,14 @@ class SSNeRF1System(BaseSystem):
                 if step_out['index'].ndim == 1:
                     if int(step_out['psnr']) != 0.0:
                         out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                        out_set_ssim[step_out['index'].item()] = {'ssim': step_out['ssim']}
                         num_imgs += 1
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
                         if int(step_out['psnr'][oi]) != 0.0:
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+                            out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
                             num_imgs += 1
                         # out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
             
@@ -259,13 +261,18 @@ class SSNeRF1System(BaseSystem):
                 psnr = torch.mean(list_psnr) 
                 psnr_standard= torch.std(list_psnr) 
 
+                list_ssim = torch.stack([o['ssim'] for o in out_set_psnr.values()])
+                ssim_score = torch.mean(list_ssim) 
+                ssim_standard= torch.std(list_ssim) 
+
                 list_delta_exposure = torch.Tensor(list_delta_exposure)
                 delta_exposure_std = torch.std(list_delta_exposure)
-
+                
+                log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- SSIM {ssim_score} -- std PSNR: {psnr_standard} -- std SSIM: {ssim_standard} -- std Exposure: {delta_exposure_std}"
                 if num_imgs<num_all_imgs:
-                    logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard} -- Standard deviation Exposure: {delta_exposure_std}")
+                    logger.warning(log_text)
                 else:
-                    logger.info(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard} -- Standard deviation Exposure: {delta_exposure_std}")
+                    logger.info(log_text)
 
 
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)         
