@@ -101,8 +101,6 @@ class SSNeRF1Model(BaseModel):
         rgb = self.texture(True, cor_feature, t_dirs) # Dự đoán ra màu sắc
 
         print(f"self.shutter_speed {self.shutter_speed.requires_grad_}")
-        for param in self.shutter_speed.parameters():
-            param.requires_grad = False
         bright_ness = self.shutter_speed(True, rays_o) * 2
             
 

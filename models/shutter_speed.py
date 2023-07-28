@@ -21,7 +21,12 @@ class VolumeBrightness(nn.Module):
 
         self.n_input_dims = encoding.n_output_dims #+ self.config.input_feature_dim #16 +16
         self.encoding = encoding
-        self.network = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config)   
+
+        if torch.distributed.is_initialized():
+            # Đặt find_unused_parameters=True khi tạo DistributedDataParallel
+            model = get_mlp(self.n_input_dims, self.n_output_dims, self.config.mlp_network_config) 
+            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[torch.cuda.current_device()], find_unused_parameters=True)
+            self.network = model
     
     def forward(self,is_freeze, origins, *args):
         """
