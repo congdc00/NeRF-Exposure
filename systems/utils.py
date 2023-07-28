@@ -324,7 +324,6 @@ def parse_optimizer(config, model):
         params = model.parameters()
     if config.name in ['FusedAdam']:
         import apex
-        
         optim = getattr(apex.optimizers, config.name)(params, **config.args)
     else:
         optim = getattr(torch.optim, config.name)(params, **config.args)
