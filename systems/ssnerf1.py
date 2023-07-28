@@ -71,7 +71,7 @@ class SSNeRF1System(BaseSystem):
             fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank) 
         else:
             
-            
+            bright_ness = self.dataset.all_factor[index][0]
             c2w = self.dataset.all_c2w[index][0]
             if self.dataset.directions.ndim == 3: # (H, W, 3)
                 directions = self.dataset.directions
@@ -113,7 +113,7 @@ class SSNeRF1System(BaseSystem):
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
         bright_ness_predict = out["bright_ness"]
-        bright_ness_label = out["bright_ness"]
+        bright_ness_label = batch["bright_ness"]
         delta_exposure = torch.pow(bright_ness_predict - bright_ness_label, 2)
         delta_exposure = torch.mean(delta_exposure)
         print(f"delta_exposure {delta_exposure}")
