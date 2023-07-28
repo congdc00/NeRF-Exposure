@@ -116,7 +116,7 @@ class SSNeRF1System(BaseSystem):
         bright_ness_label = batch["bright_ness"]
         delta_exposure = bright_ness_predict - bright_ness_label
         delta_exposure = torch.std(delta_exposure)
-        print(f"delta_exposure {delta_exposure};")
+        # print(f"delta_exposure {delta_exposure};")
         loss = 0.
         # update train_num_rays
         if self.config.model.dynamic_ray_sampling:
@@ -160,12 +160,17 @@ class SSNeRF1System(BaseSystem):
         return {'loss': loss}
     
     def validation_step(self, batch, batch_idx):
+        '''
+        batch: label
+        out: predict
+        '''
         try:
             out = self(batch) 
         except:
             return {
                 'psnr': 0.0,
                 # 'ssim': ssim,
+                'delta_exposure': 0,
                 'index': batch['index']
             }
            
@@ -173,6 +178,9 @@ class SSNeRF1System(BaseSystem):
         image_predict = out['comp_rgb']
         color_predict = out["real_rgb"]
 
+        exposure_predict = out["bright_ness"]
+        exposure_label = batch["bright_ness"]
+        print(f"exposure_predict {exposure_predict} and exposure_label {exposure_label}")
         mask_object = batch['fg_mask'].view(-1, 1)
         density_predict = out['depth'].to(mask_object.device)
         density_predict= (density_predict*mask_object)
