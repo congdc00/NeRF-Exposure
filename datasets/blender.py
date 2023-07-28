@@ -77,9 +77,12 @@ class BlenderDatasetBase():
                 img.convert("F")
                 enhancer = ImageEnhance.Brightness(img)
                 img = enhancer.enhance(exposure_factor)
-                self.all_factor.append(exposure_factor)
+                exposure_factor = torch.Tensor(exposure_factor)
+                
             except:
-                self.all_factor.append(float(1))
+                exposure_factor = torch.Tensor(1)
+            finally:
+                self.all_factor.append(exposure_factor)
                 
 
             img = img.resize(self.img_wh, Image.BICUBIC)
