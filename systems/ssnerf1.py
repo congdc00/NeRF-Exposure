@@ -271,7 +271,7 @@ class SSNeRF1System(BaseSystem):
                 list_delta_exposure = torch.Tensor(list_delta_exposure)
                 delta_exposure_std = torch.std(list_delta_exposure)
                 
-                log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- SSIM {ssim_score} -- std PSNR: {psnr_standard} -- std SSIM: {ssim_standard} -- std %Exposure: {delta_exposure_std}"
+                log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- SSIM {ssim_score} -- std PSNR: {psnr_standard} -- std SSIM: {ssim_standard} -- std Exposure: {round( delta_exposure_std, 3)}"
                 if num_imgs<num_all_imgs:
                     logger.warning(log_text)
                 else:
