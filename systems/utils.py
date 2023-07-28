@@ -322,13 +322,10 @@ def parse_optimizer(config, model):
         rank_zero_debug('Specify optimizer params:', config.params)
     else:
         params = model.parameters()
-    print("--------congig -----------")
     if config.name in ['FusedAdam']:
         import apex
-        print(f"params {params}")
         optim = getattr(apex.optimizers, config.name)(filter(lambda p: p.requires_grad, params), **config.args)
     else:
-        print(f"params {params}")
         optim = getattr(torch.optim, config.name)(filter(lambda p: p.requires_grad, params), **config.args)
     return optim
 
