@@ -111,7 +111,9 @@ class SSNeRF1System(BaseSystem):
             - batch_idx: index của từng batch
         '''
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
-        print(f"out.keys() {out.keys()}")
+
+        bright_ness_predict = out["bright_ness"]
+        print(f"out.keys() {batch.keys()}")
         loss = 0.
         # update train_num_rays
         if self.config.model.dynamic_ray_sampling:
