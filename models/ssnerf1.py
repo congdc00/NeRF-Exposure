@@ -62,7 +62,7 @@ class SSNeRF1Model(BaseModel):
         mesh = self.geometry.isosurface()
         return mesh
     
-    @torch.no_grad()
+    # @torch.no_grad()
     def forward_(self, rays):
         n_rays = rays.shape[0]
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
