@@ -33,6 +33,7 @@ class SSNeRF1System(BaseSystem):
     def prepare(self):
         self.criterions = {
             'psnr': PSNR()
+            'ssim': SSIM()
         }
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
