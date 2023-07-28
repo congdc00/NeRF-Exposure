@@ -80,7 +80,7 @@ class BlenderDatasetBase():
                 print(f"exposure_factor {exposure_factor}")
                 self.all_factor.append(exposure_factor)
             except:
-                self.all_factor.append(1)
+                self.all_factor.append(float(1))
 
             img = img.resize(self.img_wh, Image.BICUBIC)
 
