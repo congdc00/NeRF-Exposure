@@ -42,14 +42,12 @@ class VolumeBrightness(nn.Module):
         print(f"forward")
 
         def dfs_freeze(model):
-            for name, child in model.named_children():
+            print(f"child.parameters() {child.parameters()}")
+            for child in model.children():
                 for param in child.parameters():
                     print(f"dat bang false")
                     param.requires_grad = False
                 dfs_freeze(child)
-
-        
-
         dfs_freeze(self.network)
 
         for param in self.network.parameters():
