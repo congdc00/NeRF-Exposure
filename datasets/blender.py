@@ -85,7 +85,7 @@ class BlenderDatasetBase():
             img = img.resize(self.img_wh, Image.BICUBIC)
 
             img = TF.to_tensor(img).permute(1, 2, 0) # (4, h, w) => (h, w, 4)
-
+            print(f"img[..., -1] {type(img[..., -1])}")
             self.all_fg_masks.append(img[..., -1]) # (h, w)
             self.all_images.append(img[...,:3])
 
