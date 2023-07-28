@@ -174,8 +174,8 @@ class SSNeRF1System(BaseSystem):
             return {
                 'psnr': 0.0,
                 'ssim': 0.0,
+                'index': batch['index'],
                 'delta_exposure': 0,
-                'index': batch['index']
             }
         W, H = self.dataset.img_wh
         image_origin = batch['rgb'] 
@@ -259,7 +259,7 @@ class SSNeRF1System(BaseSystem):
                 ssim_score = 0
                 ssim_standard = 0
             else: 
-                print(f"out_set_ssim {torch.stack([o['ssim'] for o in out_set_psnr.values()])}")
+                print(f"out_set_ssim {torch.stack([o['ssim'] for o in out_set_ssim.values()])}")
                 list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
                 psnr = torch.mean(list_psnr) 
                 psnr_standard= torch.std(list_psnr) 
