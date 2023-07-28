@@ -192,13 +192,14 @@ class SSNeRF1System(BaseSystem):
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
 
         # Chuyển đổi tensor thành NumPy array
-        image_array1 = color_predict.to(image_origin).cpu().numpy()
-        image_array2 = image_origin.cpu().numpy()
+        image_array1 = color_predict.to(image_origin).cpu().numpy().view(H, W, 3)
+        image_array2 = image_origin.cpu().numpy().view(H, W, 3)
 
         # Điều chỉnh định dạng của tensor để phù hợp với hàm SSIM
+        print(f"image_array2 {image_array2.shape} and image_array1{image_array1.shape}")
         image_array1 = np.transpose(image_array1, (1, 2, 0))
         image_array2 = np.transpose(image_array2, (1, 2, 0))
-        print(f"image_array2 {image_array2.shape} and image_array1{image_array1.shape}")
+        
         ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
