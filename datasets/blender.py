@@ -73,11 +73,11 @@ class BlenderDatasetBase():
             img = Image.open(img_path)
             try:
                 # print(f"Thay đổi độ sáng ảnh từ 1 -> {frame['factor']}")
-                factor = float(frame['factor'])
+                exposure_factor = float(frame['factor'])
                 img.convert("F")
                 enhancer = ImageEnhance.Brightness(img)
-                img = enhancer.enhance(factor)
-                self.all_factor.append(factor)
+                img = enhancer.enhance(exposure_factor)
+                self.all_factor.append(exposure_factor)
             except:
                 pass
 
@@ -88,10 +88,11 @@ class BlenderDatasetBase():
             self.all_fg_masks.append(img[..., -1]) # (h, w)
             self.all_images.append(img[...,:3])
 
-        self.all_c2w, self.all_images, self.all_fg_masks = \
+        self.all_c2w, self.all_images, self.all_fg_masks, self.all_factor = \
             torch.stack(self.all_c2w, dim=0).float().to(self.rank), \
             torch.stack(self.all_images, dim=0).float().to(self.rank), \
-            torch.stack(self.all_fg_masks, dim=0).float().to(self.rank)
+            torch.stack(self.all_fg_masks, dim=0).float().to(self.rank), \
+            torch.stack(self.all_factor, dim=0).float().to(self.rank)
 
 class BlenderDataset(Dataset, BlenderDatasetBase):
     def __init__(self, config, split):
