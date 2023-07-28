@@ -188,6 +188,7 @@ class SSNeRF1System(BaseSystem):
         density_predict= (density_predict*mask_object)
 
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
+        print(f" color_predict.to(image_origin) {color_predict.to(image_origin).shape} and image_origin {image_origin.shape}")
         ssim = self.criterions['ssim'](preds = color_predict.to(image_origin), target = image_origin)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
