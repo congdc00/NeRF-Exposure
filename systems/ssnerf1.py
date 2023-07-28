@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_efficient_distloss import flatten_eff_distloss
 from torchmetrics.image import StructuralSimilarityIndexMeasure
+from skimage.metrics import structural_similarity as ssim
 import imageio
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_debug
@@ -14,6 +15,7 @@ import systems
 from systems.base import BaseSystem
 from systems.criterions import PSNR, SSIM
 from tabulate import tabulate
+import numpy as np
 
 def compute_psnr(img1, img2):
     mse = F.mse_loss(img1, img2)
@@ -34,7 +36,7 @@ class SSNeRF1System(BaseSystem):
     def prepare(self):
         self.criterions = {
             'psnr': PSNR(),
-            'ssim': StructuralSimilarityIndexMeasure(data_range=1.0)
+            'ssim': ssim
         }
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
@@ -188,8 +190,15 @@ class SSNeRF1System(BaseSystem):
         density_predict= (density_predict*mask_object)
 
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
-        print(f"---- color_predict.to(image_origin) {color_predict.to(image_origin).shape} and image_origin {image_origin.shape}")
-        ssim = self.criterions['ssim'](preds = color_predict.to(image_origin).to(image_origin.device), target = image_origin)
+
+        # Chuyển đổi tensor thành NumPy array
+        image_array1 = color_predict.to(image_origin).cpu().numpy()
+        image_array2 = image_origin.cpu().numpy()
+
+        # Điều chỉnh định dạng của tensor để phù hợp với hàm SSIM
+        image_array1 = np.transpose(image_array1, (1, 2, 0))
+        image_array2 = np.transpose(image_array2, (1, 2, 0))
+        ssim = self.criterions['ssim'](image_array1, image_array2)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
         # rgb_non_bg= (batch['rgb']*mask_object)
