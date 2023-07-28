@@ -51,7 +51,9 @@ class SSNeRF1System(BaseSystem):
         
         if stage in ['train']:
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
-
+            # val, test
+            bright_ness = self.dataset.all_factor[index]
+            print(f"anh {len(index)} c2w {c2w.shape} and bright_ness{bright_ness.numel()}")
             
             # Khởi tạo meshgrid
             x = torch.randint(
@@ -70,9 +72,8 @@ class SSNeRF1System(BaseSystem):
             rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank) # Khởi tạo nhãn [8192, 3]
             fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank) 
         else:
-            # val, test
-            bright_ness = self.dataset.all_factor[index]
-            print(f"anh {index} c2w {c2w.shape} and bright_ness{bright_ness[0].item()}")
+            
+            
             c2w = self.dataset.all_c2w[index][0]
             if self.dataset.directions.ndim == 3: # (H, W, 3)
                 directions = self.dataset.directions
