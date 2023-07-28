@@ -101,7 +101,7 @@ class SSNeRF1Model(BaseModel):
         rgb = self.texture(True, cor_feature, t_dirs) # Dự đoán ra màu sắc
 
         self.shutter_speed.requires_grad_(False)
-        os.environ['TORCH_DISTRIBUTED_DEBUG'] = 'INFO'
+        os.environ['TORCH_DISTRIBUTED_DEBUG'] = 'DETAIL'
         bright_ness = self.shutter_speed(True, rays_o) * 2
             
 
