@@ -81,14 +81,15 @@ class BlenderDatasetBase():
                 self.all_factor.append(exposure_factor)
             except:
                 self.all_factor.append(float(1))
+            finally:
+                self.all_factor = torch.Tensor(self.all_factor)
 
             img = img.resize(self.img_wh, Image.BICUBIC)
 
             img = TF.to_tensor(img).permute(1, 2, 0) # (4, h, w) => (h, w, 4)
-            print(f"img[..., -1] {type(img[..., -1])}")
             self.all_fg_masks.append(img[..., -1]) # (h, w)
             self.all_images.append(img[...,:3])
-
+            
         self.all_c2w, self.all_images, self.all_fg_masks, self.all_factor = \
             torch.stack(self.all_c2w, dim=0).float().to(self.rank), \
             torch.stack(self.all_images, dim=0).float().to(self.rank), \
