@@ -113,7 +113,8 @@ class SSNeRF1System(BaseSystem):
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
         bright_ness_predict = out["bright_ness"]
-        print(f"out.keys() {batch.keys()}")
+        bright_ness_label = out["bright_ness"]
+        print(f"bright_ness_predict {bright_ness_predict.shape}")
         loss = 0.
         # update train_num_rays
         if self.config.model.dynamic_ray_sampling:
