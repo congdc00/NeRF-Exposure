@@ -37,9 +37,9 @@ class VolumeBrightness(nn.Module):
 
         #freeze
         for name, param in self.network.named_parameters():
-            if ('decoder' in name) and ('weight' in name):
-                param.requires_grad = True
+            param.requires_grad = False
             print(name, param.requires_grad)
+            break
 
         brightness = self.network(network_inp).view(*origins.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
 
