@@ -178,9 +178,10 @@ class SSNeRF1System(BaseSystem):
         image_predict = out['comp_rgb']
         color_predict = out["real_rgb"]
 
-        exposure_predict = out["bright_ness"]
-        exposure_label = batch["bright_ness"]
-        print(f"exposure_predict {exposure_predict} and exposure_label {exposure_label}")
+        exposure_predict = out["bright_ness"][0].item()
+        exposure_label = batch["bright_ness"].item()
+        delta_exposure = exposure_predict - exposure_label
+        print(f"delta_exposure {delta_exposure}")
         mask_object = batch['fg_mask'].view(-1, 1)
         density_predict = out['depth'].to(mask_object.device)
         density_predict= (density_predict*mask_object)
