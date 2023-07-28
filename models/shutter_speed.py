@@ -39,9 +39,14 @@ class VolumeBrightness(nn.Module):
 
         #freeze
         print(f"forward")
-        for param in self.network.parameters():
-            param.requires_grad = False
-            print(f"param {param.requires_grad}")
+
+        def dfs_freeze(model):
+            for name, child in model.named_children():
+                for param in child.parameters():
+                    param.requires_grad = False
+                dfs_freeze(child)
+
+        dfs_freeze(self.network)
 
         brightness = self.network(network_inp).view(*origins.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
 
