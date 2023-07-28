@@ -181,7 +181,6 @@ class SSNeRF1System(BaseSystem):
         exposure_predict = out["bright_ness"][0].item()
         exposure_label = batch["bright_ness"].item()
         delta_exposure = exposure_predict - exposure_label
-        print(f"delta_exposure {delta_exposure}")
         mask_object = batch['fg_mask'].view(-1, 1)
         density_predict = out['depth'].to(mask_object.device)
         density_predict= (density_predict*mask_object)
@@ -211,7 +210,8 @@ class SSNeRF1System(BaseSystem):
         return {
             'psnr': psnr,
             # 'ssim': ssim,
-            'index': batch['index']
+            'index': batch['index'],
+            "delta_exposure": delta_exposure
         }
     
     def validation_epoch_end(self, out):
@@ -220,8 +220,10 @@ class SSNeRF1System(BaseSystem):
             out_set_psnr = {}
             num_imgs = 0
             num_all_imgs = 0
+            list_delta_exposure = []
             for step_out in out:
                 num_all_imgs += 1
+                list_delta_exposure.append(step_out["delta_exposure"])
                 if int(step_out['index'].item()) == 0:
                     print(f"\n\n[Val] r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
                 # DP
@@ -247,10 +249,14 @@ class SSNeRF1System(BaseSystem):
                 psnr = torch.mean(list_psnr) 
                 psnr_standard= torch.std(list_psnr) 
 
+                list_delta_exposure = torch.Tensor(list_delta_exposure)
+                delta_exposure_std = torch.std(list_delta_exposure)
+
                 if num_imgs<num_all_imgs:
-                    logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
+                    logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard} -- Standard deviation Exposure: {delta_exposure_std}")
                 else:
-                    logger.info(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
+                    logger.info(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard} -- Standard deviation Exposure: {delta_exposure_std}")
+
 
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)         
             # self.log('val/ssim', ssim, prog_bar=True, rank_zero_only=True)         
