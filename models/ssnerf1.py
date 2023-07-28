@@ -17,7 +17,7 @@ class SSNeRF1Model(BaseModel):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
-        self.shutter_speed.requires_grad = False
+        
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
         if self.config.learned_background:
@@ -49,7 +49,7 @@ class SSNeRF1Model(BaseModel):
         # Lan truyen nguoc
         update_module_step(self.geometry, epoch, global_step)
         update_module_step(self.texture, epoch, global_step)
-        # update_module_step(self.shutter_speed, epoch, global_step)
+        update_module_step(self.shutter_speed, epoch, global_step)
 
         def occ_eval_fn(x):
             density, _ = self.geometry(x)
@@ -61,8 +61,7 @@ class SSNeRF1Model(BaseModel):
     def isosurface(self):
         mesh = self.geometry.isosurface()
         return mesh
-    
-    # @torch.no_grad()
+        
     def forward_(self, rays):
         n_rays = rays.shape[0]
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
@@ -104,7 +103,7 @@ class SSNeRF1Model(BaseModel):
         # self.shutter_speed.requires_grad_(False)
         # os.environ['TORCH_DISTRIBUTED_DEBUG'] = 'DETAIL'
         
-        # bright_ness = self.shutter_speed(True, rays_o) * 2
+        bright_ness = self.shutter_speed(True, rays_o) * 2
             
 
         # network_inp torch.Size([97790, 32])
@@ -120,7 +119,6 @@ class SSNeRF1Model(BaseModel):
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
-        bright_ness = torch.ones_like(real_rgb)
         comp_rgb = real_rgb*bright_ness  + self.background_color * (1.0 - opacity)
         # print(f"bright_ness {bright_ness[0].item()}     --      brightness_mean {torch.mean(bright_ness)}")
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
@@ -171,7 +169,7 @@ class SSNeRF1Model(BaseModel):
         losses = {}
         losses.update(self.geometry.regularizations(out))
         losses.update(self.texture.regularizations(out))
-        # losses.update(self.shutter_speed.regularizations(out))
+        losses.update(self.shutter_speed.regularizations(out))
         return losses
 
     @torch.no_grad()
