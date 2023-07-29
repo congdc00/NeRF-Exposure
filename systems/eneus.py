@@ -41,6 +41,7 @@ class ENeuSSystem(BaseSystem):
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)
         if stage in ['train']:
             c2w = self.dataset.all_c2w[index]
+            bright_ness = self.dataset.all_factor[index]
             x = torch.randint(
                 0, self.dataset.w, size=(self.train_num_rays,), device=self.dataset.all_images.device
             )
@@ -67,6 +68,7 @@ class ENeuSSystem(BaseSystem):
         rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1)
 
         if stage in ['train']:
+            bright_ness = self.dataset.all_factor[index][0]
             if self.config.model.background_color == 'white':
                 self.model.background_color = torch.ones((3,), dtype=torch.float32, device=self.rank)
             elif self.config.model.background_color == 'random':
@@ -82,7 +84,8 @@ class ENeuSSystem(BaseSystem):
         batch.update({
             'rays': rays,
             'rgb': rgb,
-            'fg_mask': fg_mask
+            'fg_mask': fg_mask,
+            'bright_ness': bright_ness,
         })      
     
     def training_step(self, batch, batch_idx):
