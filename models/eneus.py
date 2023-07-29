@@ -54,6 +54,7 @@ class ENeuSModel(BaseModel):
         self.geometry.contraction_type = ContractionType.AABB
 
         if self.config.learned_background:
+            print(f"____________bg_name________________")
             self.geometry_bg = models.make(self.config.geometry_bg.name, self.config.geometry_bg)
             self.texture_bg = models.make(self.config.texture_bg.name, self.config.texture_bg)
             self.geometry_bg.contraction_type = ContractionType.UN_BOUNDED_SPHERE
@@ -182,7 +183,7 @@ class ENeuSModel(BaseModel):
 
         density, feature = self.geometry_bg(positions) 
         rgb = self.texture_bg(feature, positions)
-        bright_ness = self.bright_ness(True, rays_o) * 2
+        bright_ness = self.shutter_speed(True, rays_o) * 2
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
