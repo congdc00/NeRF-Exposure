@@ -34,9 +34,9 @@ class VolumeBrightness(nn.Module):
         """
         
         try:
-            print(f"origins[0] {origins[0].dtype}", end = " ")
+            print(f"origins[0] {origins[0]}", end = " ")
             origins = (origins + 1.) / 2. # (-1, 1) => (0, 1)
-            print(f"and new_origins[0] {origins[0].dtype}", end = " ")
+            print(f"and new_origins[0] {origins[0]}")
         except:
             print(f"FALSE")
             print(f"origins[0] {origins[0].dtype}")
