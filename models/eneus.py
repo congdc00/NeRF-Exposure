@@ -57,12 +57,12 @@ class ENeuSModel(BaseModel):
             print(f"____________bg_name________________")
             self.geometry_bg = models.make(self.config.geometry_bg.name, self.config.geometry_bg)
             self.texture_bg = models.make(self.config.texture_bg.name, self.config.texture_bg)
+            self.shutter_speed = models.make(self.config.shutter_speed_bg.name, self.config.shutter_speed_bg)
             self.geometry_bg.contraction_type = ContractionType.UN_BOUNDED_SPHERE
             self.near_plane_bg, self.far_plane_bg = 0.1, 1e3
             self.cone_angle_bg = 10**(math.log10(self.far_plane_bg) / self.config.num_samples_per_ray_bg) - 1.
             self.render_step_size_bg = 0.01       
-        else: 
-            print(f"_____________non bg_name____________")     
+        else:   
 
         self.variance = VarianceNetwork(self.config.variance)
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
