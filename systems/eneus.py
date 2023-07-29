@@ -222,10 +222,10 @@ class ENeuSSystem(BaseSystem):
             }
         except:
             return {
-                'psnr': 0,
-                'ssim': 0,
+                'psnr': 0.0,
+                'ssim': 0.0,
                 'index': batch['index'],
-                "delta_exposure": 0
+                "delta_exposure": 0.0
             }
             
     
