@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_efficient_distloss import flatten_eff_distloss
-
+from skimage.metrics import structural_similarity as ssim
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_debug
 
@@ -23,7 +23,8 @@ class ENeuSSystem(BaseSystem):
     """
     def prepare(self):
         self.criterions = {
-            'psnr': PSNR()
+            'psnr': PSNR(),
+            'ssim': ssim
         }
         self.train_num_samples = self.config.model.train_num_rays * (self.config.model.num_samples_per_ray + self.config.model.get('num_samples_per_ray_bg', 0))
         self.train_num_rays = self.config.model.train_num_rays

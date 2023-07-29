@@ -12,6 +12,7 @@ from nerfacc import ContractionType, OccupancyGrid, ray_marching, render_weight_
 from nerfacc.intersection import ray_aabb_intersect
 
 
+
 class VarianceNetwork(nn.Module):
     def __init__(self, config):
         super(VarianceNetwork, self).__init__()
