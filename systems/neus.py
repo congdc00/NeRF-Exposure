@@ -176,7 +176,7 @@ class NeuSSystem(BaseSystem):
         psnr = self.criterions['psnr'](out['comp_rgb_full'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
 
-        mage_array1 = color_predict.view(H, W, 3).cpu().numpy()
+        image_array1 = color_predict.view(H, W, 3).cpu().numpy()
         image_array2 = color_origin.view(H, W, 3).cpu().numpy()
         ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
         
@@ -196,6 +196,7 @@ class NeuSSystem(BaseSystem):
             ])
         return {
             'psnr': psnr,
+            'ssim':ssim,
             'index': batch['index']
         }
           
