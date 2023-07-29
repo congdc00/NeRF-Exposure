@@ -14,6 +14,7 @@ from torch.nn.parallel import DistributedDataParallel
 @models.register('ssnerf1')
 class SSNeRF1Model(BaseModel):
     def setup(self):
+        self.is_freeze = True
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
@@ -87,7 +88,6 @@ class SSNeRF1Model(BaseModel):
                 alpha_thre=0.0
             )   
         
-
         ray_indices = ray_indices.long() # chỉ mục của tia chứa các điểm
         t_origins = rays_o[ray_indices]
         t_dirs = rays_d[ray_indices]
@@ -98,12 +98,13 @@ class SSNeRF1Model(BaseModel):
         # Step 1: Predict colour point
 
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
-        rgb = self.texture(True, cor_feature, t_dirs) # Dự đoán ra màu sắc
-
-        # self.shutter_speed.requires_grad_(False)
-        # os.environ['TORCH_DISTRIBUTED_DEBUG'] = 'DETAIL'
         
-        bright_ness = self.shutter_speed(True, rays_o) * 2
+        self.is_freeze = not self.is_freeze
+        print(f"self.is_freeze {self.is_freeze}")
+
+        rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
+        k = not self.is_freeze
+        bright_ness = self.shutter_speed(k, rays_o) * 2
             
 
         # network_inp torch.Size([97790, 32])
