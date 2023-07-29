@@ -176,14 +176,51 @@ class ENeuSSystem(BaseSystem):
         pass
     """
     
-    def validation_step(self, batch, batch_idx):
-        out = self(batch)
-
-        psnr = self.criterions['psnr'](out['real_rgb_full'].to(batch['rgb']), batch['rgb'])
+    def validation_step(self, batch, batch_idx):   
+        '''
+        batch: label
+        out: predict
+        '''
+        try:
+            out = self(batch) 
+        except:
+            return {
+                'psnr': 0.0,
+                'ssim': 0.0,
+                'index': batch['index'],
+                'delta_exposure': 0,
+            }
         W, H = self.dataset.img_wh
+        image_origin = batch['rgb'] 
+        image_predict = out['comp_rgb']
+        color_predict = out["real_rgb"]
+
+        exposure_predict = out["bright_ness"][0].item()
+        exposure_label = batch["bright_ness"].item()
+        delta_exposure = abs(exposure_predict - exposure_label)*100/exposure_label
+
+        mask_object = batch['fg_mask'].view(-1, 1)
+        density_predict = out['depth'].to(mask_object.device)
+        density_predict= (density_predict*mask_object)
+
+        psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
+
+        # Chuyển đổi tensor thành NumPy array
+        image_array1 = color_predict.view(H, W, 3).cpu().numpy()
+        image_array2 = image_origin.view(H, W, 3).cpu().numpy()
+        ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
+
+        # mask_object = batch['fg_mask'].view(-1, 1)
+        # rgb_non_bg= (batch['rgb']*mask_object)
+        # psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_object, rgb_non_bg)
         
-        # torch.save(out['theta'], "theta_neus.pt")
-        # torch.save(out['positions'], "positions_neus.pt")
+        # mask_bg = torch.ones_like(mask_object) - mask_object
+        # background_rgb = (batch['rgb']*mask_bg)
+        # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
+        # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
+
+        
+            
 
         if batch_idx == 0:
             self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
@@ -196,10 +233,13 @@ class ENeuSSystem(BaseSystem):
                 {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
                 {'type': 'rgb', 'img': out['real_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC', 'data_range': (-1, 1)}}
             ])
-            
+            torch.save(out['theta'], "theta_enerf.pt")
+            torch.save(out['positions'], "positions_enerf.pt")
         return {
             'psnr': psnr,
-            'index': batch['index']
+            'ssim': ssim,
+            'index': batch['index'],
+            "delta_exposure": delta_exposure
         }
           
     
