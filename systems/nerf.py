@@ -150,7 +150,7 @@ class NeRFSystem(BaseSystem):
                 'ssim': 0.0,
                 'index': batch['index']
             }
-
+        W, H = self.dataset.img_wh
         image_origin = batch['rgb'] 
         image_predict = out['comp_rgb']
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
@@ -166,7 +166,7 @@ class NeRFSystem(BaseSystem):
         # background_rgb = (batch['rgb']*mask_bg)
         # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
         # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
-        W, H = self.dataset.img_wh
+        
 
         
         if batch_idx == 0:
