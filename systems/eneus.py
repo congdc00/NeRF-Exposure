@@ -183,7 +183,7 @@ class ENeuSSystem(BaseSystem):
     
     def validation_step(self, batch, batch_idx):   
         out = self(batch)
-        psnr = self.criterions['psnr'](out['comp_rgb_full'].to(batch['rgb']), batch['rgb'])
+        psnr = self.criterions['psnr'](out['real_rgb_full'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
         
         # torch.save(out['theta'], "theta_neus.pt")
