@@ -183,8 +183,21 @@ class ENeuSSystem(BaseSystem):
     
     def validation_step(self, batch, batch_idx):   
         out = self(batch)
+
+        color_predict = out['real_rgb_full']
+        color_origin = batch['rgb']
+
+        exposure_predict = out["bright_ness"][0].item()
+        exposure_label = batch["bright_ness"].item()
+        delta_exposure = abs(exposure_predict - exposure_label)*100/exposure_label
+
         psnr = self.criterions['psnr'](out['real_rgb_full'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
+
+        # Chuyển đổi tensor thành NumPy array
+        image_array1 = color_predict.view(H, W, 3).cpu().numpy()
+        image_array2 = color_origin.view(H, W, 3).cpu().numpy()
+        ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
         
         # torch.save(out['theta'], "theta_neus.pt")
         # torch.save(out['positions'], "positions_neus.pt")
@@ -202,7 +215,9 @@ class ENeuSSystem(BaseSystem):
             ])
         return {
             'psnr': psnr,
-            'index': batch['index']
+            'ssim': ssim,
+            'index': batch['index'],
+            "delta_exposure": delta_exposure
         }
           
     
