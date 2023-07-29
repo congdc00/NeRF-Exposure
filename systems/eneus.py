@@ -266,7 +266,7 @@ class ENeuSSystem(BaseSystem):
                 num_all_imgs += 1
                 list_delta_exposure.append(step_out["delta_exposure"])
                 if int(step_out['index'].item()) == 0:
-                    print(f"\n\n[Val] r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
+                    print(f"\n\n[Val] r_{step_out['index'].item()}.png with psnr {step_out['psnr']}")
                 # DP
                 if step_out['index'].ndim == 1:
                     if int(step_out['psnr']) != 0.0:
