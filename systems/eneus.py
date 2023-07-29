@@ -182,69 +182,27 @@ class ENeuSSystem(BaseSystem):
     """
     
     def validation_step(self, batch, batch_idx):   
-        '''
-        batch: label
-        out: predict
-        '''
-        try:
-            out = self(batch) 
-        except:
-            return {
-                'psnr': 0.0,
-                'ssim': 0.0,
-                'index': batch['index'],
-                'delta_exposure': 0,
-            }
+        out = self(batch)
+        psnr = self.criterions['psnr'](out['comp_rgb_full'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
-        image_origin = batch['rgb'] 
-        image_predict = out['comp_rgb']
-        color_predict = out["real_rgb"]
-
-        exposure_predict = out["bright_ness"][0].item()
-        exposure_label = batch["bright_ness"].item()
-        delta_exposure = abs(exposure_predict - exposure_label)*100/exposure_label
-
-        mask_object = batch['fg_mask'].view(-1, 1)
-        density_predict = out['depth'].to(mask_object.device)
-        density_predict= (density_predict*mask_object)
-
-        psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
-
-        # Chuyển đổi tensor thành NumPy array
-        image_array1 = color_predict.view(H, W, 3).cpu().numpy()
-        image_array2 = image_origin.view(H, W, 3).cpu().numpy()
-        ssim = 0
-
-        # mask_object = batch['fg_mask'].view(-1, 1)
-        # rgb_non_bg= (batch['rgb']*mask_object)
-        # psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_object, rgb_non_bg)
         
-        # mask_bg = torch.ones_like(mask_object) - mask_object
-        # background_rgb = (batch['rgb']*mask_bg)
-        # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
-        # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
-
-        
-            
+        # torch.save(out['theta'], "theta_neus.pt")
+        # torch.save(out['positions'], "positions_neus.pt")
 
         if batch_idx == 0:
             self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-                {'type': 'rgb', 'img': out['real_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
                 {'type': 'rgb', 'img': out['comp_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
             ] + ([
-                {'type': 'rgb', 'img': out['real_rgb_bg'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
                 {'type': 'rgb', 'img': out['comp_rgb_bg'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             ] if self.config.model.learned_background else []) + [
                 {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
-                {'type': 'rgb', 'img': out['real_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC', 'data_range': (-1, 1)}}
+                {'type': 'rgb', 'img': out['comp_normal'].view(H, W, 3), 'kwargs': {'data_format': 'HWC', 'data_range': (-1, 1)}}
             ])
-            # torch.save(out['theta'], "theta_enerf.pt")
-            # torch.save(out['positions'], "positions_enerf.pt")
         return {
             'psnr': psnr,
-            'ssim': ssim,
-            'index': batch['index'],
-            "delta_exposure": delta_exposure
+            'index': batch['index']
         }
           
     
@@ -255,60 +213,44 @@ class ENeuSSystem(BaseSystem):
     """
     
     def validation_epoch_end(self, out):
-        ut = self.all_gather(out)
+        out = self.all_gather(out)
         if self.trainer.is_global_zero:
             out_set_psnr = {}
-            out_set_ssim = {}
             num_imgs = 0
             num_all_imgs = 0
-            list_delta_exposure = []
             for step_out in out:
                 num_all_imgs += 1
-                list_delta_exposure.append(step_out["delta_exposure"])
                 if int(step_out['index'].item()) == 0:
-                    print(f"\n\n[Val] r_{step_out['index'].item()}.png with psnr {step_out['psnr']}")
+                    print(f"\n\nr_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
                 # DP
                 if step_out['index'].ndim == 1:
                     if int(step_out['psnr']) != 0.0:
                         out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
-                        out_set_ssim[step_out['index'].item()] = {'ssim': torch.tensor(step_out['ssim'])}
                         num_imgs += 1
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
                         if int(step_out['psnr'][oi]) != 0.0:
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-                            out_set_ssim[index[0].item()] = {'ssim': torch.tensor(step_out['ssim'][oi])}
                             num_imgs += 1
-            
+                        # out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
             
             if num_imgs == 0:
                 logger.error(f"Validation False")
                 psnr = 0
-                ssim_score = 0
-                psnr_standard = 0
-                ssim_score = 0
-                ssim_standard = 0
             else: 
+                
+
                 list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
                 psnr = torch.mean(list_psnr) 
                 psnr_standard= torch.std(list_psnr) 
 
-                list_ssim = torch.stack([o['ssim'] for o in out_set_ssim.values()])
-                # ssim_score = torch.mean(list_ssim) 
-                # ssim_standard= torch.std(list_ssim) 
-
-                list_delta_exposure = torch.Tensor(list_delta_exposure)
-                delta_exposure_std = torch.std(list_delta_exposure)
-                
-                log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- std PSNR: {psnr_standard} -- std Exposure: {round( delta_exposure_std.item(), 3)}"
                 if num_imgs<num_all_imgs:
-                    logger.warning(log_text)
+                    logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
                 else:
-                    logger.info(log_text)
+                    logger.info(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
 
-
-            self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)             
+            self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)              
 
     def test_step(self, batch, batch_idx):
         out = self(batch)
