@@ -198,7 +198,7 @@ class ENeuSSystem(BaseSystem):
                 {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
             ] if self.config.model.learned_background else []) + [
                 {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
-                {'type': 'rgb', 'img': out['real_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC', 'data_range': (-1, 1)}}
+                {'type': 'rgb', 'img': out['real_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
             ])
         return {
             'psnr': psnr,
