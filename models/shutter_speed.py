@@ -32,6 +32,7 @@ class VolumeBrightness(nn.Module):
         Result:
             brightness: torch.Size([97790, 1])
         """
+        print(f"origins {origins}")
         origins = (origins + 1.) / 2. # (-1, 1) => (0, 1)
         origins_embd = self.encoding(origins.view(-1, self.n_ori_dims)) # origins_embd torch.Size([97790, 16])
         
