@@ -100,7 +100,6 @@ class SSNeRF1Model(BaseModel):
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         
         self.is_freeze = not self.is_freeze
-        # print(f"self.is_freeze {self.is_freeze}")
 
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         k = not self.is_freeze
