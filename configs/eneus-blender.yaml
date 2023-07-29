@@ -102,7 +102,7 @@ system:
   optimizer:
     name: AdamW
     args:
-      lr: 0.0006
+      lr: 0.01
       betas: [0.9, 0.99]
       eps: 1.e-15
     params:
@@ -110,6 +110,8 @@ system:
         lr: 0.01
       texture:
         lr: 0.0001
+      shutter_speed:
+        lr: 0.0006
       variance:
         lr: 0.001
   warmup_steps: 500
