@@ -250,7 +250,7 @@ class ENeuSModel(BaseModel):
         alpha = self.get_alpha(sdf, normal, t_dirs, dists)[...,None]
         rgb = self.texture(True, feature, t_dirs, normal)
         bright_ness = self.shutter_speed(True, rays_o) * 2
-        print(f"----------------bright_ness {bright_ness} --------------------")
+        print(f"----------------bright_ness {bright_ness[0].item()} --------------------")
         weights = render_weight_from_alpha(alpha, ray_indices=ray_indices, n_rays=n_rays)
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)
