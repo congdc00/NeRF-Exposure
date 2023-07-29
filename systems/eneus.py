@@ -12,7 +12,7 @@ from models.ray_utils import get_rays
 import systems
 from systems.base import BaseSystem
 from systems.criterions import PSNR, binary_cross_entropy
-
+from loguru import logger
 
 @systems.register('eneus-system')
 class ENeuSSystem(BaseSystem):
@@ -250,19 +250,60 @@ class ENeuSSystem(BaseSystem):
     """
     
     def validation_epoch_end(self, out):
-        out = self.all_gather(out)
+        ut = self.all_gather(out)
         if self.trainer.is_global_zero:
-            out_set = {}
+            out_set_psnr = {}
+            out_set_ssim = {}
+            num_imgs = 0
+            num_all_imgs = 0
+            list_delta_exposure = []
             for step_out in out:
+                num_all_imgs += 1
+                list_delta_exposure.append(step_out["delta_exposure"])
+                if int(step_out['index'].item()) == 0:
+                    print(f"\n\n[Val] r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
                 # DP
                 if step_out['index'].ndim == 1:
-                    out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                    if int(step_out['psnr']) != 0.0:
+                        out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                        out_set_ssim[step_out['index'].item()] = {'ssim': torch.tensor(step_out['ssim'])}
+                        num_imgs += 1
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
-                        out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-            psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
-            self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True)         
+                        if int(step_out['psnr'][oi]) != 0.0:
+                            out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+                            out_set_ssim[index[0].item()] = {'ssim': torch.tensor(step_out['ssim'][oi])}
+                            num_imgs += 1
+            
+            
+            if num_imgs == 0:
+                logger.error(f"Validation False")
+                psnr = 0
+                ssim_score = 0
+                psnr_standard = 0
+                ssim_score = 0
+                ssim_standard = 0
+            else: 
+                list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
+                psnr = torch.mean(list_psnr) 
+                psnr_standard= torch.std(list_psnr) 
+
+                list_ssim = torch.stack([o['ssim'] for o in out_set_ssim.values()])
+                ssim_score = torch.mean(list_ssim) 
+                ssim_standard= torch.std(list_ssim) 
+
+                list_delta_exposure = torch.Tensor(list_delta_exposure)
+                delta_exposure_std = torch.std(list_delta_exposure)
+                
+                log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- SSIM {ssim_score} -- std PSNR: {psnr_standard} -- std SSIM: {ssim_standard} -- std Exposure: {round( delta_exposure_std.item(), 3)}"
+                if num_imgs<num_all_imgs:
+                    logger.warning(log_text)
+                else:
+                    logger.info(log_text)
+
+
+            self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)             
 
     def test_step(self, batch, batch_idx):
         out = self(batch)
