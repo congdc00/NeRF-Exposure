@@ -47,8 +47,7 @@ class VolumeBrightness(nn.Module):
         # Update: Althernative learning
         # freeze
         for param in self.network.parameters():
-            param.requires_grad = False
-            print(f"param {param.requires_grad}")
+            param.requires_grad = is_freeze
 
         brightness = self.network(network_inp).view(*origins.shape[:-1], self.n_output_dims).float() #*features.shape[:-1] => [97790,]
 
