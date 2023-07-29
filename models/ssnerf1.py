@@ -103,10 +103,9 @@ class SSNeRF1Model(BaseModel):
         self.iterator += 1
         if self.iterator % 500 == 0:
             self.is_freeze = not self.is_freeze
-            k = self.is_freeze 
             print(f" Doi ca ")
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(k, rays_o) * 2
+        bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2
             
 
         # network_inp torch.Size([97790, 32])
