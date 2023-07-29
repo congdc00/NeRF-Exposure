@@ -18,6 +18,7 @@ class SSNeRF1Model(BaseModel):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
+        self.iterator = 0
         
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
@@ -99,10 +100,12 @@ class SSNeRF1Model(BaseModel):
 
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         
-        self.is_freeze = True
-        k = True
+        self.iterator += 1
+        if self.iterator % 500 == 0:
+            self.is_freeze = not self.is_freeze
+            k = self.is_freeze 
+            print(f" Doi ca ")
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
-        
         bright_ness = self.shutter_speed(k, rays_o) * 2
             
 
