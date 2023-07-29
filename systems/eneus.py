@@ -213,7 +213,7 @@ class ENeuSSystem(BaseSystem):
         # Chuyển đổi tensor thành NumPy array
         image_array1 = color_predict.view(H, W, 3).cpu().numpy()
         image_array2 = image_origin.view(H, W, 3).cpu().numpy()
-        ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
+        ssim = 0
 
         # mask_object = batch['fg_mask'].view(-1, 1)
         # rgb_non_bg= (batch['rgb']*mask_object)
