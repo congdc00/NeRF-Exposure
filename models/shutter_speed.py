@@ -34,11 +34,11 @@ class VolumeBrightness(nn.Module):
         """
         
         try:
-            print(f"origins[0] {origins[0]}")
+            print(f"origins[0] {origins[0].dtype}")
             origins = (origins + 1.) / 2. # (-1, 1) => (0, 1)
         except:
             print(f"FALSE")
-            print(f"origins[0] {origins[0]}")
+            print(f"origins[0] {origins[0].dtype}")
             
         origins_embd = self.encoding(origins.view(-1, self.n_ori_dims)) # origins_embd torch.Size([97790, 16])
         
