@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_efficient_distloss import flatten_eff_distloss
-
+from skimage.metrics import structural_similarity as ssim
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_debug
 
@@ -23,7 +23,8 @@ class NeuSSystem(BaseSystem):
     """
     def prepare(self):
         self.criterions = {
-            'psnr': PSNR()
+            'psnr': PSNR(),
+            'ssim': ssim
         }
         self.train_num_samples = self.config.model.train_num_rays * (self.config.model.num_samples_per_ray + self.config.model.get('num_samples_per_ray_bg', 0))
         self.train_num_rays = self.config.model.train_num_rays
@@ -170,8 +171,14 @@ class NeuSSystem(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         out = self(batch)
+        color_predict = out['comp_rgb_full']
+        color_origin =  batch['rgb']
         psnr = self.criterions['psnr'](out['comp_rgb_full'].to(batch['rgb']), batch['rgb'])
         W, H = self.dataset.img_wh
+
+        mage_array1 = color_predict.view(H, W, 3).cpu().numpy()
+        image_array2 = color_origin.view(H, W, 3).cpu().numpy()
+        ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
         
         # torch.save(out['theta'], "theta_neus.pt")
         # torch.save(out['positions'], "positions_neus.pt")
@@ -203,6 +210,7 @@ class NeuSSystem(BaseSystem):
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
             out_set_psnr = {}
+            out_set_ssim = {}
             num_imgs = 0
             num_all_imgs = 0
             for step_out in out:
@@ -213,30 +221,39 @@ class NeuSSystem(BaseSystem):
                 if step_out['index'].ndim == 1:
                     if int(step_out['psnr']) != 0.0:
                         out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                        out_set_ssim[step_out['index'].item()] = {'ssim': torch.tensor(step_out['ssim'])}
                         num_imgs += 1
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
                         if int(step_out['psnr'][oi]) != 0.0:
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+                            out_set_ssim[index[0].item()] = {'ssim': torch.tensor(step_out['ssim'][oi])}
                             num_imgs += 1
                         # out_set_ssim[index[0].item()] = {'ssim': step_out['ssim'][oi]}
             
             if num_imgs == 0:
                 logger.error(f"Validation False")
                 psnr = 0
+                psnr_standard = 0
+                ssim_score = 0
+                ssim_standard = 0
             else: 
                 
 
                 list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
                 psnr = torch.mean(list_psnr) 
-                psnr_standard= torch.std(list_psnr) 
+                psnr_standard= torch.std(list_psnr)
 
+                list_ssim = torch.stack([o['ssim'] for o in out_set_ssim.values()])
+                ssim_score = torch.mean(list_ssim) 
+                ssim_standard= torch.std(list_ssim) 
+
+                log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- SSIM {ssim_score} -- std PSNR: {psnr_standard} -- std SSIM: {ssim_standard}"
                 if num_imgs<num_all_imgs:
-                    logger.warning(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
+                    logger.warning(log_text)
                 else:
-                    logger.info(f"Validation on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
-
+                    logger.info(log_text)
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)       
 
     def test_step(self, batch, batch_idx):
