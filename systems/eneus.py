@@ -295,13 +295,13 @@ class ENeuSSystem(BaseSystem):
                 psnr_standard= torch.std(list_psnr) 
 
                 list_ssim = torch.stack([o['ssim'] for o in out_set_ssim.values()])
-                ssim_score = torch.mean(list_ssim) 
-                ssim_standard= torch.std(list_ssim) 
+                # ssim_score = torch.mean(list_ssim) 
+                # ssim_standard= torch.std(list_ssim) 
 
                 list_delta_exposure = torch.Tensor(list_delta_exposure)
                 delta_exposure_std = torch.std(list_delta_exposure)
                 
-                log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- SSIM {ssim_score} -- std PSNR: {psnr_standard} -- std SSIM: {ssim_standard} -- std Exposure: {round( delta_exposure_std.item(), 3)}"
+                log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- std PSNR: {psnr_standard} -- std Exposure: {round( delta_exposure_std.item(), 3)}"
                 if num_imgs<num_all_imgs:
                     logger.warning(log_text)
                 else:
