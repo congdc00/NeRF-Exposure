@@ -182,7 +182,7 @@ class ENeuSModel(BaseModel):
         intervals = t_ends - t_starts
 
         density, feature = self.geometry_bg(positions) 
-        rgb = self.texture_bg(feature, positions)
+        rgb = self.texture_bg(True, feature, positions)
         bright_ness = self.shutter_speed(True, rays_o) * 2
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
@@ -245,10 +245,11 @@ class ENeuSModel(BaseModel):
             sdf, sdf_grad, feature, sdf_laplace = self.geometry(positions, with_grad=True, with_feature=True, with_laplace=True)
         else:
             sdf, sdf_grad, feature = self.geometry(positions, with_grad=True, with_feature=True)
+
         normal = F.normalize(sdf_grad, p=2, dim=-1)
         alpha = self.get_alpha(sdf, normal, t_dirs, dists)[...,None]
         rgb = self.texture(True, feature, positions, normal)
-        bright_ness = self.shutter_speed(True, rays_o) * 2
+        bright_ness = self.shutter_speed(True, rays_o, normal) * 2
         
         weights = render_weight_from_alpha(alpha, ray_indices=ray_indices, n_rays=n_rays)
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
