@@ -60,7 +60,9 @@ class ENeuSModel(BaseModel):
             self.geometry_bg.contraction_type = ContractionType.UN_BOUNDED_SPHERE
             self.near_plane_bg, self.far_plane_bg = 0.1, 1e3
             self.cone_angle_bg = 10**(math.log10(self.far_plane_bg) / self.config.num_samples_per_ray_bg) - 1.
-            self.render_step_size_bg = 0.01            
+            self.render_step_size_bg = 0.01       
+        else: 
+            print(f"_____________non bg_name____________")     
 
         self.variance = VarianceNetwork(self.config.variance)
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
