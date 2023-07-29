@@ -57,6 +57,7 @@ class ENeuSSystem(BaseSystem):
             fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank)
         else:
             c2w = self.dataset.all_c2w[index][0]
+            bright_ness = self.dataset.all_factor[index][0]
             if self.dataset.directions.ndim == 3: # (H, W, 3)
                 directions = self.dataset.directions
             elif self.dataset.directions.ndim == 4: # (N, H, W, 3)
@@ -68,7 +69,7 @@ class ENeuSSystem(BaseSystem):
         rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1)
 
         if stage in ['train']:
-            bright_ness = self.dataset.all_factor[index][0]
+            
             if self.config.model.background_color == 'white':
                 self.model.background_color = torch.ones((3,), dtype=torch.float32, device=self.rank)
             elif self.config.model.background_color == 'random':
