@@ -25,6 +25,8 @@ class BlenderDatasetBase():
         self.has_mask = True
         self.apply_mask = True
 
+        print(f"-----load (self.config.root_dir {self.config.root_dir}")
+
         with open(os.path.join(self.config.root_dir, f"transforms_{self.split}.json"), 'r') as f:
             meta = json.load(f)
 
