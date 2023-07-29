@@ -238,8 +238,8 @@ class ENeuSSystem(BaseSystem):
                 {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
                 {'type': 'rgb', 'img': out['real_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC', 'data_range': (-1, 1)}}
             ])
-            torch.save(out['theta'], "theta_enerf.pt")
-            torch.save(out['positions'], "positions_enerf.pt")
+            # torch.save(out['theta'], "theta_enerf.pt")
+            # torch.save(out['positions'], "positions_enerf.pt")
         return {
             'psnr': psnr,
             'ssim': ssim,
