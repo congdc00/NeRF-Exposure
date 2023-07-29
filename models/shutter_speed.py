@@ -38,7 +38,11 @@ class VolumeBrightness(nn.Module):
             origins = (origins + 1.) / 2. # (-1, 1) => (0, 1)
             print(f"and new_origins[0] {origins[0]}")
         except:
-            print(f"FALSE")
+            print(f"DIR 2")
+            one_tensor = torch.ones_like(origins)
+            add_result = torch.add(origins, one_tensor)
+            origins = torch.div(add_result, 2.0)
+            
             print(f"origins[0] {origins[0].dtype}")
             
         origins_embd = self.encoding(origins.view(-1, self.n_ori_dims)) # origins_embd torch.Size([97790, 16])
