@@ -182,44 +182,52 @@ class ENeuSSystem(BaseSystem):
     """
     
     def validation_step(self, batch, batch_idx):   
-        out = self(batch)
+        try:
+            out = self(batch)
 
-        color_predict = out['real_rgb_full']
-        color_origin = batch['rgb']
+            color_predict = out['real_rgb_full']
+            color_origin = batch['rgb']
 
-        exposure_predict = out["bright_ness"][0].item()
-        exposure_label = batch["bright_ness"].item()
-        delta_exposure = abs(exposure_predict - exposure_label)*100/exposure_label
+            exposure_predict = out["bright_ness"][0].item()
+            exposure_label = batch["bright_ness"].item()
+            delta_exposure = abs(exposure_predict - exposure_label)*100/exposure_label
 
-        psnr = self.criterions['psnr'](out['real_rgb_full'].to(batch['rgb']), batch['rgb'])
-        W, H = self.dataset.img_wh
+            psnr = self.criterions['psnr'](out['real_rgb_full'].to(batch['rgb']), batch['rgb'])
+            W, H = self.dataset.img_wh
 
-        # Chuyển đổi tensor thành NumPy array
-        image_array1 = color_predict.view(H, W, 3).cpu().numpy()
-        image_array2 = color_origin.view(H, W, 3).cpu().numpy()
-        ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
-        
-        # torch.save(out['theta'], "theta_neus.pt")
-        # torch.save(out['positions'], "positions_neus.pt")
+            # Chuyển đổi tensor thành NumPy array
+            image_array1 = color_predict.view(H, W, 3).cpu().numpy()
+            image_array2 = color_origin.view(H, W, 3).cpu().numpy()
+            ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
+            
+            # torch.save(out['theta'], "theta_neus.pt")
+            # torch.save(out['positions'], "positions_neus.pt")
 
-        if batch_idx == 0:
-            self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': out['comp_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
-            ] + ([
-                {'type': 'rgb', 'img': out['comp_rgb_bg'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            ] if self.config.model.learned_background else []) + [
-                {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
-                {'type': 'rgb', 'img': out['real_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
-            ])
-        return {
-            'psnr': psnr,
-            'ssim': ssim,
-            'index': batch['index'],
-            "delta_exposure": delta_exposure
-        }
-          
+            if batch_idx == 0:
+                self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
+                    {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                    {'type': 'rgb', 'img': out['comp_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
+                ] + ([
+                    {'type': 'rgb', 'img': out['comp_rgb_bg'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                    {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                ] if self.config.model.learned_background else []) + [
+                    {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
+                    {'type': 'rgb', 'img': out['real_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
+                ])
+            return {
+                'psnr': psnr,
+                'ssim': ssim,
+                'index': batch['index'],
+                "delta_exposure": delta_exposure
+            }
+        except:
+            return {
+                'psnr': 0,
+                'ssim': 0,
+                'index': batch['index'],
+                "delta_exposure": 0
+            }
+            
     
     """
     # aggregate outputs from different devices when using DP
@@ -228,6 +236,7 @@ class ENeuSSystem(BaseSystem):
     """
     
     def validation_epoch_end(self, out):
+        
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
             out_set_psnr = {}
