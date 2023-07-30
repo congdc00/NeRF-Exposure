@@ -47,6 +47,7 @@ class VarianceNetwork(nn.Module):
 @models.register('eneus')
 class ENeuSModel(BaseModel):
     def setup(self):
+        self.is_freeze = True
         self.geometry = models.make(self.config.geometry.name, self.config.geometry)
         self.texture = models.make(self.config.texture.name, self.config.texture)
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
