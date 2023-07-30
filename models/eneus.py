@@ -182,8 +182,12 @@ class ENeuSModel(BaseModel):
         intervals = t_ends - t_starts
 
         density, feature = self.geometry_bg(positions) 
-        rgb = self.texture_bg(True, feature, positions)
-        bright_ness = self.shutter_speed(True, rays_o) * 2
+        # rgb = self.texture_bg(True, feature, positions)
+        # bright_ness = self.shutter_speed(True, rays_o) * 2
+
+        self.is_freeze = not self.is_freeze
+        rgb = self.texture(self.is_freeze, feature, positions) # Dự đoán ra màu sắc
+        bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
