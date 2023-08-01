@@ -193,7 +193,7 @@ class ENeuSSystem(BaseSystem):
         delta_exposure = abs(exposure_predict - exposure_label)*100/exposure_label
 
         # # PSNR
-        # psnr = self.criterions['psnr'](out['real_rgb_full'].to(batch['rgb']), batch['rgb'])
+        psnr = self.criterions['psnr'](out['real_rgb_full'].to(batch['rgb']), batch['rgb'])
         
 
         # # SSIM
@@ -202,7 +202,7 @@ class ENeuSSystem(BaseSystem):
         # ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
         
         ssim = 0
-        psnr = 0
+
 
         # torch.save(out['theta'], "theta_neus.pt")
         # torch.save(out['positions'], "positions_neus.pt")
