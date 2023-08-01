@@ -201,7 +201,7 @@ class ENeuSSystem(BaseSystem):
         # image_array2 = color_origin.view(H, W, 3).cpu().numpy()
         # ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
         
-        ssim = 0
+        ssim = 1
 
 
         # torch.save(out['theta'], "theta_neus.pt")
