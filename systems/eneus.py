@@ -197,11 +197,10 @@ class ENeuSSystem(BaseSystem):
         
 
         # # SSIM
-        # image_array1 = color_predict.view(H, W, 3).cpu().numpy()
-        # image_array2 = color_origin.view(H, W, 3).cpu().numpy()
-        # ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
+        image_array1 = color_predict.view(H, W, 3).cpu().numpy()
+        image_array2 = color_origin.view(H, W, 3).cpu().numpy()
+        ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
         
-        ssim = 1
 
 
         # torch.save(out['theta'], "theta_neus.pt")
