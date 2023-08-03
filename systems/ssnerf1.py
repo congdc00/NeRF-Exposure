@@ -276,7 +276,7 @@ class SSNeRF1System(BaseSystem):
                 
                 log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} -- std Exposure: {round( delta_exposure_std.item(), 3)} -- mean Exposure {mean_exposure}"
                 for key, value in check_ssim.items():
-                     print(f"Name dataset: {key} \t SSIM: {value.item()}")
+                     print(f"Name dataset: {key} \t SSIM: {value}")
 
                 if num_imgs<num_all_imgs:
                     logger.warning(log_text)
