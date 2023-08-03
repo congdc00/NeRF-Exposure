@@ -250,7 +250,7 @@ class SSNeRF1System(BaseSystem):
                         if int(step_out['psnr'][oi]) != 0.0:
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
                             out_set_ssim[index[0].item()] = {'ssim': torch.tensor(step_out['ssim'][oi])}
-                            check_ssim[f"r_{step_out['index'].item()}.png"] = {'ssim': torch.tensor(step_out['ssim'][oi])}
+                            check_ssim[f"r_{step_out['index'].item()}.png"] = {torch.tensor(step_out['ssim'][oi])}
                             num_imgs += 1
             
             
