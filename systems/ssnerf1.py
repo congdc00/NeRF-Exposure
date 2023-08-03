@@ -250,7 +250,7 @@ class SSNeRF1System(BaseSystem):
                         if int(step_out['psnr'][oi]) != 0.0:
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
                             out_set_ssim[index[0].item()] = {'ssim': torch.tensor(step_out['ssim'][oi])}
-                            check_ssim["r_{step_out['index'].item()}.png"] = {'ssim': torch.tensor(step_out['ssim'][oi])}
+                            check_ssim[f"r_{step_out['index'].item()}.png"] = {'ssim': torch.tensor(step_out['ssim'][oi])}
                             num_imgs += 1
             
             
@@ -276,7 +276,7 @@ class SSNeRF1System(BaseSystem):
                 
                 log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} -- std Exposure: {round( delta_exposure_std.item(), 3)} -- mean Exposure {mean_exposure}"
                 for key, value in check_ssim.items():
-                     print(f"Name dataset: {key} \t SSIM: {value}")
+                     print(f"Name dataset: {key} \t SSIM: {value.item()}")
 
                 if num_imgs<num_all_imgs:
                     logger.warning(log_text)
