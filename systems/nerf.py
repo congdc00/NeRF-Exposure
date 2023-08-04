@@ -195,6 +195,7 @@ class NeRFSystem(BaseSystem):
         if self.trainer.is_global_zero:
             out_set_psnr = {}
             out_set_ssim = {}
+            check_ssim = {}
             num_imgs = 0
             num_all_imgs = 0
             for step_out in out:
@@ -213,6 +214,7 @@ class NeRFSystem(BaseSystem):
                         if int(step_out['psnr'][oi]) != 0.0:
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
                             out_set_ssim[index[0].item()] = {'ssim': torch.tensor(step_out['ssim'][oi])}
+                            check_ssim[f"r_{step_out['index'].item()}.png"] = {torch.tensor(step_out['ssim'][oi])}
                             num_imgs += 1
             
             if num_imgs == 0:
@@ -232,6 +234,8 @@ class NeRFSystem(BaseSystem):
                 ssim_standard= torch.std(list_ssim) 
 
                 log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- SSIM {ssim_score} -- std PSNR: {psnr_standard} -- std SSIM: {ssim_standard}"
+                for key, value in check_ssim.items():
+                     print(f"Name dataset: {key} \t SSIM: {value}")
                 if num_imgs<num_all_imgs:
                     logger.warning(log_text)
                 else:
