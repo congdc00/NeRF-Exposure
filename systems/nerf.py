@@ -235,7 +235,7 @@ class NeRFSystem(BaseSystem):
 
                 log_text = f"Validation on {num_imgs}/{num_all_imgs} images  -- SSIM {ssim_score} -- std PSNR: {psnr_standard} -- std SSIM: {ssim_standard}"
                 for key, value in check_ssim.items():
-                     print(f"Name dataset: {key} \t SSIM: {value.item()}")
+                     print(f"Name dataset: {key} \t SSIM: {value}")
                 if num_imgs<num_all_imgs:
                     logger.warning(log_text)
                 else:
