@@ -39,6 +39,7 @@ class NeRFSystem(BaseSystem):
         return self.model(batch['rays'])
     
     def preprocess_data(self, batch, stage):
+        print(f"chay duoc 1")
         if 'index' in batch: # validation / testing
             index = batch['index']
         else:
@@ -46,10 +47,9 @@ class NeRFSystem(BaseSystem):
                 index = torch.randint(0, len(self.dataset.all_images), size=(self.train_num_rays,), device=self.dataset.all_images.device)
             else:
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)
+        print(f"chay duoc 2")
         if stage in ['train']:
-            
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
-            
             # Khởi tạo meshgrid
             x = torch.randint(
                 0, self.dataset.w, size=(self.train_num_rays,), device=self.dataset.all_images.device
@@ -78,7 +78,7 @@ class NeRFSystem(BaseSystem):
             fg_mask = self.dataset.all_fg_masks[index].view(-1).to(self.rank)
         
         rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1)
-
+        print(f"chay duoc 3")       
         if stage in ['train']:
             if self.config.model.background_color == 'white':
                 self.model.background_color = torch.ones((3,), dtype=torch.float32, device=self.rank)
@@ -88,10 +88,10 @@ class NeRFSystem(BaseSystem):
                 raise NotImplementedError
         else:
             self.model.background_color = torch.ones((3,), dtype=torch.float32, device=self.rank)
-        
+        print(f"chay duoc 4")
         if self.dataset.apply_mask:
             rgb = rgb * fg_mask[...,None] + self.model.background_color * (1 - fg_mask[...,None])        
-        
+        print(f"chay duoc 5")
         batch.update({
             'rays': rays,
             'rgb': rgb,
@@ -155,7 +155,6 @@ class NeRFSystem(BaseSystem):
                 out = self(batch)
                 is_done = True
             except:
-                print(f"chay lai")
                 is_done = False
             
         # except:
