@@ -12,21 +12,20 @@ import tinycudann as tcnn
 
 def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
     B = None
-    
     for arg in args:
         if isinstance(arg, torch.Tensor):
             B = arg.shape[0]
             break
     out = defaultdict(list)
     out_type = None
-    
     for i in range(0, B, chunk_size):
-        print(f"True buoc 1")
-        out_chunk = func(*[arg[i:i+chunk_size] if isinstance(arg, torch.Tensor) else arg for arg in args], **kwargs)
-        print(f"True buoc 2")
+        try:
+            out_chunk = func(*[arg[i:i+chunk_size] if isinstance(arg, torch.Tensor) else arg for arg in args], **kwargs)
+            print(f"out_chunk true {out_chunk.shape}")
+        except:
+            print(f"out_chunk flase")
         if out_chunk is None:
             continue
-        print(f"True buoc 3")
         out_type = type(out_chunk)
         if isinstance(out_chunk, torch.Tensor):
             out_chunk = {0: out_chunk}
@@ -38,12 +37,10 @@ def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
         else:
             print(f'Return value of func must be in type [torch.Tensor, list, tuple, dict], get {type(out_chunk)}.')
             exit(1)
-        print(f"True buoc 4")
         for k, v in out_chunk.items():
             v = v if torch.is_grad_enabled() else v.detach()
             v = v.cpu() if move_to_cpu else v
             out[k].append(v)
-        print(f"True buoc 5")
     
     if out_type is None:
         return
