@@ -149,26 +149,27 @@ class NeRFSystem(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         W, H = self.dataset.img_wh
-        try:
-            for key in batch.keys():
-                print(key)
-            print(f"\n batch  rgb: {batch['rgb'].shape} ")
-            out = self(batch) 
-            for key in out.keys():
-                print(key)
+        is_done = False
+        while not is_done:
+            try:
+                out = self(batch)
+                is_done = True
+            except:
+                print(f"chay lai")
+                is_done = False
             
-        except:
-            print(f"\n batch  rgb: {batch['rgb'].shape} ")
-            self.save_image_grid(f"false {self.global_step}-{batch_idx}.png", [
-                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            ]) 
-            return {
-                'psnr': 0.0,
-                'ssim': 0.0,
-                'index': batch['index']
-            }
+        # except:
+        #     print(f"\n batch  rgb: {batch['rgb'].shape} ")
+        #     self.save_image_grid(f"false {self.global_step}-{batch_idx}.png", [
+        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #     ]) 
+        #     return {
+        #         'psnr': 0.0,
+        #         'ssim': 0.0,
+        #         'index': batch['index']
+        #     }
         
         image_origin = batch['rgb'] 
         image_predict = out['comp_rgb']
