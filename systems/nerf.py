@@ -148,7 +148,7 @@ class NeRFSystem(BaseSystem):
     """
     
     def validation_step(self, batch, batch_idx):
-        
+        W, H = self.dataset.img_wh
         try:
             print(f"\n batch  rgb: {batch['rgb'].shape} ")
             out = self(batch) 
@@ -164,7 +164,7 @@ class NeRFSystem(BaseSystem):
                 'ssim': 0.0,
                 'index': batch['index']
             }
-        W, H = self.dataset.img_wh
+        
         image_origin = batch['rgb'] 
         image_predict = out['comp_rgb']
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
