@@ -153,7 +153,7 @@ class NeRFSystem(BaseSystem):
             except:
                 print(f"chay lai")
                 is_done = False
-            
+        print(f"chay tiep")   
         # except:
         #     print(f"\n batch  rgb: {batch['rgb'].shape} ")
         #     self.save_image_grid(f"false {self.global_step}-{batch_idx}.png", [
