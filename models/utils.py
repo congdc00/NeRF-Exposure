@@ -19,12 +19,8 @@ def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
     out = defaultdict(list)
     out_type = None
     for i in range(0, B, chunk_size):
-        try:
-            print(f"chunk_size {chunk_size}")
-            out_chunk = func(*[arg[i:i+chunk_size] if isinstance(arg, torch.Tensor) else arg for arg in args], **kwargs)
-            print(f"out_chunk true {out_chunk.shape}")
-        except:
-            print(f"out_chunk flase")
+        out_chunk = func(*[arg[i:i+chunk_size] if isinstance(arg, torch.Tensor) else arg for arg in args], **kwargs)
+        if out_chunk == None:
             continue
         out_type = type(out_chunk)
         if isinstance(out_chunk, torch.Tensor):
