@@ -155,6 +155,7 @@ class NeRFSystem(BaseSystem):
                 out = self(batch)
                 is_done = True
             except:
+                print(f"chay lai")
                 is_done = False
             
         # except:
