@@ -24,7 +24,6 @@ def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
             print(f"out_chunk true {out_chunk.shape}")
         except:
             print(f"out_chunk flase")
-        if out_chunk is None:
             continue
         out_type = type(out_chunk)
         if isinstance(out_chunk, torch.Tensor):
