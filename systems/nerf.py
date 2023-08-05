@@ -20,6 +20,13 @@ class NeRFSystem(BaseSystem):
     1. self.print: correctly handle progress bar
     2. rank_zero_info: use the logging module
     """
+    save_PSNR = {}
+    save_std_PSNR = {}
+    save_std_SSIM = {}
+    save_SSIM = {}
+    save_std_pe = {}
+    save_pe = {}
+
     def prepare(self):
         self.criterions = {
             'psnr': PSNR(),
@@ -145,6 +152,7 @@ class NeRFSystem(BaseSystem):
         try:
             out = self(batch) 
         except:
+            print(f"\nbatch {batch}")
             return {
                 'psnr': 0.0,
                 'ssim': 0.0,
