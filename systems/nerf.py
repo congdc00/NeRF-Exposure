@@ -145,14 +145,13 @@ class NeRFSystem(BaseSystem):
     def validation_step(self, batch, batch_idx):
         W, H = self.dataset.img_wh
         is_done = False
-        while not is_done:
+        while is_done == False:
             try:
                 print(f"OK")
                 out = self(batch)
                 is_done = True
             except:
                 print(f"chay lai")
-                is_done = False
         print(f"chay tiep")   
         # except:
         #     print(f"\n batch  rgb: {batch['rgb'].shape} ")
