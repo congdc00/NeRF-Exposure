@@ -147,6 +147,7 @@ class NeRFSystem(BaseSystem):
         is_done = False
         while not is_done:
             try:
+                print(f"OK")
                 out = self(batch)
                 is_done = True
             except:

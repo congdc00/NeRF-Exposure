@@ -21,12 +21,12 @@ def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
     out_type = None
     
     for i in range(0, B, chunk_size):
-        print(f"chay den day 1")
+        # print(f"chay den day 1")
         out_chunk = func(*[arg[i:i+chunk_size] if isinstance(arg, torch.Tensor) else arg for arg in args], **kwargs)
-        print(f"chay den day 2")
+        # print(f"chay den day 2")
         if out_chunk is None:
             continue
-        print(f"chay den day 3")
+        # print(f"chay den day 3")
         out_type = type(out_chunk)
         if isinstance(out_chunk, torch.Tensor):
             out_chunk = {0: out_chunk}
@@ -38,12 +38,12 @@ def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
         else:
             print(f'Return value of func must be in type [torch.Tensor, list, tuple, dict], get {type(out_chunk)}.')
             exit(1)
-        print(f"chay den day 4")
+        # print(f"chay den day 4")
         for k, v in out_chunk.items():
             v = v if torch.is_grad_enabled() else v.detach()
             v = v.cpu() if move_to_cpu else v
             out[k].append(v)
-        print(f"chay den day 5")
+        # print(f"chay den day 5")
     
     if out_type is None:
         return
