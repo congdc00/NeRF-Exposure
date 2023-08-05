@@ -153,6 +153,11 @@ class NeRFSystem(BaseSystem):
             out = self(batch) 
         except:
             print(f"\nbatch {batch}")
+            self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
+                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            ]) 
             return {
                 'psnr': 0.0,
                 'ssim': 0.0,
