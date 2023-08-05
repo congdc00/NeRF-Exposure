@@ -26,7 +26,7 @@ model:
   dynamic_ray_sampling: true
   batch_image_sampling: true
   randomized: true
-  ray_chunk: 2
+  ray_chunk: 32768
   learned_background: false
   background_color: white
   geometry:

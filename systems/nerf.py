@@ -144,27 +144,20 @@ class NeRFSystem(BaseSystem):
     
     def validation_step(self, batch, batch_idx):
         W, H = self.dataset.img_wh
-        is_done = False
-        while is_done == False:
-            try:
-                out = self(batch)
-                print(f"OK")
-                is_done = True
-            except:
-                print(f"chay lai")
-        print(f"chay tiep")   
-        # except:
-        #     print(f"\n batch  rgb: {batch['rgb'].shape} ")
-        #     self.save_image_grid(f"false {self.global_step}-{batch_idx}.png", [
-        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-        #     ]) 
-        #     return {
-        #         'psnr': 0.0,
-        #         'ssim': 0.0,
-        #         'index': batch['index']
-        #     }
+        try:
+            out = self(batch)  
+        except:
+            print(f"\n batch  rgb: {batch['rgb'].shape} ")
+            self.save_image_grid(f"false {self.global_step}-{batch_idx}.png", [
+                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+            ]) 
+            return {
+                'psnr': 0.0,
+                'ssim': 0.0,
+                'index': batch['index']
+            }
         
         image_origin = batch['rgb'] 
         image_predict = out['comp_rgb']
@@ -184,14 +177,14 @@ class NeRFSystem(BaseSystem):
         
 
         
-        if batch_idx == 0:
-            self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
-            ])  
-            torch.save(out['theta'], "theta.pt")
-            torch.save(out['positions'], "positions.pt")
+        # if batch_idx == 0:
+        #     self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
+        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
+        #     ])  
+            # torch.save(out['theta'], "theta.pt")
+            # torch.save(out['positions'], "positions.pt")
         return {
             'psnr': psnr,
             'ssim': ssim,
@@ -223,14 +216,29 @@ class NeRFSystem(BaseSystem):
                         out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
                         out_set_ssim[step_out['index'].item()] = {'ssim': torch.tensor(step_out['ssim'])}
                         num_imgs += 1
+
+                        self.save_PSNR[step_out['index'].item()] = out_set_psnr[step_out['index'].item()]
+                        self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
+                    else:
+                        if step_out['index'].item() in  self.save_PSNR:
+                            out_set_psnr[step_out['index'].item()] = self.save_PSNR[step_out['index'].item()]
+                            out_set_ssim[step_out['index'].item()] = self.save_SSIM[step_out['index'].item()]
+                            num_imgs += 1
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
                         if int(step_out['psnr'][oi]) != 0.0:
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
                             out_set_ssim[index[0].item()] = {'ssim': torch.tensor(step_out['ssim'][oi])}
-                            check_ssim[f"r_{step_out['index'].item()}.png"] = {torch.tensor(step_out['ssim'][oi])}
                             num_imgs += 1
+
+                            self.save_PSNR[step_out['index'].item()] = out_set_psnr[step_out['index'].item()]
+                            self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
+                        else:
+                            if step_out['index'].item() in  self.save_PSNR:
+                                out_set_psnr[step_out['index'].item()] = self.save_PSNR[step_out['index'].item()]
+                                out_set_ssim[step_out['index'].item()] = self.save_SSIM[step_out['index'].item()]
+                                num_imgs += 1
             
             if num_imgs == 0:
                 logger.error(f"Validation False")
