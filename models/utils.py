@@ -12,12 +12,14 @@ import tinycudann as tcnn
 
 def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
     B = None
+    print(f"chay den day 1")
     for arg in args:
         if isinstance(arg, torch.Tensor):
             B = arg.shape[0]
             break
     out = defaultdict(list)
     out_type = None
+    print(f"chay den day 2")
     for i in range(0, B, chunk_size):
         out_chunk = func(*[arg[i:i+chunk_size] if isinstance(arg, torch.Tensor) else arg for arg in args], **kwargs)
         if out_chunk is None:
@@ -37,11 +39,12 @@ def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
             v = v if torch.is_grad_enabled() else v.detach()
             v = v.cpu() if move_to_cpu else v
             out[k].append(v)
-    
+    print(f"chay den day 3")
     if out_type is None:
         return
-
+    print(f"chay den day 4")
     out = {k: torch.cat(v, dim=0) for k, v in out.items()}
+    print(f"chay den day 5")
     if out_type is torch.Tensor:
         return out[0]
     elif out_type in [tuple, list]:
