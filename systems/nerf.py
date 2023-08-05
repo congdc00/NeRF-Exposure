@@ -150,9 +150,10 @@ class NeRFSystem(BaseSystem):
     def validation_step(self, batch, batch_idx):
         
         try:
+            print(f"\n batch  rgb: {batch['rgb'].shape} ")
             out = self(batch) 
         except:
-            print(f"\nbatch {batch}")
+            print(f"\n batch  rgb: {batch['rgb'].shape} ")
             self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
                 {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
                 {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
@@ -256,51 +257,53 @@ class NeRFSystem(BaseSystem):
 
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)      
     def test_step(self, batch, batch_idx):  
-        try:
-            out = self(batch) 
-        except:
-            logger.warning(f"Validation Failed")
-            return {
-                'psnr': 0.0,
-                # 'ssim': ssim,
-                'index': batch['index']}
-        psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
-        W, H = self.dataset.img_wh
-        if batch_idx == 0:
-            self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
-                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}}
-            ])
-        return {
-            'psnr': psnr,
-            'index': batch['index']
-        }      
+        # try:
+        #     out = self(batch) 
+        # except:
+        #     logger.warning(f"Validation Failed")
+        #     return {
+        #         'psnr': 0.0,
+        #         # 'ssim': ssim,
+        #         'index': batch['index']}
+        # psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
+        # W, H = self.dataset.img_wh
+        # if batch_idx == 0:
+        #     self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
+        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}}
+        #     ])
+        # return {
+        #     'psnr': psnr,
+        #     'index': batch['index']
+        # }   
+        pass   
     
     def test_epoch_end(self, out):
-        out = self.all_gather(out)
-        if self.trainer.is_global_zero:
-            out_set = {}
-            for step_out in out:
-                # DP
-                if step_out['index'].ndim == 1:
-                    out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
-                # DDP
-                else:
-                    for oi, index in enumerate(step_out['index']):
-                        out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-            psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
-            self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)    
+        pass
+        # out = self.all_gather(out)
+        # if self.trainer.is_global_zero:
+        #     out_set = {}
+        #     for step_out in out:
+        #         # DP
+        #         if step_out['index'].ndim == 1:
+        #             out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
+        #         # DDP
+        #         else:
+        #             for oi, index in enumerate(step_out['index']):
+        #                 out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+        #     psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
+        #     self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)    
 
-            self.save_img_sequence(
-                f"it{self.global_step}-test",
-                f"it{self.global_step}-test",
-                '(\d+)\.png',
-                save_format='mp4',
-                fps=30
-            )
+        #     self.save_img_sequence(
+        #         f"it{self.global_step}-test",
+        #         f"it{self.global_step}-test",
+        #         '(\d+)\.png',
+        #         save_format='mp4',
+        #         fps=30
+        #     )
             
-            self.export()
+        #     self.export()
 
     def export(self):
         mesh = self.model.export(self.config.export)
