@@ -214,8 +214,8 @@ class SSNeRF1System(BaseSystem):
                 {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
                 {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
             ])
-            torch.save(out['theta'], "theta_enerf.pt")
-            torch.save(out['positions'], "positions_enerf.pt")
+            # torch.save(out['theta'], "theta_enerf.pt")
+            # torch.save(out['positions'], "positions_enerf.pt")
         return {
             'psnr': psnr,
             'ssim': ssim,
