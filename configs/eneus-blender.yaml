@@ -111,7 +111,7 @@ system:
       texture:
         lr: 0.01
       shutter_speed:
-        lr: 0.0006
+        lr: 0.01
       variance:
         lr: 0.001
   warmup_steps: 500
