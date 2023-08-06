@@ -71,6 +71,7 @@ class BlenderDatasetBase():
             ## Dang png 2
             
             img = Image.open(img_path)
+            print(f"so kenh mau {img.mode}")
             img.save('test_img.png')
             try:
                 # print(f"Thay đổi độ sáng ảnh từ 1 -> {frame['factor']}")
