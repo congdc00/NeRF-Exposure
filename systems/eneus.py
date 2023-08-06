@@ -206,17 +206,17 @@ class ENeuSSystem(BaseSystem):
         # torch.save(out['theta'], "theta_neus.pt")
         # torch.save(out['positions'], "positions_neus.pt")
 
-        if batch_idx == 0:
-            self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': out['comp_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
-            ] + ([
-                {'type': 'rgb', 'img': out['comp_rgb_bg'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-            ] if self.config.model.learned_background else []) + [
-                {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
-                {'type': 'rgb', 'img': out['real_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
-            ])
+        # if batch_idx == 0:
+        #     self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
+        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'rgb', 'img': out['comp_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
+        #     ] + ([
+        #         {'type': 'rgb', 'img': out['comp_rgb_bg'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #     ] if self.config.model.learned_background else []) + [
+        #         {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
+        #         {'type': 'rgb', 'img': out['real_rgb_full'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}}
+        #     ])
         return {
             'psnr': psnr,
             'ssim': ssim,
