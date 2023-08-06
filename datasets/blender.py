@@ -71,6 +71,7 @@ class BlenderDatasetBase():
             ## Dang png 2
             
             img = Image.open(img_path)
+            img.save('test_img.png')
             try:
                 # print(f"Thay đổi độ sáng ảnh từ 1 -> {frame['factor']}")
                 exposure_factor = float(frame['factor'])
