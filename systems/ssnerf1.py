@@ -208,14 +208,14 @@ class SSNeRF1System(BaseSystem):
         # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
         # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
         
-        # if batch_idx == 0:
-        #     self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-        #         {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-        #         {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-        #         {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
-        #     ])
-        #     torch.save(out['theta'], "theta_enerf.pt")
-        #     torch.save(out['positions'], "positions_enerf.pt")
+        if batch_idx == 0:
+            self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
+                {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
+            ])
+            torch.save(out['theta'], "theta_enerf.pt")
+            torch.save(out['positions'], "positions_enerf.pt")
         return {
             'psnr': psnr,
             'ssim': ssim,
