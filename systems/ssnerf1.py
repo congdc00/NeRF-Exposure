@@ -137,7 +137,7 @@ class SSNeRF1System(BaseSystem):
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
 
         ex_delta = torch.mean(ex_delta_matrix)
-        k = 0.0005
+        k = 0.001
         total_loss = loss_rgb + k*ex_delta
 
         self.log('train/loss_rgb', total_loss)
