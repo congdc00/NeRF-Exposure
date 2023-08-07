@@ -7,8 +7,8 @@ dataset:
   scene: ???
   root_dir: ./load/nerf_synthetic/${dataset.scene}
   img_wh:
-    - 900
-    - 900
+    - 1936
+    - 1288
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
   near_plane: 2.0
   far_plane: 6.0
