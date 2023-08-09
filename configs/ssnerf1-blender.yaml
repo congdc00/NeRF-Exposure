@@ -7,8 +7,8 @@ dataset:
   scene: ???
   root_dir: ./load/nerf_synthetic/${dataset.scene}
   img_wh:
-    - 1936
     - 1288
+    - 1936
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
   near_plane: 2.0
   far_plane: 6.0
@@ -28,7 +28,7 @@ model:
   randomized: true
   ray_chunk: 32768
   learned_background: false
-  background_color: white # white giúp giảm bộ nhớ nhẹ hơn
+  background_color: random # white giúp giảm bộ nhớ nhẹ hơn
   geometry:
     name: volume-density
     radius: ${model.radius}
