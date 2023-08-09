@@ -105,7 +105,7 @@ class ENeuSSystem(BaseSystem):
         ex_template = torch.ones(out['bright_ness'].shape).to(device)
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
         ex_delta = torch.mean(ex_delta_matrix)
-        K = 0.00005
+        K = 0.01
 
         loss_rgb_mse = F.mse_loss(out['comp_rgb_full'][out['rays_valid_full'][...,0]], batch['rgb'][out['rays_valid_full'][...,0]]) + K*ex_delta
         self.log('train/loss_rgb_mse', loss_rgb_mse)
