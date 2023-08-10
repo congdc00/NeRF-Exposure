@@ -26,7 +26,7 @@ model:
   dynamic_ray_sampling: true
   batch_image_sampling: true
   randomized: true
-  ray_chunk: 16384
+  ray_chunk: 8192
   learned_background: true # colmap: true
   background_color: random # white giúp giảm bộ nhớ nhẹ hơn
   geometry:
