@@ -20,7 +20,7 @@ def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
     out_type = None
     for i in range(0, B, chunk_size):
         out_chunk = func(*[arg[i:i+chunk_size] if isinstance(arg, torch.Tensor) else arg for arg in args], **kwargs)
-        if out_chunk is None:
+        if out_chunk == None:
             continue
         out_type = type(out_chunk)
         if isinstance(out_chunk, torch.Tensor):
@@ -40,8 +40,9 @@ def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
     
     if out_type is None:
         return
-
+    
     out = {k: torch.cat(v, dim=0) for k, v in out.items()}
+    
     if out_type is torch.Tensor:
         return out[0]
     elif out_type in [tuple, list]:

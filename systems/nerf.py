@@ -20,6 +20,13 @@ class NeRFSystem(BaseSystem):
     1. self.print: correctly handle progress bar
     2. rank_zero_info: use the logging module
     """
+    save_PSNR = {}
+    save_std_PSNR = {}
+    save_std_SSIM = {}
+    save_SSIM = {}
+    save_std_pe = {}
+    save_pe = {}
+
     def prepare(self):
         self.criterions = {
             'psnr': PSNR(),
@@ -40,9 +47,7 @@ class NeRFSystem(BaseSystem):
             else:
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)
         if stage in ['train']:
-            
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
-            
             # Khởi tạo meshgrid
             x = torch.randint(
                 0, self.dataset.w, size=(self.train_num_rays,), device=self.dataset.all_images.device
@@ -67,11 +72,13 @@ class NeRFSystem(BaseSystem):
             elif self.dataset.directions.ndim == 4: # (N, H, W, 3)
                 directions = self.dataset.directions[index][0]
             rays_o, rays_d = get_rays(directions, c2w)
+
+            #them cho colmap
+
             rgb = self.dataset.all_images[index].view(-1, self.dataset.all_images.shape[-1]).to(self.rank)
             fg_mask = self.dataset.all_fg_masks[index].view(-1).to(self.rank)
         
-        rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1)
-
+        rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1)     
         if stage in ['train']:
             if self.config.model.background_color == 'white':
                 self.model.background_color = torch.ones((3,), dtype=torch.float32, device=self.rank)
@@ -81,10 +88,8 @@ class NeRFSystem(BaseSystem):
                 raise NotImplementedError
         else:
             self.model.background_color = torch.ones((3,), dtype=torch.float32, device=self.rank)
-        
         if self.dataset.apply_mask:
             rgb = rgb * fg_mask[...,None] + self.model.background_color * (1 - fg_mask[...,None])        
-        
         batch.update({
             'rays': rays,
             'rgb': rgb,
@@ -141,16 +146,16 @@ class NeRFSystem(BaseSystem):
     """
     
     def validation_step(self, batch, batch_idx):
-        
+        W, H = self.dataset.img_wh
         try:
-            out = self(batch) 
+            out = self(batch)  
         except:
             return {
                 'psnr': 0.0,
                 'ssim': 0.0,
                 'index': batch['index']
             }
-        W, H = self.dataset.img_wh
+        
         image_origin = batch['rgb'] 
         image_predict = out['comp_rgb']
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
@@ -175,8 +180,8 @@ class NeRFSystem(BaseSystem):
                 {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
                 {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
             ])  
-            torch.save(out['theta'], "theta.pt")
-            torch.save(out['positions'], "positions.pt")
+            # torch.save(out['theta'], "theta.pt")
+            # torch.save(out['positions'], "positions.pt")
         return {
             'psnr': psnr,
             'ssim': ssim,
@@ -195,6 +200,7 @@ class NeRFSystem(BaseSystem):
         if self.trainer.is_global_zero:
             out_set_psnr = {}
             out_set_ssim = {}
+            check_ssim = {}
             num_imgs = 0
             num_all_imgs = 0
             for step_out in out:
@@ -207,6 +213,14 @@ class NeRFSystem(BaseSystem):
                         out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
                         out_set_ssim[step_out['index'].item()] = {'ssim': torch.tensor(step_out['ssim'])}
                         num_imgs += 1
+
+                        self.save_PSNR[step_out['index'].item()] = out_set_psnr[step_out['index'].item()]
+                        self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
+                    else:
+                        if step_out['index'].item() in  self.save_PSNR:
+                            out_set_psnr[step_out['index'].item()] = self.save_PSNR[step_out['index'].item()]
+                            out_set_ssim[step_out['index'].item()] = self.save_SSIM[step_out['index'].item()]
+                            num_imgs += 1
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
@@ -214,6 +228,14 @@ class NeRFSystem(BaseSystem):
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
                             out_set_ssim[index[0].item()] = {'ssim': torch.tensor(step_out['ssim'][oi])}
                             num_imgs += 1
+
+                            self.save_PSNR[step_out['index'].item()] = out_set_psnr[step_out['index'].item()]
+                            self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
+                        else:
+                            if step_out['index'].item() in  self.save_PSNR:
+                                out_set_psnr[step_out['index'].item()] = self.save_PSNR[step_out['index'].item()]
+                                out_set_ssim[step_out['index'].item()] = self.save_SSIM[step_out['index'].item()]
+                                num_imgs += 1
             
             if num_imgs == 0:
                 logger.error(f"Validation False")
@@ -239,51 +261,53 @@ class NeRFSystem(BaseSystem):
 
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)      
     def test_step(self, batch, batch_idx):  
-        try:
-            out = self(batch) 
-        except:
-            logger.warning(f"Validation Failed")
-            return {
-                'psnr': 0.0,
-                # 'ssim': ssim,
-                'index': batch['index']}
-        psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
-        W, H = self.dataset.img_wh
-        if batch_idx == 0:
-            self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
-                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}}
-            ])
-        return {
-            'psnr': psnr,
-            'index': batch['index']
-        }      
+        # try:
+        #     out = self(batch) 
+        # except:
+        #     logger.warning(f"Validation Failed")
+        #     return {
+        #         'psnr': 0.0,
+        #         # 'ssim': ssim,
+        #         'index': batch['index']}
+        # psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
+        # W, H = self.dataset.img_wh
+        # if batch_idx == 0:
+        #     self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
+        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}}
+        #     ])
+        # return {
+        #     'psnr': psnr,
+        #     'index': batch['index']
+        # }   
+        pass   
     
     def test_epoch_end(self, out):
-        out = self.all_gather(out)
-        if self.trainer.is_global_zero:
-            out_set = {}
-            for step_out in out:
-                # DP
-                if step_out['index'].ndim == 1:
-                    out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
-                # DDP
-                else:
-                    for oi, index in enumerate(step_out['index']):
-                        out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-            psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
-            self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)    
+        pass
+        # out = self.all_gather(out)
+        # if self.trainer.is_global_zero:
+        #     out_set = {}
+        #     for step_out in out:
+        #         # DP
+        #         if step_out['index'].ndim == 1:
+        #             out_set[step_out['index'].item()] = {'psnr': step_out['psnr']}
+        #         # DDP
+        #         else:
+        #             for oi, index in enumerate(step_out['index']):
+        #                 out_set[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+        #     psnr = torch.mean(torch.stack([o['psnr'] for o in out_set.values()]))
+        #     self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)    
 
-            self.save_img_sequence(
-                f"it{self.global_step}-test",
-                f"it{self.global_step}-test",
-                '(\d+)\.png',
-                save_format='mp4',
-                fps=30
-            )
+        #     self.save_img_sequence(
+        #         f"it{self.global_step}-test",
+        #         f"it{self.global_step}-test",
+        #         '(\d+)\.png',
+        #         save_format='mp4',
+        #         fps=30
+        #     )
             
-            self.export()
+        #     self.export()
 
     def export(self):
         mesh = self.model.export(self.config.export)

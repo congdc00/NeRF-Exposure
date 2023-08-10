@@ -7,8 +7,8 @@ dataset:
   scene: ???
   root_dir: ./load/nerf_synthetic/${dataset.scene}
   img_wh:
-    - 800
-    - 800
+    - 1288
+    - 1936
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
   near_plane: 2.0
   far_plane: 6.0
@@ -19,7 +19,7 @@ dataset:
 model:
   name: ssnerf1
   radius: 1.5
-  num_samples_per_ray: 1024
+  num_samples_per_ray: 2048
   train_num_rays: 256
   max_train_num_rays: 8192 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
@@ -28,7 +28,7 @@ model:
   randomized: true
   ray_chunk: 32768
   learned_background: false
-  background_color: white # white giúp giảm bộ nhớ nhẹ hơn
+  background_color: random # white giúp giảm bộ nhớ nhẹ hơn
   geometry:
     name: volume-density
     radius: ${model.radius}
@@ -51,8 +51,8 @@ model:
       otype: FullyFusedMLP
       activation: ReLU
       output_activation: none
-      n_neurons: 64
-      n_hidden_layers: 1
+      n_neurons: 128
+      n_hidden_layers: 4
   texture:
     name: volume-radiance
     input_feature_dim: ${model.geometry.feature_dim}
@@ -63,8 +63,8 @@ model:
       otype: FullyFusedMLP
       activation: ReLU
       output_activation: Sigmoid
-      n_neurons: 64 
-      n_hidden_layers: 2
+      n_neurons: 128
+      n_hidden_layers: 4
   shutter_speed:
     name: volume-brightness
     input_feature_dim: ${model.geometry.feature_dim}
@@ -87,7 +87,7 @@ system:
   optimizer:
     name: AdamW
     args:
-      lr: 0.001  #0.0006 -> lego_random
+      lr: 0.0006  #0.0006 -> lego_random
       betas: [0.9, 0.99]
       eps: 1.e-15
 
@@ -107,7 +107,7 @@ export:
   export_vertex_color: False
 
 trainer:
-  max_steps: 30000
+  max_steps: 50000
   log_every_n_steps: 40000
   num_sanity_val_steps: 0
   val_check_interval: 9900

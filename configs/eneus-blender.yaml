@@ -109,9 +109,9 @@ system:
       geometry:
         lr: 0.01
       texture:
-        lr: 0.0001
+        lr: 0.01
       shutter_speed:
-        lr: 0.0006
+        lr: 0.001
       variance:
         lr: 0.001
   warmup_steps: 500
@@ -142,7 +142,7 @@ trainer:
   max_steps: 20000
   log_every_n_steps: 30000
   num_sanity_val_steps: 0
-  val_check_interval: 9900
+  val_check_interval: 19900
   limit_train_batches: 1.0
   limit_val_batches: 100
   enable_progress_bar: true

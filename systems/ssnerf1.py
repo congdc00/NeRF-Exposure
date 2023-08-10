@@ -31,6 +31,9 @@ class SSNeRF1System(BaseSystem):
     1. self.print: correctly handle progress bar
     2. rank_zero_info: use the logging module
     """
+    save_PSNR ={}
+    save_SSIM ={}
+    save_PE = {}
     def prepare(self):
         self.criterions = {
             'psnr': PSNR(),
@@ -133,7 +136,7 @@ class SSNeRF1System(BaseSystem):
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
 
         ex_delta = torch.mean(ex_delta_matrix)
-        k = 0.01
+        k = 0.001
         total_loss = loss_rgb + k*ex_delta
 
         self.log('train/loss_rgb', total_loss)
@@ -187,10 +190,11 @@ class SSNeRF1System(BaseSystem):
         mask_object = batch['fg_mask'].view(-1, 1)
         density_predict = out['depth'].to(mask_object.device)
         density_predict= (density_predict*mask_object)
-
+        
+        ## PSNR
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
 
-        # Chuyển đổi tensor thành NumPy array
+        ##  SSIM
         image_array1 = color_predict.view(H, W, 3).cpu().numpy()
         image_array2 = image_origin.view(H, W, 3).cpu().numpy()
         ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
@@ -203,18 +207,15 @@ class SSNeRF1System(BaseSystem):
         # background_rgb = (batch['rgb']*mask_bg)
         # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
         # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
-
         
-            
-
         if batch_idx == 0:
             self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
                 {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
                 {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
                 {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
             ])
-            torch.save(out['theta'], "theta_enerf.pt")
-            torch.save(out['positions'], "positions_enerf.pt")
+            # torch.save(out['theta'], "theta_enerf.pt")
+            # torch.save(out['positions'], "positions_enerf.pt")
         return {
             'psnr': psnr,
             'ssim': ssim,
@@ -227,12 +228,13 @@ class SSNeRF1System(BaseSystem):
         if self.trainer.is_global_zero:
             out_set_psnr = {}
             out_set_ssim = {}
+            check_ssim = {}
             num_imgs = 0
             num_all_imgs = 0
             list_delta_exposure = []
             for step_out in out:
                 num_all_imgs += 1
-                list_delta_exposure.append(step_out["delta_exposure"])
+                
                 if int(step_out['index'].item()) == 0:
                     print(f"\n\n[Val] r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
                 # DP
@@ -240,14 +242,36 @@ class SSNeRF1System(BaseSystem):
                     if int(step_out['psnr']) != 0.0:
                         out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
                         out_set_ssim[step_out['index'].item()] = {'ssim': torch.tensor(step_out['ssim'])}
+                        list_delta_exposure.append(step_out["delta_exposure"])
                         num_imgs += 1
+                        self.save_PSNR[step_out['index'].item()] = out_set_psnr[step_out['index'].item()]
+                        self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
+                        self.save_PE[step_out['index'].item()] = step_out["delta_exposure"]
+
+                    else:
+                        if step_out['index'].item() in  self.save_PSNR:
+                            out_set_psnr[step_out['index'].item()] = self.save_PSNR[step_out['index'].item()]
+                            out_set_ssim[step_out['index'].item()] = self.save_SSIM[step_out['index'].item()]
+                            list_delta_exposure.append(self.save_PE[step_out['index'].item()])
+                            num_imgs += 1    
                 # DDP
                 else:
                     for oi, index in enumerate(step_out['index']):
                         if int(step_out['psnr'][oi]) != 0.0:
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
                             out_set_ssim[index[0].item()] = {'ssim': torch.tensor(step_out['ssim'][oi])}
+                            check_ssim[f"r_{step_out['index'].item()}.png"] = {torch.tensor(step_out['ssim'][oi])}
+                            list_delta_exposure.append(step_out["delta_exposure"])
                             num_imgs += 1
+                            self.save_PSNR[step_out['index'].item()] = out_set_psnr[step_out['index'].item()]
+                            self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
+                            self.save_PE[step_out['index'].item()] = step_out["delta_exposure"]
+                        else:
+                            if step_out['index'].item() in  self.save_PSNR:
+                                out_set_psnr[step_out['index'].item()] = self.save_PSNR[step_out['index'].item()]
+                                out_set_ssim[step_out['index'].item()] = self.save_SSIM[step_out['index'].item()]
+                                list_delta_exposure.append(self.save_PE[step_out['index'].item()])
+                                num_imgs += 1  
             
             
             if num_imgs == 0:
@@ -267,9 +291,13 @@ class SSNeRF1System(BaseSystem):
                 ssim_standard= torch.std(list_ssim) 
 
                 list_delta_exposure = torch.Tensor(list_delta_exposure)
+                mean_exposure = torch.mean(list_delta_exposure)
                 delta_exposure_std = torch.std(list_delta_exposure)
                 
-                log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} -- std Exposure: {round( delta_exposure_std.item(), 3)}"
+                log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} -- std Exposure: {round( delta_exposure_std.item(), 3)} -- mean Exposure {mean_exposure}"
+                # for key, value in check_ssim.items():
+                #      print(f"Name dataset: {key} \t SSIM: {value}")
+
                 if num_imgs<num_all_imgs:
                     logger.warning(log_text)
                 else:
@@ -277,65 +305,67 @@ class SSNeRF1System(BaseSystem):
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)               
 
     def test_step(self, batch, batch_idx):  
-        try:
-            out = self(batch) 
-        except:
-            return {
-                'psnr': 0.0,
-                # 'ssim': ssim,
-                'index': batch['index']
-            }
+        pass
+        # try:
+        #     out = self(batch) 
+        # except:
+        #     return {
+        #         'psnr': 0.0,
+        #         # 'ssim': ssim,
+        #         'index': batch['index']
+        #     }
         
-        psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
-        W, H = self.dataset.img_wh
-        if batch_idx == 0:
-            self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
-                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
-            ])
+        # psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
+        # W, H = self.dataset.img_wh
+        # if batch_idx == 0:
+        #     self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
+        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+        #         {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
+        #     ])
 
-        return {
-            'psnr': psnr,
-            'index': batch['index']
-        }      
+        # return {
+        #     'psnr': psnr,
+        #     'index': batch['index']
+        # }      
     
     def test_epoch_end(self, out):
-        out = self.all_gather(out)
-        if self.trainer.is_global_zero:
-            out_set_psnr = {}
-            num_imgs = 0
-            num_all_imgs = 0
+        pass
+        # out = self.all_gather(out)
+        # if self.trainer.is_global_zero:
+        #     out_set_psnr = {}
+        #     num_imgs = 0
+        #     num_all_imgs = 0
             
-            for step_out in out:
-                num_all_imgs += 1
-                if int(step_out['index'].item()) == 0:
-                    print(f"\n\n[Test] r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
+        #     for step_out in out:
+        #         num_all_imgs += 1
+        #         if int(step_out['index'].item()) == 0:
+        #             print(f"\n\n[Test] r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
 
-                if step_out['index'].ndim == 1:
-                    if int(step_out['psnr']) != 0.0:
-                        out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
-                        num_imgs += 1
-                else:
-                    for oi, index in enumerate(step_out['index']):
-                        if int(step_out['psnr'][oi]) != 0.0:
-                            out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-                            num_imgs += 1
+        #         if step_out['index'].ndim == 1:
+        #             if int(step_out['psnr']) != 0.0:
+        #                 out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
+        #                 num_imgs += 1
+        #         else:
+        #             for oi, index in enumerate(step_out['index']):
+        #                 if int(step_out['psnr'][oi]) != 0.0:
+        #                     out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+        #                     num_imgs += 1
 
-            if num_imgs == 0:
-                logger.error(f"Test False")
-                psnr = 0
-            else: 
-                list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
-                psnr = torch.mean(list_psnr) 
-                psnr_standard= torch.std(list_psnr) 
+        #     if num_imgs == 0:
+        #         logger.error(f"Test False")
+        #         psnr = 0
+        #     else: 
+        #         list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
+        #         psnr = torch.mean(list_psnr) 
+        #         psnr_standard= torch.std(list_psnr) 
 
-                if num_imgs<num_all_imgs:
-                    logger.warning(f"Test on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
-                else:
-                    logger.info(f"Test on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
-            self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)
-            self.export()
+        #         if num_imgs<num_all_imgs:
+        #             logger.warning(f"Test on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
+        #         else:
+        #             logger.info(f"Test on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
+        #     self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)
+        #     self.export()
             
             # Lưu video
             # self.save_img_sequence(
