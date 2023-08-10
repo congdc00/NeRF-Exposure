@@ -7,11 +7,11 @@ dataset:
   scene: ???
   root_dir: ./load/nerf_synthetic/${dataset.scene}
   img_wh:
-    - 800
-    - 800
+    - 1288
+    - 1936
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
-  near_plane: 2.0
-  far_plane: 6.0
+  near_plane: 1.0
+  far_plane: 5.0
   train_split: "train"
   val_split: "val"
   test_split: "test"
@@ -19,7 +19,7 @@ dataset:
 model:
   name: ssnerf1
   radius: 1.5
-  num_samples_per_ray: 2048
+  num_samples_per_ray: 1024
   train_num_rays: 256
   max_train_num_rays: 8192 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
