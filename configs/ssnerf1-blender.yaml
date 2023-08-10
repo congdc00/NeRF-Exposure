@@ -7,8 +7,8 @@ dataset:
   scene: ???
   root_dir: ./load/nerf_synthetic/${dataset.scene}
   img_wh:
-    - 1288
-    - 1936
+    - 800
+    - 800
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
   near_plane: 2.0
   far_plane: 6.0
@@ -107,7 +107,7 @@ export:
   export_vertex_color: False
 
 trainer:
-  max_steps: 50000
+  max_steps: 20000
   log_every_n_steps: 40000
   num_sanity_val_steps: 0
   val_check_interval: 9900
