@@ -21,12 +21,12 @@ model:
   radius: 1.0
   num_samples_per_ray: 2048 # colmap: 2048
   train_num_rays: 128
-  max_train_num_rays: 2048 # số lượng điểm được đưa vào huấn luyện 1 batch
+  max_train_num_rays: 8192 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
   dynamic_ray_sampling: true
   batch_image_sampling: true
   randomized: true
-  ray_chunk: 2048
+  ray_chunk: 16384
   learned_background: true # colmap: true
   background_color: random # white giúp giảm bộ nhớ nhẹ hơn
   geometry:
