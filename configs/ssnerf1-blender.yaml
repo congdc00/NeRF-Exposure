@@ -11,7 +11,7 @@ dataset:
     - 1936
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
   near_plane: 1.0
-  far_plane: 4.0
+  far_plane: 5.0
   train_split: "train"
   val_split: "val"
   test_split: "test"
@@ -83,11 +83,11 @@ system:
   name: ssnerf1-system
   loss:
     lambda_rgb: 1.
-    lambda_distortion: 0.
+    lambda_distortion: 0.001
   optimizer:
     name: AdamW
     args:
-      lr: 0.0006  #0.0006 -> lego_random
+      lr: 0.01  #0.0006 -> lego_random
       betas: [0.9, 0.99]
       eps: 1.e-15
 
