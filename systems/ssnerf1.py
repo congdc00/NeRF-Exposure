@@ -367,14 +367,14 @@ class SSNeRF1System(BaseSystem):
         #     self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)
         #     self.export()
             
-            # Lưu video
-            # self.save_img_sequence(
-            #     f"it{self.global_step}-test",
-            #     f"it{self.global_step}-test",
-            #     '(\d+)\.png',
-            #     save_format='mp4',
-            #     fps=30
-            # )
+        # Lưu video
+        self.save_img_sequence(
+            f"it{self.global_step}-test",
+            f"it{self.global_step}-test",
+            '(\d+)\.png',
+            save_format='mp4',
+            fps=60
+        )
             
             
 
