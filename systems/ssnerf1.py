@@ -305,67 +305,65 @@ class SSNeRF1System(BaseSystem):
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)               
 
     def test_step(self, batch, batch_idx):  
-        pass
-        # try:
-        #     out = self(batch) 
-        # except:
-        #     return {
-        #         'psnr': 0.0,
-        #         # 'ssim': ssim,
-        #         'index': batch['index']
-        #     }
+        try:
+            out = self(batch) 
+        except:
+            return {
+                'psnr': 0.0,
+                # 'ssim': ssim,
+                'index': batch['index']
+            }
         
-        # psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
-        # W, H = self.dataset.img_wh
-        # if batch_idx == 0:
-        #     self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
-        #         {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-        #         {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-        #         {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
-        #     ])
+        psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
+        W, H = self.dataset.img_wh
+        if batch_idx == 0:
+            self.save_image_grid(f"it{self.global_step}-test/{batch['index'][0].item()}.png", [
+                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
+                {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
+            ])
 
-        # return {
-        #     'psnr': psnr,
-        #     'index': batch['index']
-        # }      
+        return {
+            'psnr': psnr,
+            'index': batch['index']
+        }      
     
     def test_epoch_end(self, out):
-        pass
-        # out = self.all_gather(out)
-        # if self.trainer.is_global_zero:
-        #     out_set_psnr = {}
-        #     num_imgs = 0
-        #     num_all_imgs = 0
+        out = self.all_gather(out)
+        if self.trainer.is_global_zero:
+            out_set_psnr = {}
+            num_imgs = 0
+            num_all_imgs = 0
             
-        #     for step_out in out:
-        #         num_all_imgs += 1
-        #         if int(step_out['index'].item()) == 0:
-        #             print(f"\n\n[Test] r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
+            for step_out in out:
+                num_all_imgs += 1
+                if int(step_out['index'].item()) == 0:
+                    print(f"\n\n[Test] r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
 
-        #         if step_out['index'].ndim == 1:
-        #             if int(step_out['psnr']) != 0.0:
-        #                 out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
-        #                 num_imgs += 1
-        #         else:
-        #             for oi, index in enumerate(step_out['index']):
-        #                 if int(step_out['psnr'][oi]) != 0.0:
-        #                     out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
-        #                     num_imgs += 1
+                if step_out['index'].ndim == 1:
+                    if int(step_out['psnr']) != 0.0:
+                        out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
+                        num_imgs += 1
+                else:
+                    for oi, index in enumerate(step_out['index']):
+                        if int(step_out['psnr'][oi]) != 0.0:
+                            out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
+                            num_imgs += 1
 
-        #     if num_imgs == 0:
-        #         logger.error(f"Test False")
-        #         psnr = 0
-        #     else: 
-        #         list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
-        #         psnr = torch.mean(list_psnr) 
-        #         psnr_standard= torch.std(list_psnr) 
+            if num_imgs == 0:
+                logger.error(f"Test False")
+                psnr = 0
+            else: 
+                list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
+                psnr = torch.mean(list_psnr) 
+                psnr_standard= torch.std(list_psnr) 
 
-        #         if num_imgs<num_all_imgs:
-        #             logger.warning(f"Test on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
-        #         else:
-        #             logger.info(f"Test on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
-        #     self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)
-        #     self.export()
+                if num_imgs<num_all_imgs:
+                    logger.warning(f"Test on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
+                else:
+                    logger.info(f"Test on {num_imgs}/{num_all_imgs} images -- Standard deviation PSNR: {psnr_standard}")
+            self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)
+            self.export()
             
         # Lưu video
         self.save_img_sequence(
