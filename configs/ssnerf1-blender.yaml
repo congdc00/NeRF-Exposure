@@ -10,7 +10,7 @@ dataset:
     - 1288
     - 1936
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
-  near_plane: 1.0
+  near_plane: 0.0
   far_plane: 5.0
   train_split: "train"
   val_split: "val"
@@ -52,7 +52,7 @@ model:
       activation: ReLU
       output_activation: none
       n_neurons: 64
-      n_hidden_layers: 2
+      n_hidden_layers: 1
   texture:
     name: volume-radiance
     input_feature_dim: ${model.geometry.feature_dim}
@@ -64,7 +64,7 @@ model:
       activation: ReLU
       output_activation: Sigmoid
       n_neurons: 64
-      n_hidden_layers: 3
+      n_hidden_layers: 2
   shutter_speed:
     name: volume-brightness
     input_feature_dim: ${model.geometry.feature_dim}
