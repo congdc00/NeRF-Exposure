@@ -19,7 +19,7 @@ dataset:
 model:
   name: ssnerf1
   radius: 1.5
-  num_samples_per_ray: 1024
+  num_samples_per_ray: 2048 # colmap: 2048
   train_num_rays: 256
   max_train_num_rays: 8192 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
@@ -39,7 +39,7 @@ model:
       method: mc
       resolution: 256
       chunk: 2097152
-      threshold: 7.0
+      threshold: 5.0
     xyz_encoding_config:
       otype: HashGrid
       n_levels: 16
@@ -52,7 +52,7 @@ model:
       activation: ReLU
       output_activation: none
       n_neurons: 64
-      n_hidden_layers: 8
+      n_hidden_layers: 1
   texture:
     name: volume-radiance
     input_feature_dim: ${model.geometry.feature_dim}
