@@ -4,7 +4,7 @@ seed: 42
 
 dataset:
   name: colmap
-  root_dir: ./load/nerf_synthetic/bucket
+  root_dir: ./load/nerf_synthetic/${dataset.scene}
   img_downscale: 4 # specify training image size by either img_wh or img_downscale
   up_est_method: ground # if true, use estimated ground plane normal direction as up direction
   center_est_method: lookat
