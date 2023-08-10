@@ -10,7 +10,7 @@ dataset:
     - 1288
     - 1936
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
-  near_plane: 0.0
+  near_plane: 1.0
   far_plane: 5.0
   train_split: "train"
   val_split: "val"
@@ -19,7 +19,7 @@ dataset:
 model:
   name: ssnerf1
   radius: 1.5
-  num_samples_per_ray: 1800 # colmap: 2048
+  num_samples_per_ray: 1600 # colmap: 2048
   train_num_rays: 128
   max_train_num_rays: 8192 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
