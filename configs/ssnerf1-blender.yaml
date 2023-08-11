@@ -11,7 +11,7 @@ dataset:
     - 1936
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
   near_plane: 1.0
-  far_plane: 5.0
+  far_plane: 4.0
   train_split: "train"
   val_split: "val"
   test_split: "test"
