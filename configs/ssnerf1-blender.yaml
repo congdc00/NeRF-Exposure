@@ -79,7 +79,7 @@ system:
   name: ssnerf1-system
   loss:
     lambda_rgb: 1.
-    lambda_distortion: 0.00001
+    lambda_distortion: 0.0001
   optimizer:
     name: AdamW
     args:
