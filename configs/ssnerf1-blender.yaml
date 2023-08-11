@@ -1,7 +1,6 @@
 name: ssnerf1-blender-${dataset.scene}
 tag: ""
 seed: 42
-
 dataset:
   name: blender
   scene: ???
@@ -11,25 +10,24 @@ dataset:
     - 1936
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
   near_plane: 1.0
-  far_plane: 4.0
+  far_plane: 5.0
   train_split: "train"
   val_split: "val"
   test_split: "test"
-
 model:
   name: ssnerf1
-  radius: 1.0
-  num_samples_per_ray: 2048 # colmap: 2048
-  train_num_rays: 16
-  max_train_num_rays: 2048 # số lượng điểm được đưa vào huấn luyện 1 batch
-  grid_prune: true
-  dynamic_ray_sampling: true
-  batch_image_sampling: true
-  randomized: true
-  ray_chunk: 2048
-  learned_background: true # colmap: true
-  background_color: random # white giúp giảm bộ nhớ nhẹ hơn
-  geometry:
+   radius: 1.0
+   num_samples_per_ray: 2048 # colmap: 2048
+   train_num_rays: 128
+   max_train_num_rays: 2048 # số lượng điểm được đưa vào huấn luyện 1 batch
+   grid_prune: true
+   dynamic_ray_sampling: true
+   batch_image_sampling: true
+   randomized: true
+   ray_chunk: 2048
+   learned_background: true # colmap: true
+   background_color: random # white giúp giảm bộ nhớ nhẹ hơn
+   geometry:
     name: volume-density
     radius: ${model.radius}
     feature_dim: 16
@@ -77,8 +75,6 @@ model:
       output_activation: Sigmoid
       n_neurons: 64
       n_hidden_layers: 2
-
-
 system:
   name: ssnerf1-system
   loss:
@@ -87,30 +83,26 @@ system:
   optimizer:
     name: AdamW
     args:
-      lr: 0.0006   #0.0006 -> lego_random
+      lr: 0.0006  #0.0006 -> lego_random
       betas: [0.9, 0.99]
       eps: 1.e-15
-
   scheduler:
     name: MultiStepLR
     interval: step
     args:
       milestones: [10000, 15000, 18000]
       gamma: 0.33
-
 checkpoint:
   save_top_k: -1
   every_n_train_steps: ${trainer.max_steps}
-
 export:
   chunk_size: 2097152
   export_vertex_color: False
-
 trainer:
   max_steps: 50000
   log_every_n_steps: 40000
   num_sanity_val_steps: 0
-  val_check_interval: 3900
+  val_check_interval: 9900
   limit_train_batches: 1.0
   limit_val_batches: 1
   enable_progress_bar: true
