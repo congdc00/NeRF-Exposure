@@ -18,15 +18,15 @@ dataset:
 
 model:
   name: nerf
-  radius: 1.5
+  radius: 1.0
   num_samples_per_ray: 1024
-  train_num_rays: 256
-  max_train_num_rays: 4096
+  train_num_rays: 128
+  max_train_num_rays: 2048
   grid_prune: true
   dynamic_ray_sampling: true
   batch_image_sampling: true
   randomized: true
-  ray_chunk: 32768
+  ray_chunk: 2048
   learned_background: false
   background_color: white
   geometry:
