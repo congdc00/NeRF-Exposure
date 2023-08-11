@@ -10,7 +10,7 @@ dataset:
     - 1936
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
   near_plane: 1.0
-  far_plane: 5.0
+  far_plane: 4.0
   train_split: "train"
   val_split: "val"
   test_split: "test"
@@ -18,13 +18,13 @@ model:
   name: ssnerf1
   radius: 1.0
   num_samples_per_ray: 4096 # colmap: 2048
-  train_num_rays: 128
-  max_train_num_rays: 8192 # số lượng điểm được đưa vào huấn luyện 1 batch
+  train_num_rays: 32
+  max_train_num_rays: 2048 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
   dynamic_ray_sampling: true
   batch_image_sampling: true
   randomized: true
-  ray_chunk: 16384
+  ray_chunk: 2048
   learned_background: true # colmap: true
   background_color: random # white giúp giảm bộ nhớ nhẹ hơn
   geometry:
