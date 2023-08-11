@@ -3,7 +3,7 @@ tag: ""
 seed: 42
 
 dataset:
-  name: nerf
+  name: blender
   scene: ???
   root_dir: ./load/nerf_synthetic/${dataset.scene}
   img_wh:
