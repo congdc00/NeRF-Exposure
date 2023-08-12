@@ -70,7 +70,7 @@ system:
   name: nerf-system
   loss:
     lambda_rgb: 1.
-    lambda_distortion: 0. # colmap 0.001
+    lambda_distortion: 0.001 # colmap 0.001
   optimizer:
     name: AdamW
     args:
