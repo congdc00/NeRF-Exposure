@@ -109,9 +109,9 @@ class SSNeRF1Model(BaseModel):
         #     rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         #     bright_ness = self.shutter_speed(self.is_freeze, rays_o) * 2
 
-        self.is_freeze = not self.is_freeze
-        rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2
+        # self.is_freeze = not self.is_freeze
+        rgb = self.texture(True, cor_feature, t_dirs) # Dự đoán ra màu sắc
+        bright_ness = self.shutter_speed(True, rays_o) * 2
 
         
             
