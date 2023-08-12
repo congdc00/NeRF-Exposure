@@ -73,7 +73,7 @@ model:
       otype: FullyFusedMLP
       activation: ReLU
       output_activation: Sigmoid
-      n_neurons: 16
+      n_neurons: 64
       n_hidden_layers: 1
 system:
   name: ssnerf1-system
