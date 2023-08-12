@@ -1,21 +1,25 @@
-name: nerf-colmap-${basename:${dataset.root_dir}}
+name: nerf-blender-${dataset.scene}
 tag: ""
 seed: 42
 
 dataset:
-  name: colmap
+  name: blender
+  scene: ???
   root_dir: ./load/nerf_synthetic/${dataset.scene}
-  img_downscale: 4 # specify training image size by either img_wh or img_downscale
-  up_est_method: ground # if true, use estimated ground plane normal direction as up direction
-  center_est_method: lookat
-  n_test_traj_steps: 120
-  apply_mask: false
-  load_data_on_gpu: false
+  img_wh:
+    - 1288
+    - 1936
+  # img_downscale: 1 # specify training image size by either img_wh or img_downscale
+  near_plane: 1.0
+  far_plane: 5.0
+  train_split: "train"
+  val_split: "val"
+  test_split: "test"
 
 model:
   name: nerf
   radius: 1.0
-  num_samples_per_ray: 2048
+  num_samples_per_ray: 2024
   train_num_rays: 128
   max_train_num_rays: 8192
   grid_prune: true
@@ -23,8 +27,8 @@ model:
   batch_image_sampling: true
   randomized: true
   ray_chunk: 16384
-  learned_background: true
-  background_color: random
+  learned_background: false
+  background_color: white
   geometry:
     name: volume-density
     radius: ${model.radius}
@@ -66,7 +70,7 @@ system:
   name: nerf-system
   loss:
     lambda_rgb: 1.
-    lambda_distortion: 0.001
+    lambda_distortion: 0.001 # colmap 0.001
   optimizer:
     name: AdamW
     args:
@@ -83,17 +87,16 @@ system:
 checkpoint:
   save_top_k: -1
   every_n_train_steps: ${trainer.max_steps}
-
 export:
   chunk_size: 2097152
   export_vertex_color: False
 
 trainer:
-  max_steps: 30000 #
-  log_every_n_steps: 200
+  max_steps: 20000
+  log_every_n_steps: 20000
   num_sanity_val_steps: 0
-  val_check_interval: 500
+  val_check_interval: 9900
   limit_train_batches: 1.0
-  limit_val_batches: 2
+  limit_val_batches: 100
   enable_progress_bar: true
   precision: 16

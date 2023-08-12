@@ -7,28 +7,28 @@ dataset:
   scene: ???
   root_dir: ./load/nerf_synthetic/${dataset.scene}
   img_wh:
-    - 1288
-    - 1936
+    - 800
+    - 800
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
-  near_plane: 1.0
-  far_plane: 5.0
+  near_plane: 2.0
+  far_plane: 6.0
   train_split: "train"
   val_split: "val"
   test_split: "test"
 
 model:
   name: nerf
-  radius: 1.0
-  num_samples_per_ray: 2024
-  train_num_rays: 128
+  radius: 1.5
+  num_samples_per_ray: 1024
+  train_num_rays: 256
   max_train_num_rays: 8192
   grid_prune: true
   dynamic_ray_sampling: true
   batch_image_sampling: true
   randomized: true
-  ray_chunk: 16384
+  ray_chunk: 32768
   learned_background: false
-  background_color: white
+  background_color: random
   geometry:
     name: volume-density
     radius: ${model.radius}
@@ -70,7 +70,7 @@ system:
   name: nerf-system
   loss:
     lambda_rgb: 1.
-    lambda_distortion: 0.001 # colmap 0.001
+    lambda_distortion: 0.
   optimizer:
     name: AdamW
     args:
@@ -87,16 +87,17 @@ system:
 checkpoint:
   save_top_k: -1
   every_n_train_steps: ${trainer.max_steps}
+
 export:
   chunk_size: 2097152
   export_vertex_color: False
 
 trainer:
   max_steps: 20000
-  log_every_n_steps: 20000
+  log_every_n_steps: 200
   num_sanity_val_steps: 0
-  val_check_interval: 9900
+  val_check_interval: 10000
   limit_train_batches: 1.0
-  limit_val_batches: 100
+  limit_val_batches: 2
   enable_progress_bar: true
   precision: 16
