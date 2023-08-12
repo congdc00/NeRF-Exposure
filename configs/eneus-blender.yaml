@@ -7,18 +7,18 @@ dataset:
   scene: ???
   root_dir: ./load/nerf_synthetic/${dataset.scene}
   img_wh:
-    - 1288
-    - 1936
+    - 800
+    - 800
   # img_downscale: 1 # specify training image size by either img_wh or img_downscale
-  near_plane: 1.0
-  far_plane: 5.0
+  near_plane: 2.0
+  far_plane: 6.0
   train_split: "train"
   val_split: "val"
   test_split: "test"
 
 model:
   name: eneus
-  radius:  0.6
+  radius:  1.5
   num_samples_per_ray: 2048
   train_num_rays: 256
   max_train_num_rays: 8192
