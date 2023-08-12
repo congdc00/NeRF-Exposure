@@ -18,13 +18,13 @@ model:
   name: ssnerf1
   radius: 1.0
   num_samples_per_ray: 2048 # colmap: 2048
-  train_num_rays: 2
-  max_train_num_rays: 2048 # số lượng điểm được đưa vào huấn luyện 1 batch
+  train_num_rays: 128
+  max_train_num_rays: 8192 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
   dynamic_ray_sampling: true
   batch_image_sampling: true
   randomized: true
-  ray_chunk: 4096
+  ray_chunk: 16384
   learned_background: true # colmap: true
   background_color: random # white giúp giảm bộ nhớ nhẹ hơn
   geometry:
@@ -49,7 +49,7 @@ model:
       otype: FullyFusedMLP
       activation: ReLU
       output_activation: none
-      n_neurons: 128
+      n_neurons: 70
       n_hidden_layers: 1
   texture:
     name: volume-radiance
