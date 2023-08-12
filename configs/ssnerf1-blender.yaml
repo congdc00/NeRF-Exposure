@@ -74,7 +74,7 @@ model:
       activation: ReLU
       output_activation: Sigmoid
       n_neurons: 64
-      n_hidden_layers: 1
+      n_hidden_layers: 2
 system:
   name: ssnerf1-system
   loss:
