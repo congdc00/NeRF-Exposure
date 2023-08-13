@@ -18,7 +18,7 @@ model:
   name: ssnerf1
   radius: 1.0
   num_samples_per_ray: 2048 # colmap: 2048
-  train_num_rays: 128
+  train_num_rays: 32
   max_train_num_rays: 8192 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
   dynamic_ray_sampling: true
