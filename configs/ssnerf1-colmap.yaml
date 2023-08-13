@@ -17,7 +17,7 @@ dataset:
 model:
   name: ssnerf1
   radius: 1.0
-  num_samples_per_ray: 1024 # colmap: 2048
+  num_samples_per_ray: 2048 # colmap: 2048
   train_num_rays: 128
   max_train_num_rays: 8192 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
@@ -26,7 +26,7 @@ model:
   randomized: true
   ray_chunk: 16384
   learned_background: true # colmap: true
-  background_color: white # white giúp giảm bộ nhớ nhẹ hơn
+  background_color: random # white giúp giảm bộ nhớ nhẹ hơn
   geometry:
     name: volume-density
     radius: ${model.radius}
