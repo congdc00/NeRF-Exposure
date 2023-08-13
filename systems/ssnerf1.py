@@ -135,10 +135,10 @@ class SSNeRF1System(BaseSystem):
         ex_template = torch.ones(out['bright_ness'].shape).to(device)
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
         ex_delta = torch.mean(ex_delta_matrix)
-        k = 0.01
+        k = 0.0001
         total_loss = loss_rgb + k*ex_delta
         self.log('train/loss_rgb', total_loss)
-        
+
         loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
 
         if self.C(self.config.system.loss.lambda_distortion) > 0:
