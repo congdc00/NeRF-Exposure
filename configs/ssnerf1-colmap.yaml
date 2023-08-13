@@ -18,7 +18,7 @@ model:
   name: ssnerf1
   radius: 1.0
   num_samples_per_ray: 1024 # colmap: 2048
-  train_num_rays: 32
+  train_num_rays: 128
   max_train_num_rays: 8192 # số lượng điểm được đưa vào huấn luyện 1 batch
   grid_prune: true
   dynamic_ray_sampling: true
@@ -72,7 +72,7 @@ model:
     mlp_network_config:
       otype: FullyFusedMLP
       activation: ReLU
-      output_activation: Sigmoid
+      output_activation: none
       n_neurons: 64
       n_hidden_layers: 2
 system:
