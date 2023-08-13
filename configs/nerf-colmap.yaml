@@ -19,7 +19,7 @@ dataset:
 model:
   name: nerf
   radius: 1.0
-  num_samples_per_ray: 1024
+  num_samples_per_ray: 2048
   train_num_rays: 128
   max_train_num_rays: 8192
   grid_prune: true
@@ -28,7 +28,7 @@ model:
   randomized: true
   ray_chunk: 16384
   learned_background: true 
-  background_color: white
+  background_color: random
   geometry:
     name: volume-density
     radius: ${model.radius}
