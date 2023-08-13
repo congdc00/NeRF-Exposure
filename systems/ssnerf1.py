@@ -123,6 +123,7 @@ class SSNeRF1System(BaseSystem):
         delta_exposure = torch.std(delta_exposure)
         # print(f"delta_exposure {delta_exposure} %;")
         loss = 0.
+
         # update train_num_rays
         if self.config.model.dynamic_ray_sampling:
             train_num_rays = int(self.train_num_rays * (self.train_num_samples / out['num_samples'].sum().item()))        
@@ -135,7 +136,7 @@ class SSNeRF1System(BaseSystem):
         ex_template = torch.ones(out['bright_ness'].shape).to(device)
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
         ex_delta = torch.mean(ex_delta_matrix)
-        k = 0.01
+        k = 0.001
         total_loss = loss_rgb + k*ex_delta
         self.log('train/loss_rgb', total_loss)
 
