@@ -5,6 +5,7 @@ dataset:
   name: blender
   scene: ???
   root_dir: ./load/nerf_synthetic/${dataset.scene}
+  img_downscale: 4
   img_wh:
     - 1288
     - 1936
