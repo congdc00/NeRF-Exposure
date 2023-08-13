@@ -113,9 +113,6 @@ class SSNeRF1Model(BaseModel):
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o) 
 
-        
-            
-
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
         # cor_feature torch.Size([97790, 16])

@@ -129,17 +129,16 @@ class SSNeRF1System(BaseSystem):
             self.train_num_rays = min(int(self.train_num_rays * 0.9 + train_num_rays * 0.1), self.config.model.max_train_num_rays)
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
         
+        # bo xung loss exposure exposur
         ex_predict = out['bright_ness']
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         ex_template = torch.ones(out['bright_ness'].shape).to(device)
-        
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
-
         ex_delta = torch.mean(ex_delta_matrix)
         k = 0.01
         total_loss = loss_rgb + k*ex_delta
-
         self.log('train/loss_rgb', total_loss)
+        
         loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
 
         if self.C(self.config.system.loss.lambda_distortion) > 0:
