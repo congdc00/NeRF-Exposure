@@ -19,7 +19,7 @@ dataset:
 model:
   name: nerf
   radius: 1.0
-  num_samples_per_ray: 2048
+  num_samples_per_ray: 2024
   train_num_rays: 128
   max_train_num_rays: 8192
   grid_prune: true
