@@ -27,7 +27,7 @@ model:
   batch_image_sampling: true
   randomized: true
   ray_chunk: 16384
-  learned_background: true 
+  learned_background: false 
   background_color: random
   geometry:
     name: volume-density
@@ -70,7 +70,7 @@ system:
   name: nerf-system
   loss:
     lambda_rgb: 1.
-    lambda_distortion: 0.0 # colmap 0.001
+    lambda_distortion: 0.001 # colmap 0.001
   optimizer:
     name: AdamW
     args:
@@ -83,14 +83,12 @@ system:
     args:
       milestones: [10000, 15000, 18000]
       gamma: 0.33
-
 checkpoint:
   save_top_k: -1
   every_n_train_steps: ${trainer.max_steps}
 export:
   chunk_size: 2097152
   export_vertex_color: False
-
 trainer:
   max_steps: 20000
   log_every_n_steps: 20000
