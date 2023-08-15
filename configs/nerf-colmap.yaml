@@ -20,7 +20,7 @@ model:
   name: nerf
   radius: 1.0
   num_samples_per_ray: 2024
-  train_num_rays: 128
+  train_num_rays: 64
   max_train_num_rays: 8192
   grid_prune: true
   dynamic_ray_sampling: true
