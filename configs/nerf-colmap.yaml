@@ -28,7 +28,7 @@ model:
   randomized: true
   ray_chunk: 16384
   learned_background: true 
-  background_color: random
+  background_color: white
   geometry:
     name: volume-density
     radius: ${model.radius}
