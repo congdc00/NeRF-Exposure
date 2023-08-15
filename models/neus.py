@@ -224,6 +224,7 @@ class NeuSModel(BaseModel):
                 alpha_thre=0.0
             )
         
+        # chi muc bat ky
         ray_indices = ray_indices.long()
         t_origins = rays_o[ray_indices]
         t_dirs = rays_d[ray_indices]
