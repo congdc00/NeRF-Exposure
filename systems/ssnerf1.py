@@ -77,7 +77,7 @@ class SSNeRF1System(BaseSystem):
             fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank) 
         
         else:
-            bright_ness = self.dataset.all_factor[index][0]
+            bright_ness = self.dataset.all_factor[index.to('cpu')][0]
             c2w = self.dataset.all_c2w[index][0]
             if self.dataset.directions.ndim == 3: # (H, W, 3)
                 directions = self.dataset.directions
