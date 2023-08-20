@@ -1,4 +1,4 @@
-name: nerf-colmap-${basename:${dataset.root_dir}}
+name: ssnerf-colmap-${basename:${dataset.root_dir}}
 tag: ""
 seed: 42
 
@@ -13,7 +13,7 @@ dataset:
   load_data_on_gpu: false
 
 model:
-  name: nerf
+  name: ssnerf1
   radius: 1.0
   num_samples_per_ray: 2048
   train_num_rays: 128
@@ -75,7 +75,7 @@ model:
       n_hidden_layers: 2
 
 system:
-  name: nerf-system
+  name: ssnerf1-system
   loss:
     lambda_rgb: 1.
     lambda_distortion: 0.001
