@@ -57,7 +57,7 @@ class SSNeRF1System(BaseSystem):
         if stage in ['train']:
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
             
-            bright_ness = self.dataset.all_factor[index].to(self.rank) # sua cho colmap
+            bright_ness = self.dataset.all_factor[index - 1].to(self.rank) # sua cho colmap
 
             # Khởi tạo meshgrid
             x = torch.randint(
