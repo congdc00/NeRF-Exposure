@@ -63,7 +63,8 @@ class NeRFSystem(BaseSystem):
 
             
             rays_o, rays_d = get_rays(directions, c2w) # Khởi tạo tia
-            rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank) # Khởi tạo nhãn
+            rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1])
+            rgb = rgb.to(self.rank) # Khởi tạo nhãn
             fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank)
         else:
             c2w = self.dataset.all_c2w[index][0]
