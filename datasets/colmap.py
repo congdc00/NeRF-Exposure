@@ -201,12 +201,12 @@ class ColmapDatasetBase():
                         mask = torch.ones_like(img[...,0], device=img.device)
                     all_fg_masks.append(mask) # (h, w)
                     all_images.append(img)
+
+                    k = float(1.0)
+                    exposure_factor = torch.Tensor([k]) 
+                    all_factor.append(exposure_factor)
             
             all_c2w = torch.stack(all_c2w, dim=0)  
-            
-            k = float(1.0)
-            exposure_factor = torch.Tensor([k]) 
-            all_factor.append(exposure_factor)
             all_factor = torch.stack(all_factor, dim=0).float()
 
             pts3d = read_points3d_binary(os.path.join(self.config.root_dir, 'sparse/0/points3D.bin'))
