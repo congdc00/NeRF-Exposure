@@ -147,8 +147,8 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = torch.exp(loss_e2)
 
         # Total loss
-        self.is_freeze = not self.is_freeze
-        if self.is_freeze:
+        self.is_true = not self.is_true
+        if self.is_true:
             alpha = 0.01
             beta = 0.01
             total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
