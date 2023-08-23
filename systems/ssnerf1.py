@@ -137,17 +137,18 @@ class SSNeRF1System(BaseSystem):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         ex_template = torch.ones(out['bright_ness'].shape).to(device)
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
-        ex_delta = torch.mean(ex_delta_matrix)
-        beta = 0.01
+        loss_e1 = torch.mean(ex_delta_matrix)
 
         # loss mean exposure 
-        alpha = 0.01
-        mean_exposure_predict =  torch.mean(ex_predict)
-        loss_e2 = np.mean(abs(ex_predict/mean_exposure_predict-1))
+        mean_exposure_predict = torch.mean(ex_predict)
+        loss_e2 = ex_predict/mean_exposure_predict-1
+        loss_e2 = np.mean(abs(loss_e2))
         loss_e2 = np.exp(-loss_e2)
 
         # Total loss
-        total_loss = loss_rgb + beta*ex_delta + alpha*loss_e2
+        alpha = 0.01
+        beta = 0.01
+        total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
         self.log('train/loss_rgb', total_loss)
         loss = 0.
         loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
@@ -389,8 +390,9 @@ class SSNeRF1System(BaseSystem):
             
 
     def export(self):
-        mesh = self.model.export(self.config.export)
-        self.save_mesh(
-            f"it{self.global_step}-{self.config.model.geometry.isosurface.method}{self.config.model.geometry.isosurface.resolution}.obj",
-            **mesh
-        )    
+        pass
+        # mesh = self.model.export(self.config.export)
+        # self.save_mesh(
+        #     f"it{self.global_step}-{self.config.model.geometry.isosurface.method}{self.config.model.geometry.isosurface.resolution}.obj",
+        #     **mesh
+        # )    
