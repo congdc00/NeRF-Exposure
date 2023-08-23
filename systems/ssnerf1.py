@@ -124,8 +124,7 @@ class SSNeRF1System(BaseSystem):
         bright_ness_label = batch["bright_ness"]
         delta_exposure = abs(bright_ness_predict - bright_ness_label)*100/bright_ness_label
         delta_exposure = torch.std(delta_exposure)
-        # print(f"delta_exposure {delta_exposure} %;")
-        loss = 0.
+        
 
         # update train_num_rays
         if self.config.model.dynamic_ray_sampling:
@@ -133,16 +132,24 @@ class SSNeRF1System(BaseSystem):
             self.train_num_rays = min(int(self.train_num_rays * 0.9 + train_num_rays * 0.1), self.config.model.max_train_num_rays)
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
         
-        # bo xung loss exposure exposur
+        # loss exposure != 1
         ex_predict = out['bright_ness']
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         ex_template = torch.ones(out['bright_ness'].shape).to(device)
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
         ex_delta = torch.mean(ex_delta_matrix)
-        k = 0.01
-        total_loss = loss_rgb + k*ex_delta
-        self.log('train/loss_rgb', total_loss)
+        beta = 0.01
 
+        # loss mean exposure 
+        alpha = 0.01
+        mean_exposure_predict =  torch.mean(ex_predict)
+        loss_e2 = np.mean(abs(ex_predict/mean_exposure_predict-1))
+        loss_e2 = np.exp(-loss_e2)
+
+        # Total loss
+        total_loss = loss_rgb + beta*ex_delta + alpha*loss_e2
+        self.log('train/loss_rgb', total_loss)
+        loss = 0.
         loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
 
         if self.C(self.config.system.loss.lambda_distortion) > 0:
