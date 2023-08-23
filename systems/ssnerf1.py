@@ -148,9 +148,9 @@ class SSNeRF1System(BaseSystem):
 
         # Total loss
         self.is_true = not self.is_true
+        alpha = 0.01
+        beta = 0.01
         if self.is_true:
-            alpha = 0.01
-            beta = 0.01
             total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
         else:
             total_loss = loss_rgb
