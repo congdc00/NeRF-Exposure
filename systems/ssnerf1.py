@@ -143,8 +143,8 @@ class SSNeRF1System(BaseSystem):
         mean_exposure_predict = torch.mean(ex_predict)
         loss_e2 = ex_predict/mean_exposure_predict-1
         print(f"--------------------- {type(loss_e2)}---------")
-        loss_e2 = np.mean(torch.abs(loss_e2))
-        loss_e2 = np.exp(-loss_e2)
+        loss_e2 = torch.mean(torch.abs(loss_e2))
+        loss_e2 = torch.exp(-loss_e2)
 
         # Total loss
         alpha = 0.01
