@@ -121,7 +121,6 @@ class SSNeRF1System(BaseSystem):
             - batch_idx: index của từng batch
         '''
         self.epoch += 1
-        print(f"epoch {self.epoch}")
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
         bright_ness_predict = out["bright_ness"]
@@ -150,16 +149,15 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = torch.exp(loss_e2)
 
         # Total loss
-        self.is_true = not self.is_true
+        if self.epoch > 10000:
+            self.is_true = not self.is_true
         alpha = 0.01
         beta = 0.01
         
         
         if self.is_true:
-            print(f"Bật loss exposure")
             total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
         else:
-            print(f"Tắt loss exposure")
             total_loss = loss_rgb
 
         self.log('train/loss_rgb', loss_rgb + alpha*loss_e1 + beta*loss_e2)
