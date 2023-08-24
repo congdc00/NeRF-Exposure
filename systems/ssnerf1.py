@@ -42,7 +42,7 @@ class SSNeRF1System(BaseSystem):
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
         self.is_true = True
-        self.epoch = 0
+        self.epoch = -1
 
     def forward(self, batch):
         return self.model(batch['rays'])
@@ -120,6 +120,7 @@ class SSNeRF1System(BaseSystem):
         args:
             - batch_idx: index của từng batch
         '''
+        self.epoch += 1
         print(f"epoch {self.epoch}")
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
@@ -149,7 +150,6 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = torch.exp(loss_e2)
 
         # Total loss
-        self.epoch += 1
         self.is_true = not self.is_true
         alpha = 0.01
         beta = 0.01
