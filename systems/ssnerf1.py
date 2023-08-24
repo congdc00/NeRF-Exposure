@@ -160,7 +160,7 @@ class SSNeRF1System(BaseSystem):
         else:
             total_loss = loss_rgb
 
-        self.log('train/loss_rgb', loss_rgb + alpha*loss_e1 + beta*loss_e2)
+        self.log('train/loss_rgb', total_loss)
         loss = 0.
         loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
 
