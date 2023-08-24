@@ -117,8 +117,8 @@ class SSNeRF1Model(BaseModel):
         
         if self.epoch <= 1000:
             bright_ness = torch.full_like(bright_ness, 1.0)
-        else:
-            print(f"\n exposure du doan {bright_ness}")
+        # else:
+        #     print(f"\n exposure du doan {bright_ness}")
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
