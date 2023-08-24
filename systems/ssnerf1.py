@@ -120,6 +120,7 @@ class SSNeRF1System(BaseSystem):
         args:
             - batch_idx: index của từng batch
         '''
+        print(f"epoch {self.epoch}")
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
         bright_ness_predict = out["bright_ness"]
@@ -152,7 +153,7 @@ class SSNeRF1System(BaseSystem):
         self.is_true = not self.is_true
         alpha = 0.01
         beta = 0.01
-        print(f"epoch {self.epoch}")
+        
         
         if self.is_true:
             print(f"Bật loss exposure")
