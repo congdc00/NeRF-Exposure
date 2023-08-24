@@ -112,7 +112,7 @@ class SSNeRF1Model(BaseModel):
             self.is_true = not self.is_true
         density, cor_feature = self.geometry(positions, self.is_freeze) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(not self.is_freeze, rays_o)
+        bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 100
         print(f"\n exposure du doan {bright_ness}")
         if self.epoch <= 10000:
             bright_ness = torch.full_like(bright_ness, 1.0)
@@ -130,7 +130,7 @@ class SSNeRF1Model(BaseModel):
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
-        comp_rgb = real_rgb*bright_ness  + self.background_color * (1.0 - opacity)
+        comp_rgb = real_rgb*bright_ness  + self.background_color*(1.0 - opacity)
         # print(f"bright_ness {bright_ness[0].item()}     --      brightness_mean {torch.mean(bright_ness)}")
         real_rgb = real_rgb + self.background_color * (1.0 - opacity)
     
