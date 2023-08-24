@@ -155,10 +155,10 @@ class SSNeRF1System(BaseSystem):
         print(f"epoch {self.epoch}")
         
         if self.is_true:
-            print(f"Bật")
+            print(f"Bật loss exposure")
             total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
         else:
-            print(f"Tắt")
+            print(f"Tắt loss exposure")
             total_loss = loss_rgb
 
         self.log('train/loss_rgb', loss_rgb + alpha*loss_e1 + beta*loss_e2)
