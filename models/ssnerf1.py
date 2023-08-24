@@ -65,9 +65,10 @@ class SSNeRF1Model(BaseModel):
         return mesh
         
     def forward_(self, rays):
+        self.epoch += 1
         n_rays = rays.shape[0]
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
-
+        
         def sigma_fn(t_starts, t_ends, ray_indices):
             ray_indices = ray_indices.long()
             t_origins = rays_o[ray_indices]
