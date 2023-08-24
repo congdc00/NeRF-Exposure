@@ -156,9 +156,9 @@ class SSNeRF1System(BaseSystem):
         
         
         if self.is_true:
-            total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
-        else:
             total_loss = loss_rgb
+        else:
+            total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
 
         self.log('train/loss_rgb', total_loss)
         loss = 0.
