@@ -42,6 +42,7 @@ class SSNeRF1System(BaseSystem):
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
         self.is_true = True
+        self.epoch = 0
 
     def forward(self, batch):
         return self.model(batch['rays'])
@@ -147,12 +148,17 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = torch.exp(loss_e2)
 
         # Total loss
+        self.epoch += 1
         self.is_true = not self.is_true
         alpha = 0.01
         beta = 0.01
+        print(f"epoch {self.epoch}")
+        
         if self.is_true:
+            print(f"Bật")
             total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
         else:
+            print(f"Tắt")
             total_loss = loss_rgb
 
         self.log('train/loss_rgb', loss_rgb + alpha*loss_e1 + beta*loss_e2)
