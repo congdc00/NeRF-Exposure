@@ -151,8 +151,8 @@ class SSNeRF1System(BaseSystem):
         # Total loss
         if self.epoch > 10000:
             self.is_true = not self.is_true
-        alpha = 0.001
-        beta = 0.001
+        alpha = 0.00001
+        beta = 0.00001
         
         
         if self.is_true:

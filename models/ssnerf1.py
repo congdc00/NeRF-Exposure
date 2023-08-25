@@ -113,7 +113,7 @@ class SSNeRF1Model(BaseModel):
             self.is_freeze = not self.is_freeze
         density, cor_feature = self.geometry(positions, self.is_freeze) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(not self.is_freeze, rays_o)
+        bright_ness = self.shutter_speed(not self.is_freeze, rays_o)*100
         
         if self.epoch <= 10000:
             bright_ness = torch.full_like(bright_ness, 1.0)
