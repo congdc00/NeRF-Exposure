@@ -115,7 +115,7 @@ class SSNeRF1Model(BaseModel):
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o)
         print(f"---------------")
         print(f"ex first {bright_ness[0].item()}")   
-
+        print(self.epoch)
         if self.epoch > 200:
             self.is_freeze = not self.is_freeze
         else:
