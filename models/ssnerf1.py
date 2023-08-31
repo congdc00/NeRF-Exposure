@@ -116,9 +116,9 @@ class SSNeRF1Model(BaseModel):
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o)
         
         if self.epoch <= 200:
-            print(f"shape {[density.size()[0], 1]}")
             bright_ness = torch.full_like([density.size()[0], 1], 1.0)
-            
+
+        print(f"ex predict {bright_ness}")   
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
