@@ -116,6 +116,7 @@ class SSNeRF1Model(BaseModel):
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o)
         
         if self.epoch <= 5000:
+            print(f"chuyen doi tai epoch {self.epoch}")
             bright_ness = torch.full_like(bright_ness, 1.0)
         # else:
         #     print(f"\n exposure du doan {bright_ness}")
