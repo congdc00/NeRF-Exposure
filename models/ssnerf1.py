@@ -115,11 +115,11 @@ class SSNeRF1Model(BaseModel):
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o)
         print(f"---------------")
-        print(f"ex first {bright_ness}")   
+        print(f"ex first {bright_ness[0].item()}")   
         if self.epoch <= 200:
             bright_ness = torch.full_like([density.size()[0], 1], 1.0)
 
-        print(f"ex second {bright_ness}")   
+        print(f"ex second {bright_ness[0].item()}")   
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
