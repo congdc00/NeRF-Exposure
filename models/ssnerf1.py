@@ -116,7 +116,7 @@ class SSNeRF1Model(BaseModel):
         print(f"---------------")
         print(f"ex first {bright_ness[0].item()}")   
         print(self.epoch)
-        if self.epoch > 200:
+        if self.epoch > 300:
             self.is_freeze = not self.is_freeze
         else:
             bright_ness = torch.full_like(bright_ness, 1.0)
