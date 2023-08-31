@@ -203,6 +203,7 @@ class SSNeRF1System(BaseSystem):
         color_predict = out["real_rgb"]
 
         exposure_predict = out["bright_ness"][0].item()
+        print(f"exposure_predict {exposure_predict}")
         exposure_label = batch["bright_ness"].item()
         delta_exposure = abs(exposure_predict - exposure_label)*100/exposure_label
 
@@ -286,7 +287,7 @@ class SSNeRF1System(BaseSystem):
                             self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
                             self.save_PE[step_out['index'].item()] = step_out["delta_exposure"]
                         else:
-                            if step_out['index'].item() in  self.save_PSNR:
+                            if step_out['index'].item() in self.save_PSNR:
                                 out_set_psnr[step_out['index'].item()] = self.save_PSNR[step_out['index'].item()]
                                 out_set_ssim[step_out['index'].item()] = self.save_SSIM[step_out['index'].item()]
                                 list_delta_exposure.append(self.save_PE[step_out['index'].item()])
