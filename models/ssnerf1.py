@@ -116,7 +116,7 @@ class SSNeRF1Model(BaseModel):
         
         
         if self.epoch <= 200:
-            
+            print(f"shape {[density.size()[0], 1]}")
             bright_ness = torch.full_like([density.size()[0], 1], 1.0)
         else:
             bright_ness = self.shutter_speed(not self.is_freeze, rays_o)
@@ -184,7 +184,7 @@ class SSNeRF1Model(BaseModel):
         losses = {}
         losses.update(self.geometry.regularizations(out))
         losses.update(self.texture.regularizations(out))
-        # losses.update(self.shutter_speed.regularizations(out))
+        losses.update(self.shutter_speed.regularizations(out))
         return losses
 
     @torch.no_grad()
