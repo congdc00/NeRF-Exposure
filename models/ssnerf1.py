@@ -117,7 +117,7 @@ class SSNeRF1Model(BaseModel):
         print(f"---------------")
         print(f"ex first {bright_ness[0].item()}")   
         if self.epoch <= 200:
-            bright_ness = torch.full_like([density.size()[0], 1], 1.0)
+            bright_ness = torch.full_like(bright_ness, 1.0)
 
         print(f"ex second {bright_ness[0].item()}")   
 
