@@ -216,7 +216,7 @@ class SSNeRF1System(BaseSystem):
         image_array2 = image_origin.view(H, W, 3).cpu().numpy()
         
         ## PSNR
-        psnr = self.criterions['psnr'](image_array1.to(image_array2), image_array2)
+        psnr = self.criterions['psnr'](image_array1, image_array2)
 
         ##  SSIM
         ssim = self.criterions['ssim'](image_array1, image_array2, multichannel=True, full=True)
