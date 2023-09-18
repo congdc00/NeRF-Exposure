@@ -1,4 +1,4 @@
-name: nerf-colmap-${basename:${dataset.root_dir}}
+name: ssnerf-colmap-${basename:${dataset.root_dir}}
 tag: ""
 seed: 42
 
@@ -13,7 +13,7 @@ dataset:
   load_data_on_gpu: false
 
 model:
-  name: nerf
+  name: ssnerf1
   radius: 1.0
   num_samples_per_ray: 2048
   train_num_rays: 128
@@ -24,7 +24,7 @@ model:
   randomized: true
   ray_chunk: 16384
   learned_background: true
-  background_color: white
+  background_color: random
   geometry:
     name: volume-density
     radius: ${model.radius}
@@ -61,9 +61,21 @@ model:
       output_activation: Sigmoid
       n_neurons: 64
       n_hidden_layers: 2
+  shutter_speed:
+    name: volume-brightness
+    input_feature_dim: ${model.geometry.feature_dim}
+    dir_encoding_config:
+      otype: SphericalHarmonics
+      degree: 4
+    mlp_network_config:
+      otype: FullyFusedMLP
+      activation: ReLU
+      output_activation: none
+      n_neurons: 64
+      n_hidden_layers: 2
 
 system:
-  name: nerf-system
+  name: ssnerf1-system
   loss:
     lambda_rgb: 1.
     lambda_distortion: 0.001

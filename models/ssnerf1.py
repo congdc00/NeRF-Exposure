@@ -15,6 +15,7 @@ from torch.nn.parallel import DistributedDataParallel
 class SSNeRF1Model(BaseModel):
     def setup(self):
         self.is_freeze = True
+        self.epoch = -1
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
@@ -65,6 +66,7 @@ class SSNeRF1Model(BaseModel):
         return mesh
         
     def forward_(self, rays):
+        self.epoch += 1
         n_rays = rays.shape[0]
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
 
@@ -113,7 +115,10 @@ class SSNeRF1Model(BaseModel):
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2
 
-        
+        if self.epoch > 10000:
+            self.is_freeze = not self.is_freeze
+        else:
+            bright_ness = torch.full_like(bright_ness, 1.0)
             
 
         # network_inp torch.Size([97790, 32])
