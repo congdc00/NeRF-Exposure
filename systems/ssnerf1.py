@@ -148,19 +148,18 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = torch.mean(torch.abs(loss_e2))
         loss_e2 = torch.exp(loss_e2)
 
-        # Total loss
-        # if self.epoch > 13000:
-        #     self.is_true = not self.is_true
+        #Total loss
+        if self.epoch > 10000:
+            self.is_true = not self.is_true
         
         
         
-        # if self.is_true:
-        #     total_loss = loss_rgb
-        # else:
-        #     alpha = 0.01
-        #     beta = 0.01
-        #     total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
-        total_loss = loss_rgb + 0.01*loss_e1
+        if self.is_true:
+            total_loss = loss_rgb
+        else:
+            alpha = 0.01
+            beta = 0.01
+            total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
 
         self.log('train/loss_rgb', total_loss)
         loss = 0.
