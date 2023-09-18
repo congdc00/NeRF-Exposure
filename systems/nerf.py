@@ -46,6 +46,7 @@ class NeRFSystem(BaseSystem):
                 index = torch.randint(0, len(self.dataset.all_images), size=(self.train_num_rays,), device=self.dataset.all_images.device)
             else:
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)
+        
         if stage in ['train']:
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
             # Khởi tạo meshgrid
@@ -74,8 +75,9 @@ class NeRFSystem(BaseSystem):
             rays_o, rays_d = get_rays(directions, c2w)
 
             #them cho colmap
-
-            rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank)
+            rgb = self.dataset.all_images[index.to('cpu')]
+            rgb = rgb.view(-1, self.dataset.all_images.shape[-1])
+            rgb = rgb.to(self.rank)
             fg_mask = self.dataset.all_fg_masks[index].view(-1).to(self.rank)
         
         rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1)     
