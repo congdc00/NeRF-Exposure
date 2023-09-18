@@ -160,7 +160,7 @@ class SSNeRF1System(BaseSystem):
         #     alpha = 0.01
         #     beta = 0.01
         #     total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
-        total_loss = loss_rgb + 0.01*loss_e2
+        total_loss = loss_rgb + 0.01*loss_e1
 
         self.log('train/loss_rgb', total_loss)
         loss = 0.
@@ -315,14 +315,14 @@ class SSNeRF1System(BaseSystem):
                 mean_exposure = torch.mean(list_delta_exposure)
                 delta_exposure_std = torch.std(list_delta_exposure)
                 
-                log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} -- std PE: {round( delta_exposure_std.item(), 3)} -- mean PE {mean_exposure}"
-                # for key, value in check_ssim.items():
-                #      print(f"Name dataset: {key} \t SSIM: {value}")
+            log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} -- std PE: {round( delta_exposure_std.item(), 3)} -- mean PE {mean_exposure}"
+            # for key, value in check_ssim.items():
+            #      print(f"Name dataset: {key} \t SSIM: {value}")
 
-                if num_imgs<num_all_imgs:
-                    logger.warning(log_text)
-                else:
-                    logger.info(log_text)
+            if num_imgs<num_all_imgs:
+                logger.warning(log_text)
+            else:
+                logger.info(log_text)
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)               
 
     def test_step(self, batch, batch_idx): 
