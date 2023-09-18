@@ -211,14 +211,13 @@ class SSNeRF1System(BaseSystem):
         mask_object = batch['fg_mask'].view(-1, 1)
         density_predict = out['depth'].to(mask_object.device)
         density_predict= (density_predict*mask_object)
-
-        image_array1 = color_predict.view(H, W, 3).cpu().numpy()
-        image_array2 = image_origin.view(H, W, 3).cpu().numpy()
         
         ## PSNR
-        psnr = self.criterions['psnr'](image_array1, image_array2)
+        psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
 
         ##  SSIM
+        image_array1 = color_predict.view(H, W, 3).cpu().numpy()
+        image_array2 = image_origin.view(H, W, 3).cpu().numpy()
         ssim = self.criterions['ssim'](image_array1, image_array2, multichannel=True, full=True)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
