@@ -75,7 +75,7 @@ class NeRFSystem(BaseSystem):
 
             #them cho colmap
 
-            rgb = self.dataset.all_images[index].view(-1, self.dataset.all_images.shape[-1]).to(self.rank)
+            rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank)
             fg_mask = self.dataset.all_fg_masks[index].view(-1).to(self.rank)
         
         rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1)     
