@@ -22,7 +22,6 @@ def compute_psnr(img1, img2):
         return float('inf')
     max_pixel = 1.0  
     psnr = 20 * torch.log10(max_pixel) - 10 * torch.log10(mse)
-
     return psnr
 
 @systems.register('ssnerf1-system')
@@ -42,6 +41,8 @@ class SSNeRF1System(BaseSystem):
         }
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
+        self.is_true = True
+        self.epoch = -1
 
     def forward(self, batch):
         return self.model(batch['rays'])
@@ -57,8 +58,8 @@ class SSNeRF1System(BaseSystem):
         
         if stage in ['train']:
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
-            # bright_ness = self.dataset.all_factor[index]
-            bright_ness = self.dataset.all_factor[index].to(self.rank)
+            
+            bright_ness = self.dataset.all_factor[index].to(self.rank) # sua cho colmap
 
             # Khởi tạo meshgrid
             x = torch.randint(
@@ -78,15 +79,17 @@ class SSNeRF1System(BaseSystem):
             fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank) 
         
         else:
-            bright_ness = self.dataset.all_factor[index][0]
+            bright_ness = self.dataset.all_factor[index.to('cpu')][0]
             c2w = self.dataset.all_c2w[index][0]
             if self.dataset.directions.ndim == 3: # (H, W, 3)
                 directions = self.dataset.directions
             elif self.dataset.directions.ndim == 4: # (N, H, W, 3)
                 directions = self.dataset.directions[index][0]
             rays_o, rays_d = get_rays(directions, c2w)
-            rgb = self.dataset.all_images[index].view(-1, self.dataset.all_images.shape[-1]).to(self.rank)
-            fg_mask = self.dataset.all_fg_masks[index].view(-1).to(self.rank)
+            rgb = self.dataset.all_images[index.to('cpu')]
+            rgb = rgb.view(-1, self.dataset.all_images.shape[-1])
+            rgb = rgb.to(self.rank)
+            fg_mask = self.dataset.all_fg_masks[index.to('cpu')].view(-1).to(self.rank) # sua cho colmap
         
         rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1) #[8192, 6]
 
@@ -117,31 +120,50 @@ class SSNeRF1System(BaseSystem):
         args:
             - batch_idx: index của từng batch
         '''
+        self.epoch += 1
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
         bright_ness_predict = out["bright_ness"]
         bright_ness_label = batch["bright_ness"]
         delta_exposure = abs(bright_ness_predict - bright_ness_label)*100/bright_ness_label
         delta_exposure = torch.std(delta_exposure)
-        # print(f"delta_exposure {delta_exposure} %;")
-        loss = 0.
+        
+
         # update train_num_rays
         if self.config.model.dynamic_ray_sampling:
             train_num_rays = int(self.train_num_rays * (self.train_num_samples / out['num_samples'].sum().item()))        
             self.train_num_rays = min(int(self.train_num_rays * 0.9 + train_num_rays * 0.1), self.config.model.max_train_num_rays)
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
         
+        # loss exposure != 1
         ex_predict = out['bright_ness']
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         ex_template = torch.ones(out['bright_ness'].shape).to(device)
-        
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
+        loss_e1 = torch.mean(ex_delta_matrix)
 
-        ex_delta = torch.mean(ex_delta_matrix)
-        k = 0.001
-        total_loss = loss_rgb + k*ex_delta
+        # loss mean exposure 
+        mean_exposure_predict = torch.mean(ex_predict)
+        loss_e2 = ex_predict/mean_exposure_predict-1
+        loss_e2 = torch.mean(torch.abs(loss_e2))
+        loss_e2 = torch.exp(loss_e2)
+
+        # #Total loss
+        # if self.epoch > 10000:
+        #     self.is_true = not self.is_true
+        
+        
+        
+        # if self.is_true:
+        #     total_loss = loss_rgb
+        # else:
+        #     alpha = 0.01
+        #     beta = 0.01
+        #     total_loss = loss_rgb + alpha*loss_e1 + beta*loss_e2
+        total_loss = loss_rgb + 0.001*loss_e1
 
         self.log('train/loss_rgb', total_loss)
+        loss = 0.
         loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
 
         if self.C(self.config.system.loss.lambda_distortion) > 0:
@@ -154,16 +176,12 @@ class SSNeRF1System(BaseSystem):
 
         for name, value in losses_model_reg.items():
             self.log(f'train/loss_{name}', value)
-
             loss_ = value * self.C(self.config.system.loss[f"lambda_{name}"])
             loss += loss_
-
         for name, value in self.config.system.loss.items():
             if name.startswith('lambda'):
                 self.log(f'train_params/{name}', self.C(value))
-        
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
-
         return {'loss': loss}
     
     def validation_step(self, batch, batch_idx):
@@ -186,6 +204,7 @@ class SSNeRF1System(BaseSystem):
         color_predict = out["real_rgb"]
 
         exposure_predict = out["bright_ness"][0].item()
+        # print(f"exposure_predict {exposure_predict}")
         exposure_label = batch["bright_ness"].item()
         delta_exposure = abs(exposure_predict - exposure_label)*100/exposure_label
 
@@ -199,7 +218,7 @@ class SSNeRF1System(BaseSystem):
         ##  SSIM
         image_array1 = color_predict.view(H, W, 3).cpu().numpy()
         image_array2 = image_origin.view(H, W, 3).cpu().numpy()
-        ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
+        ssim = self.criterions['ssim'](image_array1, image_array2, multichannel=True, full=True)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
         # rgb_non_bg= (batch['rgb']*mask_object)
@@ -269,7 +288,7 @@ class SSNeRF1System(BaseSystem):
                             self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
                             self.save_PE[step_out['index'].item()] = step_out["delta_exposure"]
                         else:
-                            if step_out['index'].item() in  self.save_PSNR:
+                            if step_out['index'].item() in self.save_PSNR:
                                 out_set_psnr[step_out['index'].item()] = self.save_PSNR[step_out['index'].item()]
                                 out_set_ssim[step_out['index'].item()] = self.save_SSIM[step_out['index'].item()]
                                 list_delta_exposure.append(self.save_PE[step_out['index'].item()])
@@ -296,17 +315,17 @@ class SSNeRF1System(BaseSystem):
                 mean_exposure = torch.mean(list_delta_exposure)
                 delta_exposure_std = torch.std(list_delta_exposure)
                 
-                log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} -- std Exposure: {round( delta_exposure_std.item(), 3)} -- mean Exposure {mean_exposure}"
-                # for key, value in check_ssim.items():
-                #      print(f"Name dataset: {key} \t SSIM: {value}")
+            log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} -- std PE: {round( delta_exposure_std.item(), 3)} -- mean PE {mean_exposure}"
+            # for key, value in check_ssim.items():
+            #      print(f"Name dataset: {key} \t SSIM: {value}")
 
-                if num_imgs<num_all_imgs:
-                    logger.warning(log_text)
-                else:
-                    logger.info(log_text)
+            if num_imgs<num_all_imgs:
+                logger.warning(log_text)
+            else:
+                logger.info(log_text)
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)               
 
-    def test_step(self, batch, batch_idx):  
+    def test_step(self, batch, batch_idx): 
         pass
         # try:
         #     out = self(batch) 
@@ -369,20 +388,21 @@ class SSNeRF1System(BaseSystem):
         #     self.log('test/psnr', psnr, prog_bar=True, rank_zero_only=True)
         #     self.export()
             
-            # Lưu video
-            # self.save_img_sequence(
-            #     f"it{self.global_step}-test",
-            #     f"it{self.global_step}-test",
-            #     '(\d+)\.png',
-            #     save_format='mp4',
-            #     fps=30
-            # )
+        # # Lưu video
+        # self.save_img_sequence(
+        #     f"it{self.global_step}-test",
+        #     f"it{self.global_step}-test",
+        #     '(\d+)\.png',
+        #     save_format='mp4',
+        #     fps=60
+        # )
             
             
 
     def export(self):
-        mesh = self.model.export(self.config.export)
-        self.save_mesh(
-            f"it{self.global_step}-{self.config.model.geometry.isosurface.method}{self.config.model.geometry.isosurface.resolution}.obj",
-            **mesh
-        )    
+        pass
+        # mesh = self.model.export(self.config.export)
+        # self.save_mesh(
+        #     f"it{self.global_step}-{self.config.model.geometry.isosurface.method}{self.config.model.geometry.isosurface.resolution}.obj",
+        #     **mesh
+        # )    
