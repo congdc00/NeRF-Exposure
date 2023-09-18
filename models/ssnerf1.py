@@ -18,7 +18,7 @@ class SSNeRF1Model(BaseModel):
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
-        self.epoch = -1
+        self.iterator = 0
         
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
@@ -65,10 +65,9 @@ class SSNeRF1Model(BaseModel):
         return mesh
         
     def forward_(self, rays):
-        self.epoch += 1
         n_rays = rays.shape[0]
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
-        
+
         def sigma_fn(t_starts, t_ends, ray_indices):
             ray_indices = ray_indices.long()
             t_origins = rays_o[ray_indices]
@@ -99,6 +98,7 @@ class SSNeRF1Model(BaseModel):
 
         # Step 1: Predict colour point
 
+        density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
         
         # self.iterator += 1
         # if self.iterator > 10000:
@@ -109,16 +109,12 @@ class SSNeRF1Model(BaseModel):
         #     rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         #     bright_ness = self.shutter_speed(self.is_freeze, rays_o) * 2
 
-        
-        density, cor_feature = self.geometry(positions, True) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá ra
+        self.is_freeze = not self.is_freeze
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
-        bright_ness = self.shutter_speed(self.is_freeze, rays_o)*2
+        bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2
 
-        # if self.epoch > 10000:
-        #     self.is_freeze = not self.is_freeze
-        # else:
-        #     bright_ness = torch.full_like(bright_ness, 1.0)
- 
+        
+            
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
@@ -133,9 +129,9 @@ class SSNeRF1Model(BaseModel):
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
         real_rgb = accumulate_along_rays(weights, ray_indices, values=rgb, n_rays=n_rays) #[n_rays, 3]
         depth = accumulate_along_rays(weights, ray_indices, values=midpoints, n_rays=n_rays)    
-        comp_rgb = real_rgb*bright_ness  + self.background_color*(1.0 - opacity)
+        comp_rgb = real_rgb*bright_ness  + self.background_color * (1.0 - opacity)
         # print(f"bright_ness {bright_ness[0].item()}     --      brightness_mean {torch.mean(bright_ness)}")
-        real_rgb = real_rgb + self.background_color*(1.0 - opacity)
+        real_rgb = real_rgb + self.background_color * (1.0 - opacity)
     
         # Export 
         out = {

@@ -74,10 +74,9 @@ class NeRFSystem(BaseSystem):
             rays_o, rays_d = get_rays(directions, c2w)
 
             #them cho colmap
-            rgb = self.dataset.all_images[index.to('cpu')]
-            rgb = rgb.view(-1, self.dataset.all_images.shape[-1])
-            rgb = rgb.to(self.rank)
-            fg_mask = self.dataset.all_fg_masks[index.to('cpu')].view(-1).to(self.rank)
+
+            rgb = self.dataset.all_images[index].view(-1, self.dataset.all_images.shape[-1]).to(self.rank)
+            fg_mask = self.dataset.all_fg_masks[index].view(-1).to(self.rank)
         
         rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1)     
         if stage in ['train']:

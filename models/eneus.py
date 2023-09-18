@@ -251,9 +251,8 @@ class ENeuSModel(BaseModel):
 
         normal = F.normalize(sdf_grad, p=2, dim=-1)
         alpha = self.get_alpha(sdf, normal, t_dirs, dists)[...,None]
-        self.is_freeze = not self.is_freeze
-        rgb = self.texture(self.is_freeze, feature, t_dirs, normal)
-        bright_ness = self.shutter_speed(not self.is_freeze, rays_o)
+        rgb = self.texture(True, feature, t_dirs, normal)
+        bright_ness = self.shutter_speed(True, rays_o) * 2
 
         # self.is_freeze = not self.is_freeze
         # rgb = self.texture(self.is_freeze, feature, t_dirs, normal) # Dự đoán ra màu sắc

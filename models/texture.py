@@ -33,8 +33,8 @@ class VolumeRadiance(nn.Module):
         """
 
         # freeze
-        # for param in self.network.parameters():
-        #     param.requires_grad = is_freeze
+        for param in self.network.parameters():
+            param.requires_grad = is_freeze
 
         dirs = (dirs + 1.) / 2. # (-1, 1) => (0, 1)
         dirs_embd = self.encoding(dirs.view(-1, self.n_dir_dims)) #[num_points, 16]

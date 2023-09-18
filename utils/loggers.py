@@ -37,6 +37,5 @@ class ConsoleLogger(LightningLoggerBase):
         metrics_ = {k: v for k, v in metrics.items() if self.match_log_keys(k)}
         if not metrics_:
             return
-        metrics['epoch']+=1
         self.experiment.info(f"\nEpoch{metrics['epoch']} Step{step}\n{self.dict_printer(metrics_)}")
 
