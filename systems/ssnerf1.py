@@ -149,8 +149,8 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = torch.exp(loss_e2)
 
         # Total loss
-        if self.epoch > 13000:
-            self.is_true = not self.is_true
+        # if self.epoch > 13000:
+        #     self.is_true = not self.is_true
         
         
         
