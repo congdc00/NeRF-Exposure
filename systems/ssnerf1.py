@@ -150,15 +150,15 @@ class SSNeRF1System(BaseSystem):
 
         # Version 2:
 
-        # if self.epoch > 6000:
-        #     self.is_true = not self.is_true
+        if self.epoch > 6000:
+            self.is_true = not self.is_true
 
-        # if self.is_true:
-        #     total_loss = loss_rgb
-        # else:
-        #     alpha = 0.01
-        #     beta = 0.01
-        #     total_loss = loss_rgb + alpha*ex_delta + beta*loss_e2
+        if self.is_true:
+            total_loss = loss_rgb
+        else:
+            alpha = 0.01
+            beta = 0.01
+            total_loss = loss_rgb + alpha*ex_delta + beta*loss_e2
 
         self.log('train/loss_rgb', total_loss)
         loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
