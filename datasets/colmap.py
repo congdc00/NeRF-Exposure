@@ -176,7 +176,7 @@ class ColmapDatasetBase():
             has_mask = os.path.exists(mask_dir) # TODO: support partial masks
             apply_mask = has_mask and self.config.apply_mask
             
-            all_c2w, all_images, all_fg_masks = [], [], []
+            all_c2w, all_images, all_fg_masks, all_factor = [], [], [], []
 
             for i, d in enumerate(imdata.values()):
                 R = d.qvec2rotmat()
@@ -201,8 +201,13 @@ class ColmapDatasetBase():
                         mask = torch.ones_like(img[...,0], device=img.device)
                     all_fg_masks.append(mask) # (h, w)
                     all_images.append(img)
+
+                    k = float(1.0)
+                    exposure_factor = torch.Tensor([k]) 
+                    all_factor.append(exposure_factor)
             
-            all_c2w = torch.stack(all_c2w, dim=0)   
+            all_c2w = torch.stack(all_c2w, dim=0)  
+            all_factor = torch.stack(all_factor, dim=0).float()
 
             pts3d = read_points3d_binary(os.path.join(self.config.root_dir, 'sparse/0/points3D.bin'))
             pts3d = torch.from_numpy(np.array([pts3d[k].xyz for k in pts3d])).float()
@@ -219,7 +224,8 @@ class ColmapDatasetBase():
                 'pts3d': pts3d,
                 'all_c2w': all_c2w,
                 'all_images': all_images,
-                'all_fg_masks': all_fg_masks
+                'all_fg_masks': all_fg_masks,
+                'all_factor': all_factor,
             }
 
             ColmapDatasetBase.initialized = True
