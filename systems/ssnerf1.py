@@ -86,8 +86,10 @@ class SSNeRF1System(BaseSystem):
             elif self.dataset.directions.ndim == 4: # (N, H, W, 3)
                 directions = self.dataset.directions[index][0]
             rays_o, rays_d = get_rays(directions, c2w)
-            rgb = self.dataset.all_images[index].view(-1, self.dataset.all_images.shape[-1]).to(self.rank)
-            fg_mask = self.dataset.all_fg_masks[index].view(-1).to(self.rank)
+            rgb = self.dataset.all_images[index.to('cpu')]
+            rgb = rgb.view(-1, self.dataset.all_images.shape[-1])
+            rgb = rgb.to(self.rank)
+            fg_mask = self.dataset.all_fg_masks[index.to('cpu')].view(-1).to(self.rank) # sua cho colmap
         
         rays = torch.cat([rays_o, F.normalize(rays_d, p=2, dim=-1)], dim=-1) #[8192, 6]
 
