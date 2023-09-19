@@ -146,8 +146,8 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = torch.mean(torch.abs(loss_e2))
         loss_e2 = torch.exp(loss_e2)
 
-        # Version 1:
-        total_loss = loss_rgb + k*ex_delta
+        # # Version 1:
+        # total_loss = loss_rgb + k*ex_delta
 
         # Version 2:
 
