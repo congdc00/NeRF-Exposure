@@ -42,6 +42,7 @@ class SSNeRF1System(BaseSystem):
         }
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
+        self.epoch = -1
 
     def forward(self, batch):
         return self.model(batch['rays'])
@@ -116,6 +117,7 @@ class SSNeRF1System(BaseSystem):
         args:
             - batch_idx: index của từng batch
         '''
+        self.epoch += 1
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
         bright_ness_predict = out["bright_ness"]
@@ -133,12 +135,30 @@ class SSNeRF1System(BaseSystem):
         ex_predict = out['bright_ness']
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         ex_template = torch.ones(out['bright_ness'].shape).to(device)
-        
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
-
         ex_delta = torch.mean(ex_delta_matrix)
         k = 0.001
+
+        # loss mean exposure 
+        mean_exposure_predict = torch.mean(ex_predict)
+        loss_e2 = ex_predict/mean_exposure_predict-1
+        loss_e2 = torch.mean(torch.abs(loss_e2))
+        loss_e2 = torch.exp(loss_e2)
+
+        # Version 1:
         total_loss = loss_rgb + k*ex_delta
+
+        # Version 2:
+
+        # if self.epoch > 6000:
+        #     self.is_true = not self.is_true
+
+        # if self.is_true:
+        #     total_loss = loss_rgb
+        # else:
+        #     alpha = 0.01
+        #     beta = 0.01
+        #     total_loss = loss_rgb + alpha*ex_delta + beta*loss_e2
 
         self.log('train/loss_rgb', total_loss)
         loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
