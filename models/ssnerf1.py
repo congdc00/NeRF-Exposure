@@ -104,13 +104,13 @@ class SSNeRF1Model(BaseModel):
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2
 
-        # Version 1:
-        self.is_freeze = not self.is_freeze
-        # # Version 2:
-        # if self.epoch > 6001:
-        #     self.is_freeze = not self.is_freeze
-        # else:
-        #     bright_ness = torch.full_like(bright_ness, 1.0)
+        # # Version 1:
+        # self.is_freeze = not self.is_freeze
+        # Version 2:
+        if self.epoch > 6001:
+            self.is_freeze = not self.is_freeze
+        else:
+            bright_ness = torch.full_like(bright_ness, 1.0)
             
 
         # network_inp torch.Size([97790, 32])
