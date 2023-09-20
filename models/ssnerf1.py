@@ -113,12 +113,12 @@ class SSNeRF1Model(BaseModel):
             bright_ness = torch.full_like(bright_ness, 1.0)
             
 
-        network_inp torch.Size([97790, 32])
-        density torch.Size([97790])
-        cor_feature torch.Size([97790, 16])
-        rgb torch.Size([97790, 3])
-        dir_feature torch.Size([97790, 16])
-        bright_ness torch.Size([97790, 1])
+        # network_inp torch.Size([97790, 32])
+        # density torch.Size([97790])
+        # cor_feature torch.Size([97790, 16])
+        # rgb torch.Size([97790, 3])
+        # dir_feature torch.Size([97790, 16])
+        # bright_ness torch.Size([97790, 1])
 
         # Step 2: Rendering 
         # Trọng số
