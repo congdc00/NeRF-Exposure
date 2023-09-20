@@ -150,7 +150,6 @@ class SSNeRF1System(BaseSystem):
 
         # # Version 1:
         # total_loss = loss_rgb + k*ex_delta
-
         # Version 2:
         if self.epoch > 6000:
             self.is_true = not self.is_true
