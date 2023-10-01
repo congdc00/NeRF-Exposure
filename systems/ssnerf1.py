@@ -264,7 +264,6 @@ class SSNeRF1System(BaseSystem):
                     print(f"\n\n[Val] r_{step_out['index'].item()}.png with psnr {step_out['psnr'].item()}")
                 # DP
                 if step_out['index'].ndim == 1:
-                    print(f"DP")
                     if int(step_out['psnr']) != 0.0:
                         out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
                         out_set_ssim[step_out['index'].item()] = {'ssim': torch.tensor(step_out['ssim'])}
@@ -284,7 +283,6 @@ class SSNeRF1System(BaseSystem):
                             num_imgs += 1    
                 # DDP
                 else:
-                    print("DDP")
                     for oi, index in enumerate(step_out['index']):
                         if int(step_out['psnr'][oi]) != 0.0:
                             out_set_psnr[index[0].item()] = {'psnr': step_out['psnr'][oi]}
