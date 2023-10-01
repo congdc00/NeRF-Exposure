@@ -199,6 +199,7 @@ class SSNeRF1System(BaseSystem):
                 'ssim': 0.0,
                 'index': batch['index'],
                 'delta_exposure': 0,
+                'exposure_predict': 0,
             }
         W, H = self.dataset.img_wh
         image_origin = batch['rgb'] 
@@ -324,7 +325,7 @@ class SSNeRF1System(BaseSystem):
 
                 list_exposure = torch.Tensor(list_exposure)
                 mean_exposure = torch.mean(list_exposure)
-                print(f"mean_exposure {mean_exposure.item()}")
+                print(f"mean_exposure {list_exposure.numpy()}")
                 log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} --Exposure {mean_exposure}" 
                 # -- std PE: {round( delta_exposure_std.item(), 3)} -- mean PE {mean_exposure}"
                 # for key, value in check_ssim.items():
