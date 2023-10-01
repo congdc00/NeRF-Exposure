@@ -292,9 +292,9 @@ class SSNeRF1System(BaseSystem):
                             num_imgs += 1
                             self.save_PSNR[step_out['index'].item()] = out_set_psnr[step_out['index'].item()]
                             self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
-                            print(f"step_out['delta_exposure'] = {step_out["delta_exposure"]}")
+                            print(f"step_out['delta_exposure'] = {step_out['delta_exposure']}")
                             self.save_PE[step_out['index'].item()] = step_out["delta_exposure"]
-                            print(f"step_out['exposure_predict'] = {step_out["exposure_predict"]}")
+                            print(f"step_out['exposure_predict'] = {step_out['exposure_predict']}")
                             self.save_Exposure[step_out['index'].item()] = step_out["exposure_predict"]
                         else:
                             if step_out['index'].item() in  self.save_PSNR:
