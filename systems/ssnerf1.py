@@ -268,6 +268,7 @@ class SSNeRF1System(BaseSystem):
                         out_set_psnr[step_out['index'].item()] = {'psnr': step_out['psnr']}
                         out_set_ssim[step_out['index'].item()] = {'ssim': torch.tensor(step_out['ssim'])}
                         list_delta_exposure.append(step_out["delta_exposure"])
+                        list_exposure.append(step_out["exposure_predict"])
                         num_imgs += 1
                         self.save_PSNR[step_out['index'].item()] = out_set_psnr[step_out['index'].item()]
                         self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
@@ -289,12 +290,11 @@ class SSNeRF1System(BaseSystem):
                             out_set_ssim[index[0].item()] = {'ssim': torch.tensor(step_out['ssim'][oi])}
                             check_ssim[f"r_{step_out['index'].item()}.png"] = {torch.tensor(step_out['ssim'][oi])}
                             list_delta_exposure.append(step_out["delta_exposure"])
+                            list_exposure.append(step_out["exposure_predict"])
                             num_imgs += 1
                             self.save_PSNR[step_out['index'].item()] = out_set_psnr[step_out['index'].item()]
                             self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
-                            print(f"step_out['delta_exposure'] = {step_out['delta_exposure']}")
                             self.save_PE[step_out['index'].item()] = step_out["delta_exposure"]
-                            print(f"step_out['exposure_predict'] = {step_out['exposure_predict']}")
                             self.save_Exposure[step_out['index'].item()] = step_out["exposure_predict"]
                         else:
                             if step_out['index'].item() in  self.save_PSNR:
