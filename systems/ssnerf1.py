@@ -35,6 +35,7 @@ class SSNeRF1System(BaseSystem):
     save_PSNR ={}
     save_SSIM ={}
     save_PE = {}
+    save_Exposure = {}
     def prepare(self):
         self.criterions = {
             'psnr': PSNR(),
@@ -151,13 +152,13 @@ class SSNeRF1System(BaseSystem):
         # # Version 1:
         # total_loss = loss_rgb + k*ex_delta
         # Version 2:
-        if self.epoch > 6000:
+        alpha = 0.01
+        beta = 0.00001
+        if self.epoch > 10000:
             self.is_true = not self.is_true
         if self.is_true:
             total_loss = loss_rgb
         else:
-            alpha = 0.01
-            beta = 0.00001
             total_loss = loss_rgb + alpha*ex_delta + beta*loss_e2
 
         self.log('train/loss_rgb', total_loss)
@@ -241,7 +242,8 @@ class SSNeRF1System(BaseSystem):
             'psnr': psnr,
             'ssim': ssim,
             'index': batch['index'],
-            "delta_exposure": delta_exposure
+            "delta_exposure": delta_exposure,
+            "exposure_predict": exposure_predict,
         }
     
     def validation_epoch_end(self, out):
@@ -253,6 +255,7 @@ class SSNeRF1System(BaseSystem):
             num_imgs = 0
             num_all_imgs = 0
             list_delta_exposure = []
+            list_exposure = []
             for step_out in out:
                 num_all_imgs += 1
                 
@@ -268,12 +271,14 @@ class SSNeRF1System(BaseSystem):
                         self.save_PSNR[step_out['index'].item()] = out_set_psnr[step_out['index'].item()]
                         self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
                         self.save_PE[step_out['index'].item()] = step_out["delta_exposure"]
+                        self.save_Exposure[step_out['index'].item()] = step_out["exposure_predict"]
 
                     else:
                         if step_out['index'].item() in  self.save_PSNR:
                             out_set_psnr[step_out['index'].item()] = self.save_PSNR[step_out['index'].item()]
                             out_set_ssim[step_out['index'].item()] = self.save_SSIM[step_out['index'].item()]
                             list_delta_exposure.append(self.save_PE[step_out['index'].item()])
+                            list_exposure.append(self.save_Exposure[step_out['index'].item()])
                             num_imgs += 1    
                 # DDP
                 else:
@@ -287,11 +292,13 @@ class SSNeRF1System(BaseSystem):
                             self.save_PSNR[step_out['index'].item()] = out_set_psnr[step_out['index'].item()]
                             self.save_SSIM[step_out['index'].item()] = out_set_ssim[step_out['index'].item()]
                             self.save_PE[step_out['index'].item()] = step_out["delta_exposure"]
+                            self.save_Exposure[step_out['index'].item()] = step_out["exposure_predict"]
                         else:
                             if step_out['index'].item() in  self.save_PSNR:
                                 out_set_psnr[step_out['index'].item()] = self.save_PSNR[step_out['index'].item()]
                                 out_set_ssim[step_out['index'].item()] = self.save_SSIM[step_out['index'].item()]
                                 list_delta_exposure.append(self.save_PE[step_out['index'].item()])
+                                list_exposure.append(self.save_Exposure[step_out['index'].item()])
                                 num_imgs += 1  
             
             
@@ -311,11 +318,15 @@ class SSNeRF1System(BaseSystem):
                 ssim_score = torch.mean(list_ssim) 
                 ssim_standard= torch.std(list_ssim) 
 
-                list_delta_exposure = torch.Tensor(list_delta_exposure)
-                mean_exposure = torch.mean(list_delta_exposure)
-                delta_exposure_std = torch.std(list_delta_exposure)
+                # list_delta_exposure = torch.Tensor(list_delta_exposure)
+                # mean_exposure = torch.mean(list_delta_exposure)
+                # delta_exposure_std = torch.std(list_delta_exposure)
+
+                list_exposure = torch.Tensor(list_exposure)
+                mean_exposure = torch.mean(list_exposure)
                 
-                log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} -- std Exposure: {round( delta_exposure_std.item(), 3)} -- mean Exposure {mean_exposure}"
+                log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} --Exposure {mean_exposure}" 
+                # -- std PE: {round( delta_exposure_std.item(), 3)} -- mean PE {mean_exposure}"
                 # for key, value in check_ssim.items():
                 #      print(f"Name dataset: {key} \t SSIM: {value}")
 
