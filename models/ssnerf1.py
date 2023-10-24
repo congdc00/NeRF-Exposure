@@ -106,9 +106,9 @@ class SSNeRF1Model(BaseModel):
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2
         
-        if MODE = 1:
+        if MODE == 1:
             self.is_freeze = not self.is_freeze
-        elif MODE = 2:
+        elif MODE == 2:
             if self.epoch > 10001:
                 self.is_freeze = not self.is_freeze
             else:

@@ -194,10 +194,10 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = torch.mean(torch.abs(loss_e2))
         loss_e2 = torch.exp(loss_e2)
         
-        if MODE = 1:
+        if MODE == 1:
             alpha = 0.001
             total_loss = loss_rgb + alpha*ex_delta
-        elif MODE = 2:
+        elif MODE == 2:
             alpha = 0.01
             beta = 0.00001
             if self.epoch > 10000:
