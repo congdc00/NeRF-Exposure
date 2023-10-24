@@ -2,11 +2,11 @@ import re
 import csv
 
 # Đọc nội dung từ file .txt
-with open("./data/save_result.txt", "r") as file:
+with open("./data/nerf_mre_lr_0001.txt", "r") as file:
     content = file.readlines()
 i = 0
 file_name = "output.csv"
-type_model = "NeRF_MR"  # Mở một file mới để lưu kết quả
+type_model = "NeRF_MRE"  # Mở một file mới để lưu kết quả
 with open(file_name, mode="w", newline="") as file:
     writer = csv.writer(file)
     # Lặp qua từng dòng trong nội dung đọc được

@@ -11,6 +11,8 @@ from systems.utils import update_module_step
 from nerfacc import ContractionType, OccupancyGrid, ray_marching, render_weight_from_density, accumulate_along_rays
 from torch.nn.parallel import DistributedDataParallel
 
+MODE = 2
+
 @models.register('ssnerf1')
 class SSNeRF1Model(BaseModel):
     def setup(self):
@@ -103,14 +105,14 @@ class SSNeRF1Model(BaseModel):
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá r
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2
-
-        # # Version 1:
-        # self.is_freeze = not self.is_freeze
-        # Version 2:
-        if self.epoch > 10001:
+        
+        if MODE = 1:
             self.is_freeze = not self.is_freeze
-        else:
-            bright_ness = torch.full_like(bright_ness, 1.0)
+        elif MODE = 2:
+            if self.epoch > 10001:
+                self.is_freeze = not self.is_freeze
+            else:
+                bright_ness = torch.full_like(bright_ness, 1.0)
             
 
         # network_inp torch.Size([97790, 32])

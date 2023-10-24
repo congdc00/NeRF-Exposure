@@ -16,6 +16,7 @@ from systems.criterions import PSNR, SSIM
 from tabulate import tabulate
 import numpy as np
 
+MODE = 1
 
 def compute_psnr(img1, img2):
     mse = F.mse_loss(img1, img2)
@@ -186,25 +187,25 @@ class SSNeRF1System(BaseSystem):
         ex_template = torch.ones(out["bright_ness"].shape).to(device)
         ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
         ex_delta = torch.mean(ex_delta_matrix)
-        k = 0.001
 
         # loss mean exposure
         mean_exposure_predict = torch.mean(ex_predict)
         loss_e2 = ex_predict / mean_exposure_predict - 1
         loss_e2 = torch.mean(torch.abs(loss_e2))
         loss_e2 = torch.exp(loss_e2)
-
-        # # Version 1:
-        # total_loss = loss_rgb + k*ex_delta
-        # Version 2:
-        alpha = 0.01
-        beta = 0.00001
-        if self.epoch > 10000:
-            self.is_true = not self.is_true
-        if self.is_true:
-            total_loss = loss_rgb
-        else:
-            total_loss = loss_rgb + alpha * ex_delta + beta * loss_e2
+        
+        if MODE = 1:
+            alpha = 0.001
+            total_loss = loss_rgb + alpha*ex_delta
+        elif MODE = 2:
+            alpha = 0.01
+            beta = 0.00001
+            if self.epoch > 10000:
+                self.is_true = not self.is_true
+            if self.is_true:
+                total_loss = loss_rgb
+            else:
+                total_loss = loss_rgb + alpha * ex_delta + beta * loss_e2
 
         self.log("train/loss_rgb", total_loss)
         loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
@@ -434,6 +435,8 @@ class SSNeRF1System(BaseSystem):
 
                 list_exposure = torch.Tensor(list_exposure)
                 mean_exposure = torch.mean(list_exposure)
+                max_exposure, max_index = torch.max(list_exposure)
+                min_exposure, min_index = torch.min(list_exposure, dim = 0)
                 log_text = f"Validation on {num_imgs}/{num_all_imgs} images"
                 # -- std PE: {round( delta_exposure_std.item(), 3)} -- mean PE {mean_exposure}"
                 # for key, value in check_ssim.items():
@@ -447,7 +450,10 @@ class SSNeRF1System(BaseSystem):
                 "val/psnr", psnr, prog_bar=True, rank_zero_only=True, sync_dist=True
             )
             print(
-                "/nstandard PSNR: {psnr_standard} /nSSIM {ssim_score} -- std SSIM: {ssim_standard} /n mean_Exposure {mean_exposure} /nPE {mean_pe} /nStd PE {std_pe}"
+                "/nstandard PSNR: {psnr_standard} \
+                    /nSSIM {ssim_score} -- std SSIM: {ssim_standard} \
+                    /n mean_Exposure {mean_exposure} -- max Exposure {max_exposure} -- min Exposure {min_exposure} \
+                    /nPE {mean_pe} -- Std PE {std_pe}"
             )
 
     def test_step(self, batch, batch_idx):
