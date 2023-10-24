@@ -186,7 +186,6 @@ class ENeuSModel(BaseModel):
         rgb = self.texture_bg(True, feature, positions)
         bright_ness = self.shutter_speed(True, rays_o) * 2
 
-        print(f"chay o day------ \n")
 
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays)
         opacity = accumulate_along_rays(weights, ray_indices, values=None, n_rays=n_rays)
