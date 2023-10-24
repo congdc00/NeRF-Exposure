@@ -452,7 +452,7 @@ class SSNeRF1System(BaseSystem):
             print(
                 f"/nstandard PSNR: {psnr_standard} \
                     /nSSIM {ssim_score} -- std SSIM: {ssim_standard} \
-                    /n mean_Exposure {mean_exposure} -- max Exposure {max_exposure} -- min Exposure {min_exposure} \
+                    /n mean_Exposure {mean_exposure:.4f} -- max Exposure {max_exposure:.4f} -- min Exposure {min_exposure:.4f} \
                     /nPE {mean_pe} -- Std PE {std_pe}"
             )
 
