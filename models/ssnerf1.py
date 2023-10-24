@@ -11,7 +11,7 @@ from systems.utils import update_module_step
 from nerfacc import ContractionType, OccupancyGrid, ray_marching, render_weight_from_density, accumulate_along_rays
 from torch.nn.parallel import DistributedDataParallel
 
-MODE = 2
+MODE = 1
 
 @models.register('ssnerf1')
 class SSNeRF1Model(BaseModel):
@@ -109,7 +109,7 @@ class SSNeRF1Model(BaseModel):
         if MODE == 1:
             self.is_freeze = not self.is_freeze
         elif MODE == 2:
-            if self.epoch > 10001:
+            if self.epoch > 20001:
                 self.is_freeze = not self.is_freeze
             else:
                 bright_ness = torch.full_like(bright_ness, 1.0)
