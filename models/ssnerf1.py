@@ -11,7 +11,7 @@ from systems.utils import update_module_step
 from nerfacc import ContractionType, OccupancyGrid, ray_marching, render_weight_from_density, accumulate_along_rays
 from torch.nn.parallel import DistributedDataParallel
 
-MODE = 1
+MODE = 2
 
 @models.register('ssnerf1')
 class SSNeRF1Model(BaseModel):

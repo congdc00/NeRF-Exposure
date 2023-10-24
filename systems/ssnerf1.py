@@ -15,7 +15,7 @@ from systems.base import BaseSystem
 from systems.criterions import PSNR, SSIM
 from tabulate import tabulate
 import numpy as np
-MODE = 1
+MODE = 2
 def compute_psnr(img1, img2):
     mse = F.mse_loss(img1, img2)
     if mse == 0:
@@ -154,7 +154,7 @@ class SSNeRF1System(BaseSystem):
         else: 
             alpha = 0.01
             beta = 0.00001
-            if self.epoch > 10000:
+            if self.epoch > 20000:
                 self.is_true = not self.is_true
             if self.is_true:
                 total_loss = loss_rgb
