@@ -435,7 +435,7 @@ class SSNeRF1System(BaseSystem):
 
                 list_exposure = torch.Tensor(list_exposure)
                 mean_exposure = torch.mean(list_exposure)
-                max_exposure, max_index = torch.max(list_exposure)
+                max_exposure, max_index = torch.max(list_exposure, dim = 0)
                 min_exposure, min_index = torch.min(list_exposure, dim = 0)
                 log_text = f"Validation on {num_imgs}/{num_all_imgs} images"
                 # -- std PE: {round( delta_exposure_std.item(), 3)} -- mean PE {mean_exposure}"
