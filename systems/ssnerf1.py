@@ -450,7 +450,7 @@ class SSNeRF1System(BaseSystem):
                 "val/psnr", psnr, prog_bar=True, rank_zero_only=True, sync_dist=True
             )
             print(
-                "/nstandard PSNR: {psnr_standard} \
+                f"/nstandard PSNR: {psnr_standard} \
                     /nSSIM {ssim_score} -- std SSIM: {ssim_standard} \
                     /n mean_Exposure {mean_exposure} -- max Exposure {max_exposure} -- min Exposure {min_exposure} \
                     /nPE {mean_pe} -- Std PE {std_pe}"
