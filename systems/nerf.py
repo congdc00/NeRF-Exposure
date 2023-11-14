@@ -39,20 +39,20 @@ class NeRFSystem(BaseSystem):
         return self.model(batch['rays'])
     
     def preprocess_data(self, batch, stage):
-        logger.info(f"Preprocess data")
+        # logger.info(f"Preprocess data")
         if 'index' in batch: # validation / testing
             index = batch['index']
-            print(f" index in batch {index}")
+            # print(f" index in batch {index}")
         else:
             if self.config.model.batch_image_sampling:
-                print(f"self.train_num_rays {self.train_num_rays}")
-                print(f"self.config.model.batch_image_sampling {self.config.model.batch_image_sampling}")
+                # print(f"self.train_num_rays {self.train_num_rays}")
+                # print(f"self.config.model.batch_image_sampling {self.config.model.batch_image_sampling}")
                 index = torch.randint(0, len(self.dataset.all_images), size=(self.train_num_rays,), device=self.dataset.all_images.device)
             else:
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)    
-            print(f"Prepare {len(index)} images with index {index}")
+            # print(f"Prepare {len(index)} images with index {index}")
         if stage in ['train']:
-            print(f"train Mode")
+            # print(f"train Mode")
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
             # Khởi tạo meshgrid
             x = torch.randint(
