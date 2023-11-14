@@ -197,7 +197,7 @@ class NeRFSystem(BaseSystem):
             cv2.imwrite("predict_image_new.png", img_predict)
 
             # chuyen ve dang chuan 
-            img_predict = TF.to_tensor(img_predict).permute(1, 2, 0)[...,:3]
+            img_predict = TF.to_tensor(img_predict/255).permute(1, 2, 0)[...,:3]
             img_predict = img_predict.to(self.rank)
             img_predict = img_predict.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
             print(f"image_predict {torch.max(image_predict)} and img_predict {torch.max(img_predict)}")
