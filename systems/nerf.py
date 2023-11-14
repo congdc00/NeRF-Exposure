@@ -183,8 +183,8 @@ class NeRFSystem(BaseSystem):
         else:
             img_target = cv2.cvtColor(image_origin.view(H, W, 3).cpu().numpy() * 255, cv2.COLOR_RGB2BGR)
             img_predict= cv2.cvtColor(image_predict.view(H, W, 3).cpu().numpy() * 255, cv2.COLOR_RGB2BGR)
-            cv2.imwrite("target_images.png", img_target)
-            cv2.imwrite("predict_images.png", img_predict)
+            # cv2.imwrite("target_images.png", img_target)
+            # cv2.imwrite("predict_images.png", img_predict)
             
             gray_img_predict = cv2.cvtColor(img_predict, cv2.COLOR_BGR2GRAY)
             gray_img_target = cv2.cvtColor(img_target, cv2.COLOR_BGR2GRAY)
@@ -195,13 +195,13 @@ class NeRFSystem(BaseSystem):
             # Áp dụng sự chênh lệch để cân bằng độ sáng của ảnh gốc
             img_predict = cv2.addWeighted(img_predict, 1, np.zeros_like(img_predict), 0, brightness_diff)
             # img_predict = np.clip(img_predict, 0, 255)
-            cv2.imwrite("predict_image_new.png", img_predict)
+            # cv2.imwrite("predict_image_new.png", img_predict)
 
             # chuyen ve dang chuan 
             img_predict = TF.to_tensor(img_predict/np.max(img_predict)).permute(1, 2, 0)[...,:3]
             img_predict = img_predict.to(self.rank)
             img_predict = img_predict.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
-            print(f"image_predict {torch.max(image_predict)} and img_predict {torch.max(img_predict)}")
+            # print(f"image_predict {torch.max(image_predict)} and img_predict {torch.max(img_predict)}")
 
             
 
