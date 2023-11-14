@@ -85,7 +85,7 @@ class NeRFSystem(BaseSystem):
             #them cho colmap
             rgb = self.dataset.all_images[index.to('cpu')]
             new_rgb = rgb.squeeze().numpy().shape
-            print(f"validation Mode {index['index']}")
+            print(f"validation Mode {index}")
             image = Image.fromarray(new_rgb)
             image.save('test.png')
 
