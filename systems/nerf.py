@@ -15,6 +15,9 @@ from loguru import logger
 import numpy as np
 from PIL import Image
 import cv2
+
+MODE_VAL = 1 # 0: normal (val), 1: no val
+
 @systems.register('nerf-system')
 class NeRFSystem(BaseSystem):
     """
@@ -173,12 +176,27 @@ class NeRFSystem(BaseSystem):
             }
         
         image_origin = batch['rgb'] 
-        img_target = batch['rgb'].view(H, W, 3).cpu().numpy() * 255
-        cv2.imwrite("target_images.png", cv2.cvtColor(img_target, cv2.COLOR_RGB2BGR))
-
         image_predict = out['comp_rgb']
-        img_predict= image_predict.view(H, W, 3).cpu().numpy() * 255
-        cv2.imwrite("predict_images.png", cv2.cvtColor(img_predict, cv2.COLOR_RGB2BGR))
+
+        if MODE_VAL ==0 :
+            pass
+        else:
+            img_target = image_origin.view(H, W, 3).cpu().numpy() * 255
+            img_predict= image_predict.view(H, W, 3).cpu().numpy() * 255
+            cv2.imwrite("target_images.png", cv2.cvtColor(img_target, cv2.COLOR_RGB2BGR))
+            cv2.imwrite("predict_images.png", cv2.cvtColor(img_predict, cv2.COLOR_RGB2BGR))
+            
+            gray_img_predict = cv2.cvtColor(img_predict, cv2.COLOR_BGR2GRAY)
+            gray_img_target = cv2.cvtColor(img_target, cv2.COLOR_BGR2GRAY)
+
+            # Tính toán sự chênh lệch độ sáng giữa hai ảnh
+            brightness_diff = np.mean(gray_img_target) - np.mean(gray_img_predict)
+
+            # Áp dụng sự chênh lệch để cân bằng độ sáng của ảnh gốc
+            balanced_image = cv2.addWeighted(gray_img_predict, 1, np.zeros_like(gray_img_predict), 0, brightness_diff)
+            cv2.imwrite("target_images (new).png", img_target)
+
+            
 
         # print(f"image_predict.shape {image_predict.shape}")
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
