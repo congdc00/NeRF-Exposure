@@ -173,7 +173,7 @@ class NeRFSystem(BaseSystem):
             }
         
         image_origin = batch['rgb'] 
-        print(f"img origin {image_origin.shape}")
+        print(f"img origin {image_origin.view(H, W, 3).shape}")
         cv2.imwrite("test.png", batch['rgb'].view(H, W, 3))
         image_predict = out['comp_rgb']
 
