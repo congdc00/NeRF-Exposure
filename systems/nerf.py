@@ -85,7 +85,6 @@ class NeRFSystem(BaseSystem):
             print(f"rgb.shape 1 {rgb.shape}")
             print(f"validation Mode {index}")
             rgb = rgb.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
-            print(f"rgb {rgb.shape}")
             rgb = rgb.to(self.rank)
             fg_mask = self.dataset.all_fg_masks[index.to('cpu')].view(-1).to(self.rank)
         
