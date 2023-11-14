@@ -87,7 +87,7 @@ class NeRFSystem(BaseSystem):
             new_rgb = rgb.squeeze().numpy()*255
             idx = index.item()
             print(f"gia tri max {np.max(new_rgb)}")
-            cv2.imwrite(f"{idx}.jpg", new_rgb)
+            cv2.imwrite(f"{idx}.jpg", cv2.cvtColor(new_rgb, cv2.COLOR_RGB2BGR))
             
             rgb = rgb.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
             rgb = rgb.to(self.rank)
