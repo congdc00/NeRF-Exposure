@@ -181,10 +181,10 @@ class NeRFSystem(BaseSystem):
         if MODE_VAL ==0 :
             pass
         else:
-            img_target = image_origin.view(H, W, 3).cpu().numpy() * 255
-            img_predict= image_predict.view(H, W, 3).cpu().numpy() * 255
-            cv2.imwrite("target_images.png", cv2.cvtColor(img_target, cv2.COLOR_RGB2BGR))
-            cv2.imwrite("predict_images.png", cv2.cvtColor(img_predict, cv2.COLOR_RGB2BGR))
+            img_target = cv2.cvtColor(image_origin.view(H, W, 3).cpu().numpy() * 255, cv2.COLOR_RGB2BGR)
+            img_predict= cv2.cvtColor(image_predict.view(H, W, 3).cpu().numpy() * 255, cv2.COLOR_RGB2BGR)
+            cv2.imwrite("target_images.png", img_target)
+            cv2.imwrite("predict_images.png", img_predict)
             
             gray_img_predict = cv2.cvtColor(img_predict, cv2.COLOR_BGR2GRAY)
             gray_img_target = cv2.cvtColor(img_target, cv2.COLOR_BGR2GRAY)
