@@ -39,7 +39,7 @@ class NeRFSystem(BaseSystem):
         return self.model(batch['rays'])
     
     def preprocess_data(self, batch, stage):
-        logger.info(f"Preprocess data {index}")
+        logger.info(f"Preprocess data")
         if 'index' in batch: # validation / testing
             index = batch['index']
             print(f"index {index}")
