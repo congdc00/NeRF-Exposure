@@ -13,6 +13,8 @@ from systems.base import BaseSystem
 from systems.criterions import PSNR
 from loguru import logger
 import numpy as np
+from PIL import Image
+
 @systems.register('nerf-system')
 class NeRFSystem(BaseSystem):
     """
@@ -82,8 +84,11 @@ class NeRFSystem(BaseSystem):
 
             #them cho colmap
             rgb = self.dataset.all_images[index.to('cpu')]
-            print(f"rgb.shape 1 {rgb.squeeze().numpy().shape}")
-            print(f"validation Mode {index}")
+            new_rgb = rgb.squeeze().numpy().shape
+            print(f"validation Mode {index["index"].item()}")
+            image = Image.fromarray(new_rgb)
+            image.save('test.png')
+
             rgb = rgb.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
             rgb = rgb.to(self.rank)
             fg_mask = self.dataset.all_fg_masks[index.to('cpu')].view(-1).to(self.rank)
