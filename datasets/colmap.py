@@ -206,6 +206,7 @@ class ColmapDatasetBase():
                     else:
                         mask = torch.ones_like(img[...,0], device=img.device)
                     all_fg_masks.append(mask) # (h, w)
+                    print(f"img_data {img.shape}")
                     all_images.append(img)
                     
                         
