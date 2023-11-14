@@ -194,7 +194,7 @@ class NeRFSystem(BaseSystem):
 
             # Áp dụng sự chênh lệch để cân bằng độ sáng của ảnh gốc
             balanced_image = cv2.addWeighted(gray_img_predict, 1, np.zeros_like(gray_img_predict), 0, brightness_diff)
-            cv2.imwrite("target_images (new).png", balanced_image)
+            cv2.imwrite("predict_image_new.png", balanced_image)
 
             
 
