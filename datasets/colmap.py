@@ -184,6 +184,10 @@ class ColmapDatasetBase():
                 c2w = torch.from_numpy(np.concatenate([R.T, -R.T@t], axis=1)).float()
                 c2w[:,1:3] *= -1. # COLMAP => OpenGL
                 all_c2w.append(c2w)
+
+                #test
+                print(f"self.split {self.split}")
+
                 if self.split in ['train', 'val']:
                     img_path = os.path.join(self.config.root_dir, 'images', d.name)
                     img = Image.open(img_path)
@@ -201,6 +205,10 @@ class ColmapDatasetBase():
                         mask = torch.ones_like(img[...,0], device=img.device)
                     all_fg_masks.append(mask) # (h, w)
                     all_images.append(img)
+                    
+                    #test
+                    if i == 0:
+                        img.save("test.png")
 
                     k = float(1.0)
                     exposure_factor = torch.Tensor([k]) 
