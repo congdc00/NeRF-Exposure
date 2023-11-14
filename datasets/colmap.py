@@ -191,7 +191,7 @@ class ColmapDatasetBase():
 
                 if self.split in ['train', 'val']:
                     img_path = os.path.join(self.config.root_dir, 'images', d.name)
-                    print(f"img {img_path}")
+                    # ./load/nerf_synthetic/new_buffalo_2/images/IMG_8999.CR2
 
                     # img train
                     img = Image.open(img_path)
