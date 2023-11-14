@@ -86,7 +86,7 @@ class NeRFSystem(BaseSystem):
             rgb = self.dataset.all_images[index.to('cpu')]
             new_rgb = rgb.squeeze().numpy()
             idx = index.item()
-            import cv2
+            print(f"gia tri max {np.max(new_rgb)}")
             cv2.imwrite(f"{idx}.jpg", new_rgb)
             
             rgb = rgb.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
