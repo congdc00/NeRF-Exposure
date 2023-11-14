@@ -86,11 +86,8 @@ class NeRFSystem(BaseSystem):
             rgb = self.dataset.all_images[index.to('cpu')]
             new_rgb = rgb.squeeze().numpy()
             idx = index.item()
-            print(new_rgb.shape)
-            import torchvision.transforms as transforms
-            image = transforms.ToPILImage()(rgb.squeeze())
-            # image = Image.fromarray(new_rgb)
-            image.save(f'{idx}.png')
+            import cv2
+            cv2.imwrite(f"{idx}.jpg", new_rgb)
             
             rgb = rgb.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
             rgb = rgb.to(self.rank)
