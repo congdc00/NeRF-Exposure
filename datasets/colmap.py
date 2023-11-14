@@ -16,6 +16,7 @@ from datasets.colmap_utils import \
 from models.ray_utils import get_ray_directions
 from utils.misc import get_rank
 
+MODE_VAL = True
 
 def get_center(pts):
     center = pts.mean(0)
@@ -176,7 +177,7 @@ class ColmapDatasetBase():
             has_mask = os.path.exists(mask_dir) # TODO: support partial masks
             apply_mask = has_mask and self.config.apply_mask
             
-            all_c2w, all_images, all_fg_masks, all_factor = [], [], [], []
+            all_c2w, all_images, all_images_val, all_fg_masks, all_factor = [], [], [], [], []
             
             # print(f"self.split {self.split} - {len(imdata.values())} images")
             for i, d in enumerate(imdata.values()):
@@ -190,12 +191,15 @@ class ColmapDatasetBase():
 
                 if self.split in ['train', 'val']:
                     img_path = os.path.join(self.config.root_dir, 'images', d.name)
-                    #print(f"img {img_path}")
+                    print(f"img {img_path}")
 
+                    # img train
                     img = Image.open(img_path)
                     img = img.resize(img_wh, Image.BICUBIC)
                     img = TF.to_tensor(img).permute(1, 2, 0)[...,:3]
                     img = img.to(self.rank) if self.config.load_data_on_gpu else img.cpu()
+                    
+                    # mask
                     if has_mask:
                         mask_paths = [os.path.join(mask_dir, d.name), os.path.join(mask_dir, d.name[3:])]
                         mask_paths = list(filter(os.path.exists, mask_paths))
@@ -205,8 +209,17 @@ class ColmapDatasetBase():
                         mask = TF.to_tensor(mask)[0]
                     else:
                         mask = torch.ones_like(img[...,0], device=img.device)
+
+                    # img val
+                    if MODE_VAL:
+                        img_val_path = img_path
+                        img_val = Image.open(img_val_path)
+                        img_val = img_val.resize(img_wh, Image.BICUBIC)
+                        img_val = TF.to_tensor(img_val).permute(1, 2, 0)[...,:3]
+                        img_val = img_val.to(self.rank) if self.config.load_data_on_gpu else img_val.cpu()
+                        all_images_val.append(img_val)
+
                     all_fg_masks.append(mask) # (h, w)
-                    # print(f"img_data {img.shape}")
                     all_images.append(img)
                     
                         
@@ -233,6 +246,7 @@ class ColmapDatasetBase():
                 'pts3d': pts3d,
                 'all_c2w': all_c2w,
                 'all_images': all_images,
+                'all_images_val': all_images_val,
                 'all_fg_masks': all_fg_masks,
                 'all_factor': all_factor,
             }
@@ -245,9 +259,10 @@ class ColmapDatasetBase():
         if self.split == 'test':
             self.all_c2w = create_spheric_poses(self.all_c2w[:,:,3], n_steps=self.config.n_test_traj_steps)
             self.all_images = torch.zeros((self.config.n_test_traj_steps, self.h, self.w, 3), dtype=torch.float32)
+            self.all_images_val = torch.zeros((self.config.n_test_traj_steps, self.h, self.w, 3), dtype=torch.float32)
             self.all_fg_masks = torch.zeros((self.config.n_test_traj_steps, self.h, self.w), dtype=torch.float32)
         else:
-            self.all_images, self.all_fg_masks = torch.stack(self.all_images, dim=0).float(), torch.stack(self.all_fg_masks, dim=0).float()
+            self.all_images_val, self.all_images, self.all_fg_masks = torch.stack(self.all_images, dim=0).float(), torch.stack(self.all_images, dim=0).float(), torch.stack(self.all_fg_masks, dim=0).float()
 
         """
         # for debug use
@@ -280,6 +295,7 @@ class ColmapDatasetBase():
         self.all_c2w = self.all_c2w.float().to(self.rank)
         if self.config.load_data_on_gpu:
             self.all_images = self.all_images.to(self.rank) 
+            self.all_images_val = self.all_images_val.to(self.rank) 
             self.all_fg_masks = self.all_fg_masks.to(self.rank)
         
 
