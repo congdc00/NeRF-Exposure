@@ -84,7 +84,7 @@ class NeRFSystem(BaseSystem):
 
             #them cho colmap
             rgb = self.dataset.all_images[index.to('cpu')]
-            new_rgb = rgb.squeeze().numpy().shape
+            new_rgb = rgb.squeeze().numpy()
             idx = index.item()
             print(new_rgb.shape)
             image = Image.fromarray(new_rgb)
