@@ -178,7 +178,7 @@ class ColmapDatasetBase():
             
             all_c2w, all_images, all_fg_masks, all_factor = [], [], [], []
             
-            print(f"self.split {self.split} - {len(imdata.values())} images")
+            # print(f"self.split {self.split} - {len(imdata.values())} images")
             for i, d in enumerate(imdata.values()):
                 R = d.qvec2rotmat()
                 t = d.tvec.reshape(3, 1)
@@ -190,7 +190,7 @@ class ColmapDatasetBase():
 
                 if self.split in ['train', 'val']:
                     img_path = os.path.join(self.config.root_dir, 'images', d.name)
-                    print(f"img {img_path}")
+                    #print(f"img {img_path}")
 
                     img = Image.open(img_path)
                     img = img.resize(img_wh, Image.BICUBIC)
@@ -206,7 +206,7 @@ class ColmapDatasetBase():
                     else:
                         mask = torch.ones_like(img[...,0], device=img.device)
                     all_fg_masks.append(mask) # (h, w)
-                    print(f"img_data {img.shape}")
+                    # print(f"img_data {img.shape}")
                     all_images.append(img)
                     
                         

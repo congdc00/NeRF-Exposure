@@ -173,11 +173,11 @@ class NeRFSystem(BaseSystem):
             }
         
         image_origin = batch['rgb'] 
-        print(f"img origin {image_origin.view(H, W, 3).cpu().numpy().shape}")
+        # print(f"img origin {image_origin.view(H, W, 3).cpu().numpy().shape}")
         cv2.imwrite("test.png", batch['rgb'].view(H, W, 3).cpu().numpy())
         image_predict = out['comp_rgb']
 
-        print(f"image_predict.shape {image_predict.shape}")
+        # print(f"image_predict.shape {image_predict.shape}")
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
 
         image_array1 = image_predict.view(H, W, 3).cpu().numpy()
