@@ -15,7 +15,7 @@ from loguru import logger
 import numpy as np
 from PIL import Image
 import cv2
-
+import torchvision.transforms.functional as TF
 MODE_VAL = 1 # 0: normal (val), 1: no val
 
 @systems.register('nerf-system')
@@ -89,8 +89,8 @@ class NeRFSystem(BaseSystem):
             rgb = self.dataset.all_images[index.to('cpu')]
 
             # luu anh dung de validation 
-            new_rgb = rgb.squeeze().numpy()*255
-            idx = index.item()
+            # new_rgb = rgb.squeeze().numpy()*255
+            # idx = index.item()
             # cv2.imwrite(f"{idx}.jpg", cv2.cvtColor(new_rgb, cv2.COLOR_RGB2BGR))
             
             rgb = rgb.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
@@ -193,8 +193,14 @@ class NeRFSystem(BaseSystem):
             brightness_diff = np.mean(gray_img_target) - np.mean(gray_img_predict)
 
             # Áp dụng sự chênh lệch để cân bằng độ sáng của ảnh gốc
-            balanced_image = cv2.addWeighted(img_predict, 1, np.zeros_like(img_predict), 0, brightness_diff)
-            cv2.imwrite("predict_image_new.png", balanced_image)
+            img_predict = cv2.addWeighted(img_predict, 1, np.zeros_like(img_predict), 0, brightness_diff)
+            cv2.imwrite("predict_image_new.png", img_predict)
+
+            # chuyen ve dang chuan 
+            img_predict = TF.to_tensor(img_predict).permute(1, 2, 0)[...,:3]
+            img_predict = img_predict.to(self.rank) if self.config.load_data_on_gpu else img.cpu()
+            img_predict = img_predict.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
+            img_predict = img_predict.to(self.rank)
 
             
 
