@@ -45,6 +45,7 @@ class NeRFSystem(BaseSystem):
             print(f" index in batch {index}")
         else:
             if self.config.model.batch_image_sampling:
+                print(f"run here")
                 index = torch.randint(0, len(self.dataset.all_images), size=(self.train_num_rays,), device=self.dataset.all_images.device)
             else:
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)    
