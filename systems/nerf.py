@@ -52,6 +52,7 @@ class NeRFSystem(BaseSystem):
                 index = torch.randint(0, len(self.dataset.all_images), size=(1,), device=self.dataset.all_images.device)    
             print(f"Prepare {len(index)} images with index {index}")
         if stage in ['train']:
+            print(f"train Mode")
             c2w = self.dataset.all_c2w[index] # Lấy thông tin file transform
             # Khởi tạo meshgrid
             x = torch.randint(
@@ -71,6 +72,7 @@ class NeRFSystem(BaseSystem):
             rgb = self.dataset.all_images[index, y, x].view(-1, self.dataset.all_images.shape[-1]).to(self.rank) # Khởi tạo nhãn
             fg_mask = self.dataset.all_fg_masks[index, y, x].view(-1).to(self.rank)
         else:
+            print(f"validation Mode")
             c2w = self.dataset.all_c2w[index][0]
             if self.dataset.directions.ndim == 3: # (H, W, 3)
                 directions = self.dataset.directions
