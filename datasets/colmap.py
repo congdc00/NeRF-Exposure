@@ -212,7 +212,7 @@ class ColmapDatasetBase():
 
                     # img val
                     if MODE_VAL:
-                        img_val_path = img_path
+                        img_val_path = img_path.replace("images", "val")
                         img_val = Image.open(img_val_path)
                         img_val = img_val.resize(img_wh, Image.BICUBIC)
                         img_val = TF.to_tensor(img_val).permute(1, 2, 0)[...,:3]
