@@ -88,7 +88,7 @@ class NeRFSystem(BaseSystem):
             idx = index.item()
             print(new_rgb.shape)
             import torchvision.transforms as transforms
-            image = transforms.ToPILImage(rgb.squeeze())
+            image = transforms.ToPILImage()(rgb.squeeze())
             # image = Image.fromarray(new_rgb)
             image.save(f'{idx}.png')
             
