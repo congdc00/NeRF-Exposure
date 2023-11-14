@@ -191,6 +191,7 @@ class ColmapDatasetBase():
                 if self.split in ['train', 'val']:
                     img_path = os.path.join(self.config.root_dir, 'images', d.name)
                     img = Image.open(img_path)
+                    img.save("test.png")
                     img = img.resize(img_wh, Image.BICUBIC)
                     img = TF.to_tensor(img).permute(1, 2, 0)[...,:3]
                     img = img.to(self.rank) if self.config.load_data_on_gpu else img.cpu()
@@ -206,9 +207,6 @@ class ColmapDatasetBase():
                     all_fg_masks.append(mask) # (h, w)
                     all_images.append(img)
                     
-                    #test
-                    if i == 0:
-                        print(f"img {img.shape}")
                         
 
                     k = float(1.0)
