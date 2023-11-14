@@ -16,7 +16,7 @@ from datasets.colmap_utils import \
 from models.ray_utils import get_ray_directions
 from utils.misc import get_rank
 
-MODE_VAL = False
+MODE_VAL = True
 
 def get_center(pts):
     center = pts.mean(0)
