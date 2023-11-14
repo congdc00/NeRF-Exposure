@@ -84,7 +84,7 @@ class NeRFSystem(BaseSystem):
 
             #them cho colmap
             rgb = self.dataset.all_images[index.to('cpu')]
-            new_rgb = rgb.squeeze().numpy()
+            new_rgb = rgb.squeeze().numpy()*255
             idx = index.item()
             print(f"gia tri max {np.max(new_rgb)}")
             cv2.imwrite(f"{idx}.jpg", new_rgb)
