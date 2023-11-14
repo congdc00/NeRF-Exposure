@@ -193,7 +193,7 @@ class NeRFSystem(BaseSystem):
             brightness_diff = np.mean(gray_img_target) - np.mean(gray_img_predict)
 
             # Áp dụng sự chênh lệch để cân bằng độ sáng của ảnh gốc
-            balanced_image = cv2.addWeighted(img_target, 1, np.zeros_like(img_target), 0, brightness_diff)
+            balanced_image = cv2.addWeighted(img_predict, 1, np.zeros_like(img_predict), 0, brightness_diff)
             cv2.imwrite("predict_image_new.png", balanced_image)
 
             
