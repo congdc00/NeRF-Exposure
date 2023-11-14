@@ -208,7 +208,8 @@ class ColmapDatasetBase():
                     
                     #test
                     if i == 0:
-                        img.save("test.png")
+                        print(f"img {img.shape}")
+                        
 
                     k = float(1.0)
                     exposure_factor = torch.Tensor([k]) 
