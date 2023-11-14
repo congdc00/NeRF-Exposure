@@ -177,6 +177,8 @@ class ColmapDatasetBase():
             apply_mask = has_mask and self.config.apply_mask
             
             all_c2w, all_images, all_fg_masks, all_factor = [], [], [], []
+            
+            print(f"self.split {self.split}")
 
             for i, d in enumerate(imdata.values()):
                 R = d.qvec2rotmat()
@@ -186,12 +188,12 @@ class ColmapDatasetBase():
                 all_c2w.append(c2w)
 
                 #test
-                print(f"self.split {self.split}")
 
                 if self.split in ['train', 'val']:
                     img_path = os.path.join(self.config.root_dir, 'images', d.name)
+                    print(f"img {img_path}")
+
                     img = Image.open(img_path)
-                    img.save("test.png")
                     img = img.resize(img_wh, Image.BICUBIC)
                     img = TF.to_tensor(img).permute(1, 2, 0)[...,:3]
                     img = img.to(self.rank) if self.config.load_data_on_gpu else img.cpu()
