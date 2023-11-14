@@ -84,9 +84,10 @@ class NeRFSystem(BaseSystem):
 
             #them cho colmap
             rgb = self.dataset.all_images[index.to('cpu')]
+
+            # luu anh dung de validation 
             new_rgb = rgb.squeeze().numpy()*255
             idx = index.item()
-            print(f"gia tri max {np.max(new_rgb)}")
             cv2.imwrite(f"{idx}.jpg", cv2.cvtColor(new_rgb, cv2.COLOR_RGB2BGR))
             
             rgb = rgb.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
@@ -172,7 +173,9 @@ class NeRFSystem(BaseSystem):
             }
         
         image_origin = batch['rgb'] 
+        print(f"image_origin.shape {image_origin.shape}")
         image_predict = out['comp_rgb']
+        print(f"image_predict.shape {image_predict.shape}")
         psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
 
         image_array1 = image_predict.view(H, W, 3).cpu().numpy()
