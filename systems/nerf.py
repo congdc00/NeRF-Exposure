@@ -88,7 +88,7 @@ class NeRFSystem(BaseSystem):
             # luu anh dung de validation 
             new_rgb = rgb.squeeze().numpy()*255
             idx = index.item()
-            cv2.imwrite(f"{idx}.jpg", cv2.cvtColor(new_rgb, cv2.COLOR_RGB2BGR))
+            # cv2.imwrite(f"{idx}.jpg", cv2.cvtColor(new_rgb, cv2.COLOR_RGB2BGR))
             
             rgb = rgb.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
             rgb = rgb.to(self.rank)
@@ -174,7 +174,9 @@ class NeRFSystem(BaseSystem):
         
         image_origin = batch['rgb'] 
         # print(f"img origin {image_origin.view(H, W, 3).cpu().numpy().shape}")
-        cv2.imwrite("test.png", batch['rgb'].view(H, W, 3).cpu().numpy() * 255)
+        img_target = batch['rgb'].view(H, W, 3).cpu().numpy() * 255
+        
+        cv2.imwrite("target_images.png", cv2.cvtColor(img_target, cv2.COLOR_RGB2BGR))
         image_predict = out['comp_rgb']
 
         # print(f"image_predict.shape {image_predict.shape}")
