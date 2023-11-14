@@ -198,7 +198,7 @@ class NeRFSystem(BaseSystem):
 
             # chuyen ve dang chuan 
             img_predict = TF.to_tensor(img_predict).permute(1, 2, 0)[...,:3]
-            img_predict = img_predict.to(self.rank) if self.config.load_data_on_gpu else img.cpu()
+            img_predict = img_predict.to(self.rank) if self.config.load_data_on_gpu else img_predict.cpu()
             img_predict = img_predict.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
             img_predict = img_predict.to(self.rank)
 
