@@ -178,8 +178,7 @@ class ColmapDatasetBase():
             
             all_c2w, all_images, all_fg_masks, all_factor = [], [], [], []
             
-            print(f"self.split {self.split}")
-
+            print(f"self.split {self.split} - {len(imdata.values())} images")
             for i, d in enumerate(imdata.values()):
                 R = d.qvec2rotmat()
                 t = d.tvec.reshape(3, 1)
