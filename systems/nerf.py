@@ -200,8 +200,7 @@ class NeRFSystem(BaseSystem):
             img_predict = TF.to_tensor(img_predict).permute(1, 2, 0)[...,:3]
             img_predict = img_predict.to(self.rank)
             img_predict = img_predict.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
-            print(f"max {torch.max(img_predict)}")
-            print(f"image_predict {image_predict.shape} and img_predict {img_predict.shape}")
+            print(f"image_predict {torch.max(image_predict)} and img_predict {torch.max(img_predict)}")
 
             
 
