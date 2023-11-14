@@ -2,9 +2,9 @@ import re
 import csv
 
 # Đọc nội dung từ file .txt
-with open("./data/nerf.txt", "r") as file:
+with open("./data/nerf_mr_random.txt", "r") as file:
     content = file.readlines()
-i = 0
+i = 1
 file_name = "output.csv"
 type_model = "NeRF_MR"  # Mở một file mới để lưu kết quả
 with open(file_name, mode="w", newline="") as file:
@@ -88,4 +88,6 @@ with open(file_name, mode="w", newline="") as file:
                     )
 
             else:
-                i = 0
+                i = 1
+                
+
