@@ -85,9 +85,10 @@ class NeRFSystem(BaseSystem):
             #them cho colmap
             rgb = self.dataset.all_images[index.to('cpu')]
             new_rgb = rgb.squeeze().numpy().shape
-            print(f"validation Mode {index.item()}")
+            idx = index.item()
+            print(new_rgb.shape)
             image = Image.fromarray(new_rgb)
-            image.save('test.png')
+            image.save(f'{idx}.png')
 
             rgb = rgb.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
             rgb = rgb.to(self.rank)
