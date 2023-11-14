@@ -14,7 +14,7 @@ from systems.criterions import PSNR
 from loguru import logger
 import numpy as np
 from PIL import Image
-
+import cv2
 @systems.register('nerf-system')
 class NeRFSystem(BaseSystem):
     """
