@@ -212,7 +212,6 @@ class ColmapDatasetBase():
 
                     # img val
                     if MODE_VAL:
-                        print(f"validation mode")
                         img_val_path = img_path.replace("images", "val")
                         img_val = Image.open(img_val_path)
                         img_val = img_val.resize(img_wh, Image.BICUBIC)
