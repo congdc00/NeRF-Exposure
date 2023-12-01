@@ -9,7 +9,7 @@ dataset:
 
   img_downscale: 8 # specify training image size by either img_wh or img_downscale
   up_est_method: ground # if true, use estimated ground plane normal direction as up direction
-  center_est_method: lookout
+  center_est_method: lookat
   n_test_traj_steps: 120
   apply_mask: false
   load_data_on_gpu: false
