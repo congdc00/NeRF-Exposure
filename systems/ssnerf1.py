@@ -91,10 +91,14 @@ class SSNeRF1System(BaseSystem):
             elif self.dataset.directions.ndim == 4: # (N, H, W, 3)
                 directions = self.dataset.directions[index][0]
             rays_o, rays_d = get_rays(directions, c2w)
-            if len(self.dataset.all_images_val)>0:
-                rgb = self.dataset.all_images_val[index.to('cpu')]
-                rgb = rgb.view(-1, self.dataset.all_images_val.shape[-1])
-            else:
+            try:
+                if len(self.dataset.all_images_val)>0:
+                    rgb = self.dataset.all_images_val[index.to('cpu')]
+                    rgb = rgb.view(-1, self.dataset.all_images_val.shape[-1])
+                else:
+                    rgb = self.dataset.all_images[index.to('cpu')]
+                    rgb = rgb.view(-1, self.dataset.all_images.shape[-1])
+            except:
                 rgb = self.dataset.all_images[index.to('cpu')]
                 rgb = rgb.view(-1, self.dataset.all_images.shape[-1])
                 
