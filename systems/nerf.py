@@ -85,12 +85,16 @@ class NeRFSystem(BaseSystem):
                 directions = self.dataset.directions[index][0]
             rays_o, rays_d = get_rays(directions, c2w)
 
-            if len(self.dataset.all_images_val)>0:
-                rgb = self.dataset.all_images_val[index.to('cpu')]
-                rgb = rgb.view(-1, self.dataset.all_images_val.shape[-1])
-            else:
+            try:
+                if len(self.dataset.all_images_val)>0:
+                    rgb = self.dataset.all_images_val[index.to('cpu')]
+                    rgb = rgb.view(-1, self.dataset.all_images_val.shape[-1])
+                else:
+                    rgb = self.dataset.all_images[index.to('cpu')]
+                    rgb = rgb.view(-1, self.dataset.all_images.shape[-1])
+            except:
                 rgb = self.dataset.all_images[index.to('cpu')]
-                rgb = rgb.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
+                rgb = rgb.view(-1, self.dataset.all_images.shape[-1])
 
             # luu anh dung de validation 
             # new_rgb = rgb.squeeze().numpy()*255
