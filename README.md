@@ -15,10 +15,12 @@ Cuda: 11.3
 `pip install -r requirements.txt`<br>
 
 # Chuẩn bị dữ liệu
-Từ ./SSNeRF
+Từ ./SSNeRF  
 `mkdir load`
-Dữ liệu có thể được tải về từ [https://drive.google.com/drive/folders/128yBriW1IG_3NJ5Rp7APSTZsJqdJdfc1?usp=share_link](NeRF_data) và đặt vào thư mục load
 
+Dữ liệu có thể được tải về từ [https://drive.google.com/drive/folders/128yBriW1IG_3NJ5Rp7APSTZsJqdJdfc1?usp=share_link](NeRF_data) và đặt vào thư mục load  
+
+Chạy demo [https://colab.research.google.com/drive/1Vv-3qg_7sOZrH1k_r9CG9fekyQPYRpS3?usp=share_link](Train NeRF)
 # Chạy
 
 với `$NAME_DATA` là tên của tập dữ liệu đã tải về

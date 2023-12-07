@@ -17,7 +17,6 @@ from utils.callbacks import (
     CustomProgressBar,
 )
 from utils.misc import load_config
-
 from loguru import logger
 
 
