@@ -125,15 +125,14 @@ def init_log(configs):
 def main():
     
     args, extras = get_args()
-    init_log(args)
      
 
 
     set_environtment(gpu = args.gpu)
     n_gpus = get_environtment(gpu = args.gpu)
     config = load_info_config(args, extras)
-    # print(config)
-    # return 
+    init_log(config)
+
     logger = set_logger(args)
     loggers, callbacks = get_info(args.train, args.runs_dir, config)
     strategy = "ddp"
