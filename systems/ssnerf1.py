@@ -198,7 +198,7 @@ class SSNeRF1System(BaseSystem):
             alpha = 0.01
             beta = 0.00001
             if self.epoch > 501:
-                print(f"system {is_true}")
+                print(f"system {self.is_true}")
 
                 self.is_true = not self.is_true
             if self.is_true:
