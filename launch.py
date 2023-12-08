@@ -120,7 +120,7 @@ def init_log(configs):
 
 
 def main():
-    
+    torch.set_float32_matmul_precision('high')
     args, extras = get_args()
      
 
