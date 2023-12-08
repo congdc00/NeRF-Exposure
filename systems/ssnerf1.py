@@ -233,7 +233,7 @@ class SSNeRF1System(BaseSystem):
             gray_img_target = cv2.cvtColor(img_target, cv2.COLOR_BGR2GRAY)
 
             brightness_diff_scale = np.mean(gray_img_target)/np.mean(gray_img_predict)
-            color_predict = color_predict*brightness_diff_scale
+            #color_predict = color_predict*brightness_diff_scale
             print(f"color_predict {color_predict.shape}")
 
         
