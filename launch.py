@@ -129,8 +129,6 @@ def main():
         load_from_checkpoint=None if not args.resume_weights_only else args.resume,
     )
 
-   
-
     
     if args.train:
         if args.resume and not args.resume_weights_only:
