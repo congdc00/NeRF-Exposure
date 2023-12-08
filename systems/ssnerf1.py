@@ -31,15 +31,29 @@ def compute_psnr(img1, img2):
 
     return psnr
 def calculate_ssim(image1, image2):
-    mu_1 = cv2.mean(image1)
-    mu_2 = cv2.mean(image2)
+    # Chuyển định dạng màu của ảnh từ BGR sang RGB
+    image1_rgb = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
+    image2_rgb = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
 
-    sigma_1 = cv2.std(image1)
-    sigma_2 = cv2.std(image2)
+    # Chuyển đổi ảnh sang định dạng grayscale
+    gray_image1 = cv2.cvtColor(image1_rgb, cv2.COLOR_RGB2GRAY)
+    gray_image2 = cv2.cvtColor(image2_rgb, cv2.COLOR_RGB2GRAY)
 
-    correlation = cv2.corrcoef(image1.flatten(), image2.flatten())[0, 1]
+    # Thiết lập các tham số
+    C1 = (0.01 * 255) ** 2
+    C2 = (0.03 * 255) ** 2
 
-    ssim = (2 * mu_1 * mu_2 + C1) / (mu_1^2 + mu_2^2 + C1)* (2 * sigma_1 * sigma_2 + C2) / (sigma_1^2 + sigma_2^2 + C2)* (correlation + C3) / (1 + C3)    
+    # Tính các thống kê
+    mean_image1 = np.mean(gray_image1)
+    mean_image2 = np.mean(gray_image2)
+    var_image1 = np.var(gray_image1)
+    var_image2 = np.var(gray_image2)
+    covar = np.cov(gray_image1, gray_image2)[0, 1]
+
+    # Tính SSIM
+    numerator = (2 * mean_image1 * mean_image2 + C1) * (2 * covar + C2)
+    denominator = (mean_image1 ** 2 + mean_image2 ** 2 + C1) * (var_image1 + var_image2 + C2)
+    ssim = numerator / denominator 
     return ssim
 
 @systems.register('ssnerf1-system')
