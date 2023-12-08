@@ -18,10 +18,8 @@ from utils.callbacks import (
 )
 from utils.misc import load_config
 from loguru import logger
-
-
-def main():
-    # Step1 : Thêm thamm số
+import torch
+def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True, help="path to config file")
     parser.add_argument("--gpu", default="0", help="GPU(s) to be used")
@@ -47,45 +45,43 @@ def main():
     )
 
     args, extras = parser.parse_known_args()
+    return args, extras
+    
 
-    # Step 2: Cài đặt môi trường
+def set_environtment(gpu):
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
-    n_gpus = len(args.gpu.split(","))
+    os.environ["CUDA_VISIBLE_DEVICES"] = gpu
+    torch.set_float32_matmul_precision('medium')
 
-    # Step 3: Lấy cấu hình từ file yaml
+def get_environtment(gpu):
+    n_gpus = len(gpu.split(","))
+    return n_gpus
+
+def load_info_config(args, extras):
     config = load_config(args.config, cli_args=extras)
     config.cmd_args = vars(args)
 
-    config.trial_name = config.get("trial_name") or (
-        config.tag + datetime.now().strftime("@%Y%m%d-%H%M%S")
-    )
-    config.exp_dir = config.get("exp_dir") or os.path.join(args.exp_dir, config.name)
-    config.save_dir = config.get("save_dir") or os.path.join(
-        config.exp_dir, config.trial_name, "save"
-    )
-    config.ckpt_dir = config.get("ckpt_dir") or os.path.join(
-        config.exp_dir, config.trial_name, "ckpt"
-    )
-    config.code_dir = config.get("code_dir") or os.path.join(
-        config.exp_dir, config.trial_name, "code"
-    )
-    config.config_dir = config.get("config_dir") or os.path.join(
-        config.exp_dir, config.trial_name, "config"
-    )
+    config.trial_name = config.get('trial_name') or (config.tag + datetime.now().strftime('@%Y%m%d-%H%M%S'))
+    config.exp_dir = config.get('exp_dir') or os.path.join(args.exp_dir, config.name)
+    config.save_dir = config.get('save_dir') or os.path.join(config.exp_dir, config.trial_name, 'save')
+    config.ckpt_dir = config.get('ckpt_dir') or os.path.join(config.exp_dir, config.trial_name, 'ckpt')
+    config.code_dir = config.get('code_dir') or os.path.join(config.exp_dir, config.trial_name, 'code')
+    config.config_dir = config.get('config_dir') or os.path.join(config.exp_dir, config.trial_name, 'config') 
+    
+    if "seed" not in config:
+        config.seed = int(time.time() * 1000) % 1000 
+    pl.seed_everything(config.seed)
 
+    return config
+
+def set_logger(args):
     logger = logging.getLogger("pytorch_lightning")
-    # Step 3.1: Cài cấu hình đã lấy ra
     if args.verbose:
         logger.setLevel(logging.DEBUG)
 
-    if "seed" not in config:
-        config.seed = int(time.time() * 1000) % 1000
-    pl.seed_everything(config.seed)
-
-    # Step 4: Lưu log
+def get_info(is_train, runs_dir, config):
     callbacks = []
-    if args.train:
+    if is_train:
         callbacks += [
             ModelCheckpoint(dirpath=config.ckpt_dir, **config.checkpoint),
             LearningRateMonitor(logging_interval="step"),
@@ -95,18 +91,27 @@ def main():
         ]
 
     loggers = []
-    if args.train:
+    if is_train:
         loggers += [
             TensorBoardLogger(
-                args.runs_dir, name=config.name, version=config.trial_name
+                runs_dir, name=config.name, version=config.trial_name
             ),
             CSVLogger(config.exp_dir, name=config.trial_name, version="csv_logs"),
         ]
 
+    return loggers, callbacks
+
+def main():
+    args, extras = get_args()
+    
+    set_environtment(gpu = args.gpu)
+    n_gpus = get_environtment(gpu = args.gpu)
+    config = load_info_config(args, extras) 
+    logger = set_logger(args)
+    loggers, callbacks = get_info(args.train, args.runs_dir, config)
     strategy = "ddp"
     # strategy = 'ddp_find_unused_parameters_false'
 
-    # Step 5: Bắt đầu train
     trainer = Trainer(
         devices=n_gpus,
         accelerator="gpu",
@@ -116,35 +121,32 @@ def main():
         **config.trainer
     )
 
-    # Load data
     dm = datasets.make(config.dataset.name, config.dataset)
-
+    
     system = systems.make(
         config.system.name,
         config,
         load_from_checkpoint=None if not args.resume_weights_only else args.resume,
     )
 
-    # train
+   
+
+    
     if args.train:
         if args.resume and not args.resume_weights_only:
             trainer.fit(system, datamodule=dm, ckpt_path=args.resume)
         else:
             trainer.fit(system, datamodule=dm)
         trainer.test(system, datamodule=dm)
-
     # validation
     elif args.validate:
         trainer.validate(system, datamodule=dm, ckpt_path=args.resume)
-
     # test
     elif args.test:
         trainer.test(system, datamodule=dm, ckpt_path=args.resume)
-
     # predict
     elif args.predict:
         trainer.predict(system, datamodule=dm, ckpt_path=args.resume)
-
 
 if __name__ == "__main__":
     main()
