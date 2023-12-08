@@ -160,11 +160,11 @@ class SSNeRF1Model(BaseModel):
         
         return out
 
-    def forward(self, rays):
+    def forward(self, rays, epoch):
         if self.training:
             self.epoch += 1
 
-            out = self.forward_(rays)
+            out = self.forward_(rays, epoch)
         else:
             out = chunk_batch(self.forward_, self.config.ray_chunk, True, rays)
             
