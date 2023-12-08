@@ -258,7 +258,7 @@ class SSNeRF1System(BaseSystem):
 
         print(f"array 1 {image_array1.shape}")
         print(f"array 2 {image_array2.shape}")
-        ssim = 0
+        ssim = 0.
         # ssim = self.criterions['ssim'](image_array1, image_array2, full=True)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
