@@ -234,7 +234,7 @@ class SSNeRF1System(BaseSystem):
 
             brightness_diff_scale = np.mean(gray_img_target)/np.mean(gray_img_predict)
             color_predict = color_predict*brightness_diff_scale
-            print(f"color_predict {color_predict.shape()}")
+            print(f"color_predict {color_predict.shape}")
 
         
 
