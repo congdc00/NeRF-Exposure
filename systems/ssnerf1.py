@@ -32,6 +32,8 @@ def compute_psnr(img1, img2):
     return psnr
 
 @systems.register('ssnerf1-system')
+
+
 class SSNeRF1System(BaseSystem):
     """
     Two ways to print to console:
@@ -45,7 +47,7 @@ class SSNeRF1System(BaseSystem):
     def prepare(self):
         self.criterions = {
             'psnr': PSNR(),
-            'ssim': cv2.ssim
+            'ssim': SSIM()
         }
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
