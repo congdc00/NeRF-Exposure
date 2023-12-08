@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_efficient_distloss import flatten_eff_distloss
-from skimage.measure import compare_ssim as ssim
+from skimage.metrics import structural_similarity as ssim
 import imageio
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.rank_zero import rank_zero_info, rank_zero_debug
