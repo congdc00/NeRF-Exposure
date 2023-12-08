@@ -114,11 +114,7 @@ def init_log(configs):
 
     wandb.init(    
         project="NeRF-MRE",
-        config={
-            "model": model_name,
-            "data": data_name,
-            "mode": mode_run,
-        },
+        config=configs
     )
 
 
