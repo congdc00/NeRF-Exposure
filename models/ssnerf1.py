@@ -68,7 +68,7 @@ class SSNeRF1Model(BaseModel):
         return mesh
         
     def forward_(self, rays, epoch):
-
+        print(f"model {epoch}")
         n_rays = rays.shape[0]
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
 
@@ -109,7 +109,7 @@ class SSNeRF1Model(BaseModel):
         if MODE == 1:
             self.is_freeze = not self.is_freeze
         elif MODE == 2:
-            if self.epoch > 25000:
+            if epoch > 25000:
                 self.is_freeze = not self.is_freeze
                 print(f"model change")
 

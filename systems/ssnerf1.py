@@ -77,7 +77,7 @@ class SSNeRF1System(BaseSystem):
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
         self.is_true = True
-        self.epoch = -1
+        self.epoch = 0
 
     def forward(self, batch):
         return self.model(batch['rays'], self.epoch)
@@ -164,6 +164,7 @@ class SSNeRF1System(BaseSystem):
             - batch_idx: index của từng batch
         '''
         self.epoch += 1
+        print(f"system {self.epoch}")
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
         bright_ness_predict = out["bright_ness"]
