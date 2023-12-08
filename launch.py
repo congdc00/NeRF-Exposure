@@ -125,7 +125,7 @@ def init_log(configs):
 def main():
     
     args, extras = get_args()
-    # init_log(args)
+    init_log(args)
      
 
 
