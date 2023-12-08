@@ -19,6 +19,10 @@ from utils.callbacks import (
 from utils.misc import load_config
 from loguru import logger
 import torch
+import wandb
+
+wandb.login(key="3150d2d7cfb2243369255497308e5457525529be")
+
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True, help="path to config file")
@@ -51,7 +55,8 @@ def get_args():
 def set_environtment(gpu):
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
-    torch.set_float32_matmul_precision('medium')
+    
+   
 
 def get_environtment(gpu):
     n_gpus = len(gpu.split(","))
@@ -101,12 +106,34 @@ def get_info(is_train, runs_dir, config):
 
     return loggers, callbacks
 
-def main():
-    args, extras = get_args()
+def init_log(configs):
+    model_name = configs.model.name 
+    data_name = configs.dataset.scene
+    mode_run = configs.dataset.name 
     
+
+    wandb.init(    
+        project="NeRF-MRE",
+        config={
+            "model": model_name,
+            "data": data_name,
+            "mode": mode_run,
+        },
+    )
+
+
+def main():
+    
+    args, extras = get_args()
+    # init_log(args)
+     
+
+
     set_environtment(gpu = args.gpu)
     n_gpus = get_environtment(gpu = args.gpu)
-    config = load_info_config(args, extras) 
+    config = load_info_config(args, extras)
+    # print(config)
+    # return 
     logger = set_logger(args)
     loggers, callbacks = get_info(args.train, args.runs_dir, config)
     strategy = "ddp"
@@ -128,7 +155,8 @@ def main():
         config,
         load_from_checkpoint=None if not args.resume_weights_only else args.resume,
     )
-
+    
+   
     
     if args.train:
         if args.resume and not args.resume_weights_only:

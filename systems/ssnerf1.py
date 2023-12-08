@@ -17,6 +17,7 @@ from tabulate import tabulate
 import numpy as np
 import cv2
 import torchvision.transforms.functional as TF
+import wandb
 
 MODE_VAL = 1 # 0: normal (val), 1: no val
 MODE = 2
@@ -196,7 +197,8 @@ class SSNeRF1System(BaseSystem):
                 self.log(f'train_params/{name}', self.C(value))
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
-
+        
+        wandb.log({"loss": loss})
         return {'loss': loss}
     
     def validation_step(self, batch, batch_idx):
@@ -229,10 +231,10 @@ class SSNeRF1System(BaseSystem):
             gray_img_target = cv2.cvtColor(img_target, cv2.COLOR_BGR2GRAY)
 
             # Tính toán sự chênh lệch độ sáng giữa hai ảnh
-            brightness_diff = np.mean(gray_img_target) - np.mean(gray_img_predict)
+            brightness_diff_scale = np.mean(gray_img_target)/np.mean(gray_img_predict)
 
             # Áp dụng sự chênh lệch để cân bằng độ sáng của ảnh gốc
-            img_predict = cv2.addWeighted(img_predict, 1, np.zeros_like(img_predict), 0, brightness_diff)
+            img_predict = img_predict * brightness_diff_scale
             # img_predict = np.clip(img_predict, 0, 255)
             # cv2.imwrite("predict_image_new.png", img_predict)
 
