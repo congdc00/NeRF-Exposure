@@ -19,6 +19,7 @@ import cv2
 import torchvision.transforms.functional as TF
 import wandb
 
+MODE_COLMAP = False
 MODE_VAL = 1 # 0: normal (val), 1: no val
 MODE = 2
 def compute_psnr(img1, img2):
@@ -93,7 +94,7 @@ class SSNeRF1System(BaseSystem):
                 directions = self.dataset.directions[index][0]
             rays_o, rays_d = get_rays(directions, c2w)
             try:
-                if len(self.dataset.all_images_val)>0:
+                if len(self.dataset.all_images_val)>0 and MODE_COLMAP:
                     rgb = self.dataset.all_images_val[index.to('cpu')]
                     rgb = rgb.view(-1, self.dataset.all_images_val.shape[-1])
                 else:
@@ -233,8 +234,8 @@ class SSNeRF1System(BaseSystem):
             gray_img_target = cv2.cvtColor(img_target, cv2.COLOR_BGR2GRAY)
 
             brightness_diff_scale = np.mean(gray_img_target)/np.mean(gray_img_predict)
-            #color_predict = color_predict*brightness_diff_scale
-            print(f"color_predict {color_predict.shape}")
+            color_predict = color_predict*brightness_diff_scale
+            #print(f"color_predict {color_predict.shape}")
 
         
 
