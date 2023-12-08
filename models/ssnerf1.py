@@ -110,7 +110,6 @@ class SSNeRF1Model(BaseModel):
                 self.is_freeze = not self.is_freeze
             else:
                 bright_ness = torch.full_like(bright_ness, 1.0)
-        print(f"bright_ness {bright_ness}")
 
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
