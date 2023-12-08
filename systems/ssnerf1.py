@@ -230,7 +230,7 @@ class SSNeRF1System(BaseSystem):
 
         for name, value in self.config.system.loss.items():
             if name.startswith('lambda'):
-                    self.log(f'train_params/{name}', self.C(value))
+                self.log(f'train_params/{name}', self.C(value))
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
         

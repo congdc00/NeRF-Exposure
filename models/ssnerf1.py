@@ -68,7 +68,6 @@ class SSNeRF1Model(BaseModel):
         return mesh
         
     def forward_(self, rays):
-        self.epoch += 1
         n_rays = rays.shape[0]
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
 
@@ -162,6 +161,8 @@ class SSNeRF1Model(BaseModel):
 
     def forward(self, rays):
         if self.training:
+            self.epoch += 1
+
             out = self.forward_(rays)
         else:
             out = chunk_batch(self.forward_, self.config.ray_chunk, True, rays)
