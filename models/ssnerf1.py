@@ -67,7 +67,6 @@ class SSNeRF1Model(BaseModel):
         return mesh
         
     def forward_(self, rays, epoch = 0):
-        print(f"model {epoch}")
         n_rays = rays.shape[0]
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
 
@@ -109,7 +108,6 @@ class SSNeRF1Model(BaseModel):
             self.is_freeze = not self.is_freeze
         elif MODE == 2:
             if epoch > 500:
-                print(f"model is {self.is_freeze}")
                 self.is_freeze = not self.is_freeze
             else:
                 bright_ness = torch.full_like(bright_ness, 1.0)
