@@ -111,10 +111,11 @@ def init_log(configs):
     data_name = configs.dataset.scene
     mode_run = configs.dataset.name 
     
+    config = dict(configs)
 
     wandb.init(    
         project="NeRF-MRE",
-        config=configs
+        config=config
     )
 
 
