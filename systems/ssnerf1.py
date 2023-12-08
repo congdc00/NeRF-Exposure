@@ -199,6 +199,7 @@ class SSNeRF1System(BaseSystem):
             beta = 0.00001
             if self.epoch > 25001:
                 self.is_true = not self.is_true
+                print("system change")
             if self.is_true:
                 total_loss = loss_rgb
                 wandb.log({"[Train] loss_1 (%)": 0})

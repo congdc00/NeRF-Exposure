@@ -109,6 +109,7 @@ class SSNeRF1Model(BaseModel):
         if MODE == 1:
             self.is_freeze = not self.is_freeze
         elif MODE == 2:
+            print(f"model change")
             if self.epoch > 25000:
                 self.is_freeze = not self.is_freeze
             else:
