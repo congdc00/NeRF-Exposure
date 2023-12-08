@@ -190,7 +190,8 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = ex_predict/mean_exposure_predict-1
         loss_e2 = torch.mean(torch.abs(loss_e2))
         loss_e2 = torch.exp(loss_e2)
-
+        
+        wandb.log({"[Train] mean Exposure": mean_exposure})
         if MODE == 1:
             total_loss = loss_rgb + k*ex_delta
         else: 
@@ -200,12 +201,12 @@ class SSNeRF1System(BaseSystem):
                 self.is_true = not self.is_true
             if self.is_true:
                 total_loss = loss_rgb
-                wandb.log({"[Train] loss_1": 0})
-                wandb.log({"[Train] loss_2": 0})
+                wandb.log({"[Train] loss_1 (%)": 0})
+                wandb.log({"[Train] loss_2 (%)": 0})
             else:
                 total_loss = loss_rgb + alpha*ex_delta + beta*loss_e2
-                wandb.log({"[Train] loss_1": (alpha*ex_delta/total_loss)*100})
-                wandb.log({"[Train] loss_2": (beta*loss_e2/total_loss)*100})
+                wandb.log({"[Train] loss_1 (%)": (alpha*ex_delta/total_loss)*100})
+                wandb.log({"[Train] loss_2 (%)": (beta*loss_e2/total_loss)*100})
 
 
         self.log('train/loss_rgb', total_loss)
@@ -213,6 +214,7 @@ class SSNeRF1System(BaseSystem):
 
         if self.C(self.config.system.loss.lambda_distortion) > 0:
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
+            wandb.log({"[Train] loss_distortion": loss_distortion})
             self.log('train/loss_distortion', loss_distortion)
             loss += loss_distortion * self.C(self.config.system.loss.lambda_distortion)
 
@@ -236,6 +238,7 @@ class SSNeRF1System(BaseSystem):
         return {'loss': loss}
     
     def validation_step(self, batch, batch_idx):
+        self.epoch += 1
         '''
         batch: label
         out: predict
