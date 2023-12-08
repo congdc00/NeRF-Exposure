@@ -385,6 +385,9 @@ class SSNeRF1System(BaseSystem):
                 psnr_standard = 0
                 ssim_score = 0
                 ssim_standard = 0
+                mean_exposure = 0
+                mean_pe = 0 
+                std_pe = 0
             else: 
                 list_psnr = torch.stack([o['psnr'] for o in out_set_psnr.values()])
                 psnr = torch.mean(list_psnr) 
