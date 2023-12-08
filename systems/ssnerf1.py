@@ -255,6 +255,9 @@ class SSNeRF1System(BaseSystem):
         ##  SSIM
         image_array1 = color_predict.view(H, W, 3).cpu().numpy()
         image_array2 = image_origin.view(H, W, 3).cpu().numpy()
+        image_array1 = np.moveaxis(image_array1, -1, 0)[np.newaxis, :]
+        image_array2 = np.moveaxis(image_array2, -1, 0)[np.newaxis, :]
+
         print(f"array 1 {image_array1.shape}")
         print(f"array 2 {image_array2.shape}")
         ssim = self.criterions['ssim'](image_array1, image_array2)
