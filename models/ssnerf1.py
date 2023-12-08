@@ -17,7 +17,6 @@ MODE = 2
 class SSNeRF1Model(BaseModel):
     def setup(self):
         self.is_freeze = True
-        self.epoch = -1
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
@@ -109,10 +108,9 @@ class SSNeRF1Model(BaseModel):
         if MODE == 1:
             self.is_freeze = not self.is_freeze
         elif MODE == 2:
-            if epoch > 25000:
+            if epoch > 500:
+                print(f"model is {is_freeze}")
                 self.is_freeze = not self.is_freeze
-                print(f"model change")
-
             else:
                 bright_ness = torch.full_like(bright_ness, 1.0)
             
@@ -162,7 +160,6 @@ class SSNeRF1Model(BaseModel):
 
     def forward(self, rays, epoch):
         if self.training:
-            self.epoch += 1
 
             out = self.forward_(rays, epoch)
         else:
