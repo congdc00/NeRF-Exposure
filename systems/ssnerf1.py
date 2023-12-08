@@ -80,7 +80,7 @@ class SSNeRF1System(BaseSystem):
         self.epoch = -1
 
     def forward(self, batch):
-        return self.model(batch['rays'])
+        return self.model(batch['rays'], self.epoch)
     
     def preprocess_data(self, batch, stage):
         if 'index' in batch: # validation / testing
@@ -164,7 +164,7 @@ class SSNeRF1System(BaseSystem):
             - batch_idx: index của từng batch
         '''
         self.epoch += 1
-        out = self(batch, self.epoch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
+        out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
         bright_ness_predict = out["bright_ness"]
         bright_ness_label = batch["bright_ness"]
