@@ -177,7 +177,7 @@ class SSNeRF1System(BaseSystem):
             train_num_rays = int(self.train_num_rays * (self.train_num_samples / out['num_samples'].sum().item()))        
             self.train_num_rays = min(int(self.train_num_rays * 0.9 + train_num_rays * 0.1), self.config.model.max_train_num_rays)
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
-        
+         
         ex_predict = out['bright_ness']
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         ex_template = torch.ones(out['bright_ness'].shape).to(device)
@@ -200,8 +200,13 @@ class SSNeRF1System(BaseSystem):
                 self.is_true = not self.is_true
             if self.is_true:
                 total_loss = loss_rgb
+                wandb.log({"[Train] loss_1": 0})
+                wandb.log({"[Train] loss_2": 0})
             else:
                 total_loss = loss_rgb + alpha*ex_delta + beta*loss_e2
+                wandb.log({"[Train] loss_1": (alpha*ex_delta/total_loss)*100})
+                wandb.log({"[Train] loss_2": (beta*loss_e2/total_loss)*100})
+
 
         self.log('train/loss_rgb', total_loss)
         loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
@@ -222,11 +227,12 @@ class SSNeRF1System(BaseSystem):
 
         for name, value in self.config.system.loss.items():
             if name.startswith('lambda'):
-                self.log(f'train_params/{name}', self.C(value))
+                    self.log(f'train_params/{name}', self.C(value))
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
         
-        wandb.log({"loss_train": loss})
+        wandb.log({"[Train] total_loss": loss})
+
         return {'loss': loss}
     
     def validation_step(self, batch, batch_idx):
