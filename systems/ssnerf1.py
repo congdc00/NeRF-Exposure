@@ -32,8 +32,8 @@ def compute_psnr(img1, img2):
     return psnr
 def calculate_ssim(image1, image2):
     # Chuyển đổi ảnh sang định dạng grayscale
-    gray_image1 = cv2.cvtColor(image1, cv2.COLOR_RGB2GRAY)
-    gray_image2 = cv2.cvtColor(image2, cv2.COLOR_RGB2GRAY)
+    gray_image1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+    gray_image2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
 
     # Tính điểm SSIM
     ssim_score, _ = ssim(gray_image1, gray_image2, full=True)
