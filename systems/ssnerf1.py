@@ -225,18 +225,16 @@ class SSNeRF1System(BaseSystem):
             pass
         else:
             img_target = cv2.cvtColor(image_origin.view(H, W, 3).cpu().numpy() * 255, cv2.COLOR_RGB2BGR)
-            img_predict= cv2.cvtColor(image_predict.view(H, W, 3).cpu().numpy() * 255, cv2.COLOR_RGB2BGR)
+            img_predict= cv2.cvtColor(color_predict.view(H, W, 3).cpu().numpy() * 255, cv2.COLOR_RGB2BGR)
             # cv2.imwrite("target_images.png", img_target)
             # cv2.imwrite("predict_images.png", img_predict)
             
             gray_img_predict = cv2.cvtColor(img_predict, cv2.COLOR_BGR2GRAY)
             gray_img_target = cv2.cvtColor(img_target, cv2.COLOR_BGR2GRAY)
 
-            # Tính toán sự chênh lệch độ sáng giữa hai ảnh
             brightness_diff_scale = np.mean(gray_img_target)/np.mean(gray_img_predict)
-
-            # Áp dụng sự chênh lệch để cân bằng độ sáng của ảnh gốc
             color_predict = color_predict*brightness_diff_scale
+            print(f"color_predict {color_predict.shape()}")
 
         
 
