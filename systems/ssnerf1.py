@@ -30,6 +30,15 @@ def compute_psnr(img1, img2):
     psnr = 20 * torch.log10(max_pixel) - 10 * torch.log10(mse)
 
     return psnr
+def calculate_ssim(image1, image2):
+    # Chuyển đổi ảnh sang định dạng grayscale
+    gray_image1 = cv2.cvtColor(image1, cv2.COLOR_RGB2GRAY)
+    gray_image2 = cv2.cvtColor(image2, cv2.COLOR_RGB2GRAY)
+
+    # Tính điểm SSIM
+    ssim_score, _ = ssim(gray_image1, gray_image2, full=True)
+    
+    return ssim_score
 
 @systems.register('ssnerf1-system')
 
@@ -47,7 +56,7 @@ class SSNeRF1System(BaseSystem):
     def prepare(self):
         self.criterions = {
             'psnr': PSNR(),
-            'ssim': ssim
+            'ssim': calculate_ssim
         }
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
