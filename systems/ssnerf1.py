@@ -47,7 +47,7 @@ class SSNeRF1System(BaseSystem):
     def prepare(self):
         self.criterions = {
             'psnr': PSNR(),
-            'ssim': SSIM()
+            'ssim': ssim
         }
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
@@ -255,12 +255,10 @@ class SSNeRF1System(BaseSystem):
         ##  SSIM
         image_array1 = color_predict.view(H, W, 3).cpu().numpy()
         image_array2 = image_origin.view(H, W, 3).cpu().numpy()
-        image_array1 = np.moveaxis(image_array1, -1, 0)[np.newaxis, :]
-        image_array2 = np.moveaxis(image_array2, -1, 0)[np.newaxis, :]
 
         print(f"array 1 {image_array1.shape}")
         print(f"array 2 {image_array2.shape}")
-        ssim = self.criterions['ssim'](image_array1, image_array2)
+        ssim = self.criterions['ssim'](image_array1, image_array2, full=True)
 
         # mask_object = batch['fg_mask'].view(-1, 1)
         # rgb_non_bg= (batch['rgb']*mask_object)
