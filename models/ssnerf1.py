@@ -67,7 +67,8 @@ class SSNeRF1Model(BaseModel):
         mesh = self.geometry.isosurface()
         return mesh
         
-    def forward_(self, rays):
+    def forward_(self, rays, epoch):
+
         n_rays = rays.shape[0]
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
 

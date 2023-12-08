@@ -164,7 +164,7 @@ class SSNeRF1System(BaseSystem):
             - batch_idx: index của từng batch
         '''
         self.epoch += 1
-        out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
+        out = self(batch, self.epoch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
         bright_ness_predict = out["bright_ness"]
         bright_ness_label = batch["bright_ness"]
