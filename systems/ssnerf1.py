@@ -199,6 +199,8 @@ class SSNeRF1System(BaseSystem):
             beta = 0.00001
             if self.epoch > 5000:
                 self.is_true = not self.is_true
+            else:
+                print(f"epoch estimate {self.epoch}")
             if self.is_true:
                 total_loss = loss_rgb
                 wandb.log({"[Train] loss_1 (%)": 0})
