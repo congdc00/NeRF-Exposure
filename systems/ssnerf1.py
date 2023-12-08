@@ -219,6 +219,8 @@ class SSNeRF1System(BaseSystem):
         W, H = self.dataset.img_wh
         image_origin = batch['rgb'] 
         image_predict = out['comp_rgb']
+        color_predict = out["real_rgb"]
+
         if MODE_VAL ==0 :
             pass
         else:
@@ -234,17 +236,9 @@ class SSNeRF1System(BaseSystem):
             brightness_diff_scale = np.mean(gray_img_target)/np.mean(gray_img_predict)
 
             # Áp dụng sự chênh lệch để cân bằng độ sáng của ảnh gốc
-            img_predict = img_predict * brightness_diff_scale
-            # img_predict = np.clip(img_predict, 0, 255)
-            # cv2.imwrite("predict_image_new.png", img_predict)
+            color_predict = color_predict*brightness_diff_scale
 
-            # chuyen ve dang chuan 
-            img_predict = TF.to_tensor(img_predict/np.max(img_predict)).permute(1, 2, 0)[...,:3]
-            img_predict = img_predict.to(self.rank)
-            img_predict = img_predict.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
-            # print(f"image_predict {torch.max(image_predict)} and img_predict {torch.max(img_predict)}")
-
-        color_predict = out["real_rgb"]
+        
 
         exposure_predict = out["bright_ness"][0].item()
         exposure_label = batch["bright_ness"].item()
