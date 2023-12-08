@@ -239,7 +239,7 @@ class SSNeRF1System(BaseSystem):
         return {'loss': loss}
     
     def validation_step(self, batch, batch_idx):
-        # self.epoch += 1
+        self.epoch += 1
         '''
         batch: label
         out: predict
