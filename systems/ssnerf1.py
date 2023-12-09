@@ -199,12 +199,12 @@ class SSNeRF1System(BaseSystem):
                 self.is_true = not self.is_true
             if self.is_true:
                 total_loss = loss_rgb
-                wandb.log({'epoch': self.epoch, "[Train] loss_1 (%)": 0})
-                wandb.log({'epoch': self.epoch, "[Train] loss_2 (%)": 0})
+                wandb.log({"[Train] loss_1 (%)": 0})
+                wandb.log({"[Train] loss_2 (%)": 0})
             else:
                 total_loss = loss_rgb + alpha*ex_delta + beta*loss_e2
-                wandb.log({'epoch': self.epoch, "[Train] loss_1 (%)": (alpha*ex_delta/total_loss)*100})
-                wandb.log({'epoch': self.epoch, "[Train] loss_2 (%)": (beta*loss_e2/total_loss)*100})
+                wandb.log({"[Train] loss_1 (%)": (alpha*ex_delta/total_loss)*100})
+                wandb.log({"[Train] loss_2 (%)": (beta*loss_e2/total_loss)*100})
 
 
         self.log('train/loss_rgb', total_loss)
@@ -214,9 +214,7 @@ class SSNeRF1System(BaseSystem):
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
             self.log('train/loss_distortion', loss_distortion)
             loss += loss_distortion * self.C(self.config.system.loss.lambda_distortion)
-
-            wandb.log({'epoch': self.epoch, "[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss_distortion)/loss)*100})
-
+            wandb.log({"[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss_distortion)/loss)*100})
 
         losses_model_reg = self.model.regularizations(out)
         # print(f"losses_model_reg {losses_model_reg}")
