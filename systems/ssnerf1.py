@@ -410,7 +410,8 @@ class SSNeRF1System(BaseSystem):
                     logger.warning(log_text)
                 else:
                     logger.info(log_text)
-            
+            if mean_exposure == 0:
+                mean_exposure = 1
             wandb.log({"[Val] PSNR": psnr, "[Val] std PSNR": psnr_standard, "[Val] SSIM": ssim_score, "[Val] std SSIM": ssim_standard, "[Val] Exposure": mean_exposure, "[Val] PE": mean_pe, "[Val] std PE": std_pe}, step=self.epoch)
 
 
