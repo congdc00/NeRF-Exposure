@@ -189,7 +189,7 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = torch.mean(torch.abs(loss_e2))
         loss_e2 = torch.exp(loss_e2)
         
-        wandb.log({"[Train] mean Exposure": mean_exposure_predict})
+        wandb.log({'epoch': self.epoch, "[Train] mean Exposure": mean_exposure_predict})
         if MODE == 1:
             total_loss = loss_rgb + k*ex_delta
         else: 
@@ -212,9 +212,11 @@ class SSNeRF1System(BaseSystem):
 
         if self.C(self.config.system.loss.lambda_distortion) > 0:
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
-            wandb.log({"[Train] loss_distortion": loss_distortion})
             self.log('train/loss_distortion', loss_distortion)
             loss += loss_distortion * self.C(self.config.system.loss.lambda_distortion)
+
+            wandb.log({'epoch': self.epoch, "[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss_distortion)/loss)*100})
+
 
         losses_model_reg = self.model.regularizations(out)
         # print(f"losses_model_reg {losses_model_reg}")
