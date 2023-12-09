@@ -230,24 +230,18 @@ class NeRFSystem(BaseSystem):
             brightness_diff = np.mean(gray_img_target) - np.mean(gray_img_predict)
 
             # Áp dụng sự chênh lệch để cân bằng độ sáng của ảnh gốc
-            img_predict = cv2.addWeighted(img_predict, 1, np.zeros_like(img_predict), 0, brightness_diff)
-            # img_predict = np.clip(img_predict, 0, 255)
-            # cv2.imwrite("predict_image_new.png", img_predict)
-
-            # chuyen ve dang chuan 
-            img_predict = TF.to_tensor(img_predict/np.max(img_predict)).permute(1, 2, 0)[...,:3]
-            img_predict = img_predict.to(self.rank)
-            img_predict = img_predict.view(-1, self.dataset.all_images.shape[-1]) # type torch.Tensor 
-            # print(f"image_predict {torch.max(image_predict)} and img_predict {torch.max(img_predict)}")
-
+            brightness_diff_scale = np.mean(gray_img_target)/np.mean(gray_img_predict)
+            color_predict = color_predict*brightness_diff_scale
+ 
             
 
         # print(f"image_predict.shape {image_predict.shape}")
-        psnr = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb']), batch['rgb'])
+        psnr = self.criterions['psnr'](color_predict.to(batch['rgb']), batch['rgb'])
 
-        image_array1 = image_predict.view(H, W, 3).cpu().numpy()
+        image_array1 = color_predict.view(H, W, 3).cpu().numpy()
         image_array2 = image_origin.view(H, W, 3).cpu().numpy()
-        ssim = self.criterions['ssim'](image_array1, image_array2)
+        ssim = self.criterions['ssim'](image_array1, image_array2,multichannel=True, full=True)
+
         # mask_object = batch['fg_mask'].view(-1, 1)
         # rgb_non_bg= (batch['rgb']*mask_object)
         # psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_object, rgb_non_bg)
