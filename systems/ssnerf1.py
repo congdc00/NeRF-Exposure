@@ -189,7 +189,7 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = torch.mean(torch.abs(loss_e2))
         loss_e2 = torch.exp(loss_e2)
         
-        wandb.log({"[Train] mean Exposure": mean_exposure_predict})
+        wandb.log({"[Train] mean Exposure": mean_exposure_predict}, step = self.epoch)
         if MODE == 1:
             total_loss = loss_rgb + k*ex_delta
         else: 
@@ -410,8 +410,6 @@ class SSNeRF1System(BaseSystem):
                     logger.warning(log_text)
                 else:
                     logger.info(log_text)
-            if mean_exposure == 0:
-                mean_exposure = 1
             wandb.log({"[Val] PSNR": psnr, "[Val] std PSNR": psnr_standard, "[Val] SSIM": ssim_score, "[Val] std SSIM": ssim_standard, "[Val] Exposure": mean_exposure, "[Val] PE": mean_pe, "[Val] std PE": std_pe}, step=self.epoch)
 
 
