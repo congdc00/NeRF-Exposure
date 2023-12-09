@@ -214,7 +214,7 @@ class NeRFSystem(BaseSystem):
         
         image_origin = batch['rgb'] 
         image_predict = out['comp_rgb']
-
+        color_predict = image_predict
         if MODE_VAL ==0 :
             pass
         else:
