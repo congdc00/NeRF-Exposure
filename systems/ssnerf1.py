@@ -214,7 +214,7 @@ class SSNeRF1System(BaseSystem):
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
             self.log('train/loss_distortion', loss_distortion)
             loss += loss_distortion * self.C(self.config.system.loss.lambda_distortion)
-            wandb.log({"[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss_distortion)/loss)*100}, , step=self.epoch)
+            wandb.log({"[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss_distortion)/loss)*100}, step=self.epoch)
 
         losses_model_reg = self.model.regularizations(out)
         # print(f"losses_model_reg {losses_model_reg}")
@@ -230,7 +230,7 @@ class SSNeRF1System(BaseSystem):
                 self.log(f'train_params/{name}', self.C(value))
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
-        wandb.log({"[Train] total_loss": loss}, , step=self.epoch)
+        wandb.log({"[Train] total_loss": loss},step=self.epoch)
 
         return {'loss': loss}
     
@@ -412,6 +412,7 @@ class SSNeRF1System(BaseSystem):
                     logger.info(log_text)
             
             wandb.log({"[Val] PSNR": psnr, "[Val] std PSNR": psnr_standard, "[Val] SSIM": ssim_score, "[Val] std SSIM": ssim_standard, "[Val] Exposure": mean_exposure, "[Val] PE": mean_pe, "[Val] std PE": std_pe}, step=self.epoch)
+
 
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)               
 
