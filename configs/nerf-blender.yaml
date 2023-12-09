@@ -5,7 +5,7 @@ seed: 42
 dataset:
   name: blender
   scene: ???
-  root_dir: ./load/nerf_synthetic/${dataset.scene}
+  root_dir: ./data/${dataset.scene}
   img_wh:
     - 800
     - 800

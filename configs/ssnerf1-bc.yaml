@@ -5,7 +5,7 @@ seed: 42
 dataset:
   name: blender
   scene: ???
-  root_dir: ./load/nerf_synthetic/${dataset.scene}
+  root_dir: ./data/${dataset.scene}
 
   img_downscale: 8 # specify training image size by either img_wh or img_downscale
   up_est_method: ground # if true, use estimated ground plane normal direction as up direction
