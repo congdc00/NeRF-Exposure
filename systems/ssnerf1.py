@@ -28,8 +28,8 @@ def compute_psnr(img1, img2):
         return float('inf')
     max_pixel = 1.0  
     psnr = 20 * torch.log10(max_pixel) - 10 * torch.log10(mse)
-
     return psnr
+    
 def calculate_ssim(image1, image2):
     # Chuyển định dạng màu của ảnh từ BGR sang RGB
     image1_rgb = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
@@ -199,7 +199,7 @@ class SSNeRF1System(BaseSystem):
         else: 
             alpha = 0.01
             beta = 0.00001
-            if self.epoch > 25000:
+            if self.epoch > 0:
                 self.is_true = not self.is_true
             if self.is_true:
                 total_loss = loss_rgb
