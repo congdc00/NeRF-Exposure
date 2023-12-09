@@ -21,6 +21,7 @@ class SSNeRF1Model(BaseModel):
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
         self.iterator = 0
+        self.pass_epoch = 0
         
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
@@ -66,7 +67,7 @@ class SSNeRF1Model(BaseModel):
         mesh = self.geometry.isosurface()
         return mesh
         
-    def forward_(self, rays, epoch):
+    def forward_(self, rays, epoch=-1):
         n_rays = rays.shape[0]
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
 
@@ -103,15 +104,18 @@ class SSNeRF1Model(BaseModel):
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá r
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2
+        if epoch == -1:
+            epoch = self.pass_epoch + 1
+
         if MODE == 1:
             self.is_freeze = not self.is_freeze
         elif MODE == 2:
-            if epoch > 5000 or epoch <0:
+            if epoch > 5000:
                 print(f"epoch {epoch}")
                 self.is_freeze = not self.is_freeze
             else:
                 bright_ness = torch.full_like(bright_ness, 1.0)
-
+        self.pass_epoch = epoch
         # network_inp torch.Size([97790, 32])
         # density torch.Size([97790])
         # cor_feature torch.Size([97790, 16])
@@ -160,7 +164,7 @@ class SSNeRF1Model(BaseModel):
 
             out = self.forward_(rays, epoch)
         else:
-            out = chunk_batch(self.forward_, self.config.ray_chunk, True, rays, epoch)
+            out = chunk_batch(self.forward_, self.config.ray_chunk, True, rays)
             
         return {**out,}
 
