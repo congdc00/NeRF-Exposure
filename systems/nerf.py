@@ -18,7 +18,31 @@ import cv2
 import torchvision.transforms.functional as TF
 import wandb
 MODE_VAL = 1 # 0: normal (val), 1: no val
+def calculate_ssim(image1, image2):
+    # Chuyển định dạng màu của ảnh từ BGR sang RGB
+    image1_rgb = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
+    image2_rgb = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
 
+    # Chuyển đổi ảnh sang định dạng grayscale
+    gray_image1 = cv2.cvtColor(image1_rgb, cv2.COLOR_RGB2GRAY)
+    gray_image2 = cv2.cvtColor(image2_rgb, cv2.COLOR_RGB2GRAY)
+
+    # Thiết lập các tham số
+    C1 = (0.01 * 255) ** 2
+    C2 = (0.03 * 255) ** 2
+
+    # Tính các thống kê
+    mean_image1 = np.mean(gray_image1)
+    mean_image2 = np.mean(gray_image2)
+    var_image1 = np.var(gray_image1)
+    var_image2 = np.var(gray_image2)
+    covar = np.cov(gray_image1, gray_image2)[0, 1]
+
+    # Tính SSIM
+    numerator = (2 * mean_image1 * mean_image2 + C1) * (2 * covar + C2)
+    denominator = (mean_image1 ** 2 + mean_image2 ** 2 + C1) * (var_image1 + var_image2 + C2)
+    ssim = numerator / denominator 
+    return ssim
 @systems.register('nerf-system')
 class NeRFSystem(BaseSystem):
     """
@@ -36,7 +60,7 @@ class NeRFSystem(BaseSystem):
     def prepare(self):
         self.criterions = {
             'psnr': PSNR(),
-            'ssim': ssim
+            'ssim': calculate_ssim
         }
         self.epoch = 0
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
