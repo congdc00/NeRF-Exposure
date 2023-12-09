@@ -10,7 +10,7 @@ from torch.cuda.amp import custom_bwd, custom_fwd
 import tinycudann as tcnn
 
 
-def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
+def chunk_batch(func, chunk_size, move_to_cpu, epoch, *args, **kwargs):
     B = None
     for arg in args:
         if isinstance(arg, torch.Tensor):
@@ -19,7 +19,7 @@ def chunk_batch(func, chunk_size, move_to_cpu, *args, **kwargs):
     out = defaultdict(list)
     out_type = None
     for i in range(0, B, chunk_size):
-        out_chunk = func(*[arg[i:i+chunk_size] if isinstance(arg, torch.Tensor) else arg for arg in args], **kwargs)
+        out_chunk = func(*[arg[i:i+chunk_size] if isinstance(arg, torch.Tensor) else arg for arg in args], epoch, **kwargs)
         if out_chunk == None:
             continue
         out_type = type(out_chunk)
