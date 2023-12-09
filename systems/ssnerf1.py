@@ -199,12 +199,12 @@ class SSNeRF1System(BaseSystem):
                 self.is_true = not self.is_true
             if self.is_true:
                 total_loss = loss_rgb
-                wandb.log({"[Train] loss_1 (%)": 0})
-                wandb.log({"[Train] loss_2 (%)": 0})
+                wandb.log({"[Train] loss_1 (%)": 0}, step=self.epoch)
+                wandb.log({"[Train] loss_2 (%)": 0} , step=self.epoch)
             else:
                 total_loss = loss_rgb + alpha*ex_delta + beta*loss_e2
-                wandb.log({"[Train] loss_1 (%)": (alpha*ex_delta/total_loss)*100})
-                wandb.log({"[Train] loss_2 (%)": (beta*loss_e2/total_loss)*100})
+                wandb.log({"[Train] loss_1 (%)": (alpha*ex_delta/total_loss)*100}, step=self.epoch)
+                wandb.log({"[Train] loss_2 (%)": (beta*loss_e2/total_loss)*100}, step=self.epoch)
 
 
         self.log('train/loss_rgb', total_loss)
@@ -214,7 +214,7 @@ class SSNeRF1System(BaseSystem):
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
             self.log('train/loss_distortion', loss_distortion)
             loss += loss_distortion * self.C(self.config.system.loss.lambda_distortion)
-            wandb.log({"[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss_distortion)/loss)*100})
+            wandb.log({"[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss_distortion)/loss)*100}, , step=self.epoch)
 
         losses_model_reg = self.model.regularizations(out)
         # print(f"losses_model_reg {losses_model_reg}")
@@ -230,7 +230,7 @@ class SSNeRF1System(BaseSystem):
                 self.log(f'train_params/{name}', self.C(value))
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
-        wandb.log({"[Train] total_loss": loss})
+        wandb.log({"[Train] total_loss": loss}, , step=self.epoch)
 
         return {'loss': loss}
     
@@ -306,7 +306,7 @@ class SSNeRF1System(BaseSystem):
                 {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
             ])
             # wandb.log({"images": wandb.Image(image_predict.view(H, W, 3))})
-            wandb.log({f'Prediction': [wandb.Image(image_predict, caption=f'Iteration {i}')]}, step=self.epoch)
+            # wandb.log({f'Prediction': [wandb.Image(image_predict, caption=f'Iteration {i}')]}, step=self.epoch)
             # torch.save(out['theta'], "theta_enerf.pt")
             # torch.save(out['positions'], "positions_enerf.pt")
         return {
@@ -411,7 +411,7 @@ class SSNeRF1System(BaseSystem):
                 else:
                     logger.info(log_text)
             
-            wandb.log({"[Val] PSNR": psnr, "[Val] std PSNR": psnr_standard, "[Val] SSIM": ssim_score, "[Val] std SSIM": ssim_standard, "[Val] Exposure": mean_exposure, "[Val] PE": mean_pe, "[Val] std PE": std_pe})
+            wandb.log({"[Val] PSNR": psnr, "[Val] std PSNR": psnr_standard, "[Val] SSIM": ssim_score, "[Val] std SSIM": ssim_standard, "[Val] Exposure": mean_exposure, "[Val] PE": mean_pe, "[Val] std PE": std_pe}, , step=self.epoch)
 
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)               
 
