@@ -197,7 +197,7 @@ class SSNeRF1System(BaseSystem):
         if MODE == 1:
             total_loss = loss_rgb + k*ex_delta
         else: 
-            alpha = 0.01
+            alpha = 0.1
             beta = 0.00001
             if self.epoch > 0:
                 self.is_true = not self.is_true
