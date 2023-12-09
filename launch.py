@@ -115,7 +115,6 @@ def init_log(configs):
 
     wandb.init(    
         project="NeRF-MRE",
-        entity='serkar',
         config=config
     )
 
