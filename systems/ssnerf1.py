@@ -188,8 +188,12 @@ class SSNeRF1System(BaseSystem):
         loss_e2 = ex_predict/mean_exposure_predict-1
         loss_e2 = torch.mean(torch.abs(loss_e2))
         loss_e2 = torch.exp(loss_e2)
-        
-        wandb.log({"[Train] mean Exposure": mean_exposure_predict}, step = self.epoch)
+       
+        if mean_exposure_predict == 0:
+            value_fl = 1. 
+        else:
+            value_fl = mean_exposure_predict
+        wandb.log({"[Train] mean Exposure": value_fl}, step = self.epoch)
         if MODE == 1:
             total_loss = loss_rgb + k*ex_delta
         else: 
