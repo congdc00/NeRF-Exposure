@@ -57,8 +57,6 @@ def calculate_ssim(image1, image2):
     return ssim
 
 @systems.register('ssnerf1-system')
-
-
 class SSNeRF1System(BaseSystem):
     """
     Two ways to print to console:
