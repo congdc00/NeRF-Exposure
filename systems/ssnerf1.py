@@ -230,7 +230,6 @@ class SSNeRF1System(BaseSystem):
                 self.log(f'train_params/{name}', self.C(value))
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
-        
         wandb.log({"[Train] total_loss": loss})
 
         return {'loss': loss}
