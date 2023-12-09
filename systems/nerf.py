@@ -16,6 +16,7 @@ import numpy as np
 from PIL import Image
 import cv2
 import torchvision.transforms.functional as TF
+import wandb
 MODE_VAL = 1 # 0: normal (val), 1: no val
 
 @systems.register('nerf-system')
