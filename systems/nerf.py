@@ -37,6 +37,7 @@ class NeRFSystem(BaseSystem):
             'psnr': PSNR(),
             'ssim': ssim
         }
+        self.epoch = 0
         self.train_num_samples = self.config.model.train_num_rays * self.config.model.num_samples_per_ray
         self.train_num_rays = self.config.model.train_num_rays
 
@@ -125,7 +126,7 @@ class NeRFSystem(BaseSystem):
     
     def training_step(self, batch, batch_idx):
         out = self(batch)
-
+        self.epoch += 1
         loss = 0.
 
         # update train_num_rays
@@ -143,6 +144,7 @@ class NeRFSystem(BaseSystem):
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
             self.log('train/loss_distortion', loss_distortion)
             loss += loss_distortion * self.C(self.config.system.loss.lambda_distortion)
+            wandb.log({"[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss_distortion)/loss)*100}, step=self.epoch)
 
         losses_model_reg = self.model.regularizations(out)
         for name, value in losses_model_reg.items():
@@ -155,6 +157,7 @@ class NeRFSystem(BaseSystem):
                 self.log(f'train_params/{name}', self.C(value))
         
         self.log('train/num_rays', float(self.train_num_rays), prog_bar=True)
+        wandb.log({"[Train] total_loss": loss},step=self.epoch)
 
         return {
             'loss': loss
@@ -173,6 +176,7 @@ class NeRFSystem(BaseSystem):
     """
     
     def validation_step(self, batch, batch_idx):
+        self.epoch += 1
         W, H = self.dataset.img_wh
         try:
             out = self(batch)  
@@ -314,6 +318,8 @@ class NeRFSystem(BaseSystem):
                     logger.warning(log_text)
                 else:
                     logger.info(log_text)
+
+            wandb.log({"[Val] PSNR": psnr, "[Val] std PSNR": psnr_standard, "[Val] SSIM": ssim_score, "[Val] std SSIM": ssim_standard, "[Val] Exposure": 1, "[Val] PE": 0, "[Val] std PE": 0}, step=self.epoch)
 
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)      
     def test_step(self, batch, batch_idx):  
