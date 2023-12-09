@@ -411,7 +411,7 @@ class SSNeRF1System(BaseSystem):
                 else:
                     logger.info(log_text)
             
-            wandb.log({"[Val] PSNR": psnr, "[Val] std PSNR": psnr_standard, "[Val] SSIM": ssim_score, "[Val] std SSIM": ssim_standard, "[Val] Exposure": mean_exposure, "[Val] PE": mean_pe, "[Val] std PE": std_pe}, , step=self.epoch)
+            wandb.log({"[Val] PSNR": psnr, "[Val] std PSNR": psnr_standard, "[Val] SSIM": ssim_score, "[Val] std SSIM": ssim_standard, "[Val] Exposure": mean_exposure, "[Val] PE": mean_pe, "[Val] std PE": std_pe}, step=self.epoch)
 
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)               
 
