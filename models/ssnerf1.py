@@ -110,7 +110,7 @@ class SSNeRF1Model(BaseModel):
         if MODE == 1:
             self.is_freeze = not self.is_freeze
         elif MODE == 2:
-            if epoch > 5000:
+            if epoch > 25000:
                 # print(f"epoch {epoch}")
                 self.is_freeze = not self.is_freeze
             else:
