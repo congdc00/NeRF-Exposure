@@ -56,8 +56,8 @@ def calculate_ssim(image1, image2):
     ssim = numerator / denominator 
     return ssim
 
-@systems.register('ssnerf1-system')
-class SSNeRF1System(BaseSystem):
+@systems.register('nerf_mre-system')
+class NeRFMRESystem(BaseSystem):
     """
     Two ways to print to console:
     1. self.print: correctly handle progress bar
@@ -178,13 +178,15 @@ class SSNeRF1System(BaseSystem):
          
         ex_predict = out['bright_ness']
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        mean_exposure_predict = torch.mean(ex_predict)
+
         ex_template = torch.ones(out['bright_ness'].shape).to(device)
-        ex_delta_matrix = torch.pow(ex_predict - ex_template, 2)
+        
+        ex_delta_matrix = torch.pow(mean_exposure_predict - 1, 2)
         ex_delta = torch.mean(ex_delta_matrix)
         k = 0.001
 
         # loss mean exposure 
-        mean_exposure_predict = torch.mean(ex_predict)
         loss_e2 = ex_predict/mean_exposure_predict-1
         loss_e2 = torch.mean(torch.abs(loss_e2))
         loss_e2 = torch.exp(loss_e2)
@@ -203,16 +205,16 @@ class SSNeRF1System(BaseSystem):
                 self.is_true = not self.is_true
             if self.is_true:
                 total_loss = loss_rgb
-                wandb.log({"[Train] loss_1 (%)": 0}, step=self.epoch)
-                wandb.log({"[Train] loss_2 (%)": 0} , step=self.epoch)
+                wandb.log({"[Train] loss_mean_exposure (%)": 0}, step=self.epoch)
+                wandb.log({"[Train] loss_diff_exposure (%)": 0} , step=self.epoch)
             else:
                 total_loss = loss_rgb + alpha*ex_delta + beta*loss_e2
-                wandb.log({"[Train] loss_1 (%)": (alpha*ex_delta/total_loss)*100}, step=self.epoch)
-                wandb.log({"[Train] loss_2 (%)": (beta*loss_e2/total_loss)*100}, step=self.epoch)
+                wandb.log({"[Train] loss_mean_exposure (%)": (alpha*ex_delta/total_loss)*100}, step=self.epoch)
+                wandb.log({"[Train] loss_diff_exposure (%)": (beta*loss_e2/total_loss)*100}, step=self.epoch)
 
 
         self.log('train/loss_rgb', total_loss)
-        loss += total_loss * self.C(self.config.system.loss.lambda_rgb)
+        loss += total_loss*self.C(self.config.system.loss.lambda_rgb)
 
         if self.C(self.config.system.loss.lambda_distortion) > 0:
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
@@ -324,6 +326,7 @@ class SSNeRF1System(BaseSystem):
     def validation_epoch_end(self, out):
         out = self.all_gather(out)
         if self.trainer.is_global_zero:
+            
             out_set_psnr = {}
             out_set_ssim = {}
             check_ssim = {}
@@ -331,6 +334,7 @@ class SSNeRF1System(BaseSystem):
             num_all_imgs = 0
             list_delta_exposure = []
             list_exposure = []
+            
             for step_out in out:
                 num_all_imgs += 1
                 

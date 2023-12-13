@@ -50,13 +50,10 @@ def get_args():
 
     args, extras = parser.parse_known_args()
     return args, extras
-    
 
 def set_environtment(gpu):
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
-    
-   
 
 def get_environtment(gpu):
     n_gpus = len(gpu.split(","))
@@ -103,7 +100,6 @@ def get_info(is_train, runs_dir, config):
             ),
             CSVLogger(config.exp_dir, name=config.trial_name, version="csv_logs"),
         ]
-
     return loggers, callbacks
 
 def init_log(configs):
@@ -122,9 +118,6 @@ def init_log(configs):
 def main():
     torch.set_float32_matmul_precision('high')
     args, extras = get_args()
-     
-
-
     set_environtment(gpu = args.gpu)
     n_gpus = get_environtment(gpu = args.gpu)
     config = load_info_config(args, extras)
@@ -143,7 +136,6 @@ def main():
         strategy=strategy,
         **config.trainer
     )
-
     dm = datasets.make(config.dataset.name, config.dataset)
     
     system = systems.make(
@@ -151,8 +143,6 @@ def main():
         config,
         load_from_checkpoint=None if not args.resume_weights_only else args.resume,
     )
-    
-   
     
     if args.train:
         if args.resume and not args.resume_weights_only:

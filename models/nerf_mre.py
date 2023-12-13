@@ -13,8 +13,8 @@ from torch.nn.parallel import DistributedDataParallel
 
 MODE = 2
 
-@models.register('ssnerf1')
-class SSNeRF1Model(BaseModel):
+@models.register('nerf_mre')
+class NeRFMREModel(BaseModel):
     def setup(self):
         self.is_freeze = True
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
@@ -22,7 +22,6 @@ class SSNeRF1Model(BaseModel):
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
         self.iterator = 0
         self.pass_epoch = 0
-        
         self.register_buffer('scene_aabb', torch.as_tensor([-self.config.radius, -self.config.radius, -self.config.radius, self.config.radius, self.config.radius, self.config.radius], dtype=torch.float32))
 
         if self.config.learned_background:
@@ -100,7 +99,6 @@ class SSNeRF1Model(BaseModel):
         intervals = t_ends - t_starts
 
         # Step 1: Predict colour point
-
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá r
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2

@@ -1,4 +1,4 @@
-name: ssnerf1-blender-${dataset.scene}
+name: nerf_mre-blender-${dataset.scene}
 tag: ""
 seed: 42
 
@@ -21,7 +21,7 @@ dataset:
   test_split: "test"
 
 model:
-  name: ssnerf1
+  name: nerf_mre
   radius: 1.0
   num_samples_per_ray: 2048
   train_num_rays: 128
@@ -81,10 +81,12 @@ model:
       output_activation: Sigmoid
       n_neurons: 64
       n_hidden_layers: 2
-
+flow:
+  mode: 1 # 1 la chay thang, 2 la dong bang 
+  
 
 system:
-  name: ssnerf1-system
+  name: nerf_mre-system
   loss:
     lambda_rgb: 1.
     lambda_distortion: 0.001

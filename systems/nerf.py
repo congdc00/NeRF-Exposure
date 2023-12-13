@@ -43,6 +43,8 @@ def calculate_ssim(image1, image2):
     denominator = (mean_image1 ** 2 + mean_image2 ** 2 + C1) * (var_image1 + var_image2 + C2)
     ssim = numerator / denominator 
     return ssim
+
+
 @systems.register('nerf-system')
 class NeRFSystem(BaseSystem):
     """
