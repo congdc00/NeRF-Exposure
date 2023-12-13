@@ -211,7 +211,7 @@ class NeRFMRESystem(BaseSystem):
             beta = 0.00001
 
 
-        self.log('train/loss_rgb', total_loss)
+        self.log('train/loss_rgb', loss)
 
         loss += loss_rgb*self.C(self.config.system.loss.lambda_rgb)
         loss += loss_mean_exposure*alpha
