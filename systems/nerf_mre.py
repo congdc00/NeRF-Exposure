@@ -185,8 +185,8 @@ class NeRFMRESystem(BaseSystem):
         
         # loss diff exposure  
         loss_diff_exposure = ex_predict/mean_exposure_predict-1
-        loss_diff_exposure = torch.mean(torch.abs(loss_e2))
-        loss_diff_exposure = torch.exp(loss_e2)
+        loss_diff_exposure = torch.mean(torch.abs(loss_diff_exposure))
+        loss_diff_exposure = torch.exp(loss_diff_exposure)
         
         # log
         if mean_exposure_predict == 0:
