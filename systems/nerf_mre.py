@@ -225,7 +225,8 @@ class NeRFMRESystem(BaseSystem):
             loss += loss_distortion * self.C(self.config.system.loss.lambda_distortion)
         else:
             loss_distortion = 0
-
+        
+        wandb.log({"[Train] total_loss":loss}, step=self.epoch)
         wandb.log({"[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss.lambda_distortion)/loss)*100}, step=self.epoch)
         wandb.log({"[Train] loss_rgb (%)": (loss_rgb*self.C(self.config.system.loss.lambda_rgb)/loss)*100}, step=self.epoch)
         wandb.log({"[Train] loss_mean_exposure (%)": (alpha*loss_mean_exposure/loss)*100}, step=self.epoch)
