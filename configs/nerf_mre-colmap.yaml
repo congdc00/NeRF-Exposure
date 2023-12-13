@@ -13,7 +13,7 @@ dataset:
   load_data_on_gpu: false
 
 model:
-  name: ssnerf1
+  name: nerf_mre
   radius: 1.0
   num_samples_per_ray: 2048
   train_num_rays: 128
@@ -75,7 +75,7 @@ model:
       n_hidden_layers: 2
 
 system:
-  name: ssnerf1-system
+  name: nerf_mre-system
   loss:
     lambda_rgb: 1.
     lambda_distortion: 0.001

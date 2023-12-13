@@ -178,49 +178,58 @@ class NeRFMRESystem(BaseSystem):
          
         ex_predict = out['bright_ness']
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        # loss diff mean exposure with 1
         mean_exposure_predict = torch.mean(ex_predict)
-
-        ex_template = torch.ones(out['bright_ness'].shape).to(device)
+        loss_mean_exposure = torch.pow(mean_exposure_predict - 1, 2)
         
-        ex_delta_matrix = torch.pow(mean_exposure_predict - 1, 2)
-        ex_delta = torch.mean(ex_delta_matrix)
-        k = 0.001
-
-        # loss mean exposure 
-        loss_e2 = ex_predict/mean_exposure_predict-1
-        loss_e2 = torch.mean(torch.abs(loss_e2))
-        loss_e2 = torch.exp(loss_e2)
-       
+        # loss diff exposure  
+        loss_diff_exposure = ex_predict/mean_exposure_predict-1
+        loss_diff_exposure = torch.mean(torch.abs(loss_e2))
+        loss_diff_exposure = torch.exp(loss_e2)
+        
+        # log
         if mean_exposure_predict == 0:
-            value_fl = 1. 
+            wandb.log({"[Train] mean Exposure": 1}, step = self.epoch)
         else:
-            value_fl = mean_exposure_predict
-        wandb.log({"[Train] mean Exposure": value_fl}, step = self.epoch)
+            wandb.log({"[Train] mean Exposure": mean_exposure_predict}, step = self.epoch)
+
+        
+        # hoc normal
         if MODE == 1:
-            total_loss = loss_rgb + k*ex_delta
+            total_loss = loss_rgb + alpha*loss_mean_exposure
         else: 
+        # hoc alternative
+            # if self.epoch > 0:
+            self.is_true = not self.is_true
+        
+        if self.is_true:
+            alpha = 0 
+            beta = 0 
+        else:
             alpha = 100
             beta = 0.00001
-            if self.epoch > 0:
-                self.is_true = not self.is_true
-            if self.is_true:
-                total_loss = loss_rgb
-                wandb.log({"[Train] loss_mean_exposure (%)": 0}, step=self.epoch)
-                wandb.log({"[Train] loss_diff_exposure (%)": 0} , step=self.epoch)
-            else:
-                total_loss = loss_rgb + alpha*ex_delta + beta*loss_e2
-                wandb.log({"[Train] loss_mean_exposure (%)": (alpha*ex_delta/total_loss)*100}, step=self.epoch)
-                wandb.log({"[Train] loss_diff_exposure (%)": (beta*loss_e2/total_loss)*100}, step=self.epoch)
 
 
         self.log('train/loss_rgb', total_loss)
-        loss += total_loss*self.C(self.config.system.loss.lambda_rgb)
+
+        loss += loss_rgb*self.C(self.config.system.loss.lambda_rgb)
+        loss += loss_mean_exposure*alpha
+        loss += loss_diff_exposure*beta
+
+        
 
         if self.C(self.config.system.loss.lambda_distortion) > 0:
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
             self.log('train/loss_distortion', loss_distortion)
             loss += loss_distortion * self.C(self.config.system.loss.lambda_distortion)
-            wandb.log({"[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss.lambda_distortion)/loss)*100}, step=self.epoch)
+        else:
+            loss_distortion = 0
+
+        wandb.log({"[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss.lambda_distortion)/loss)*100}, step=self.epoch)
+        wandb.log({"[Train] loss_rgb (%)": (alpha*loss_rgb/loss)*100}, step=self.epoch)
+        wandb.log({"[Train] loss_mean_exposure (%)": (alpha*loss_mean_exposure/loss)*100}, step=self.epoch)
+        wandb.log({"[Train] loss_diff_exposure (%)": (beta*loss_diff_exposure/loss)*100}, step=self.epoch)
 
         losses_model_reg = self.model.regularizations(out)
         # print(f"losses_model_reg {losses_model_reg}")

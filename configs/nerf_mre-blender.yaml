@@ -1,4 +1,4 @@
-name: ssnerf1-blender-${dataset.scene}
+name: nerf_mre-blender-${dataset.scene}
 tag: ""
 seed: 42
 
@@ -17,7 +17,7 @@ dataset:
   test_split: "test"
 
 model:
-  name: ssnerf1
+  name: nerf_mre
   radius: 1.5
   num_samples_per_ray: 1024
   train_num_rays: 256
@@ -80,7 +80,7 @@ model:
 
 
 system:
-  name: ssnerf1-system
+  name: nerf_mre-system
   loss:
     lambda_rgb: 1.
     lambda_distortion: 0.

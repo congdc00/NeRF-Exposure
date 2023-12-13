@@ -7,7 +7,6 @@ def register(name):
         return cls
     return decorator
 
-
 def make(name, config):
     model = models[name](config)
     return model
