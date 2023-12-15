@@ -182,8 +182,8 @@ class NeRFMRESystem(BaseSystem):
         print(f"\n len {len(out['list_ex'].values())}")
         for ex in out['list_ex'].values():
             ex_predict.append(ex)
-        ex_predict = torch.tensor(ex_predict)
-        mean_exposure_predict = torch.mean(ex_predict)
+        ex_predict = torch.tensor(ex_predict).to(device)
+        mean_exposure_predict = torch.mean(ex_predict).to(device)
         
         # loss diff mean exposure with 1
         loss_mean_exposure = torch.pow(mean_exposure_predict - 1, 2)
