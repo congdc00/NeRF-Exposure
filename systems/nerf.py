@@ -249,20 +249,21 @@ class NeRFSystem(BaseSystem):
         # psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_object, rgb_non_bg)
         
         # mask_bg = torch.ones_like(mask_object) - mask_object
-        # background_rgb = (batch['rgb']*mask_bg)
-        # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
-        # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
-        
-
-        
+             # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
         if batch_idx == 0:
-            self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-                {'type': 'rgb', 'img': batch['rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': out['comp_rgb'].view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'grayscale', 'img': out['depth'].view(H, W), 'kwargs': {}},
-            ])  
-            # torch.save(out['theta'], "theta.pt")
-            # torch.save(out['positions'], "positions.pt")
+            image_predict = image_predict.view(H, W, 3).detach().cpu().numpy()
+            image_predict = wandb.Image(image_predict, caption="RGB+B")
+            wandb.log({"[Train] Image predict": image_predict}, step = self.epoch)
+
+            color_predict = color_predict.view(H, W, 3).detach().cpu().numpy()
+            color_predict = wandb.Image(color_predict, caption="RGB")
+            wandb.log({"[Val] Image inference": color_predict}, step = self.epoch)
+
+            density_predict = out["depth"].view(H, W).detach().cpu().numpy()
+            density_predict = wandb.Image(density_predict, caption="Images")
+            wandb.log({"[Val] Density": density_predict}, step = self.epoch)
+ 
+
         return {
             'psnr': psnr,
             'ssim': ssim,

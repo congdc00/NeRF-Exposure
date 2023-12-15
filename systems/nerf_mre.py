@@ -309,15 +309,6 @@ class NeRFMRESystem(BaseSystem):
         # ssim = 0.
         ssim = self.criterions['ssim'](image_array1, image_array2)
 
-        # mask_object = batch['fg_mask'].view(-1, 1)
-        # rgb_non_bg= (batch['rgb']*mask_object)
-        # psnr_object = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_object, rgb_non_bg)
-        
-        # mask_bg = torch.ones_like(mask_object) - mask_object
-        # background_rgb = (batch['rgb']*mask_bg)
-        # psnr_background = self.criterions['psnr'](out['comp_rgb'].to(batch['rgb'])*mask_bg, background_rgb)
-        # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
-        
         if batch_idx == 0:
             image_predict = image_predict.view(H, W, 3).detach().cpu().numpy()
             image_predict = wandb.Image(image_predict, caption="RGB+B")
