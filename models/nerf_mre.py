@@ -70,8 +70,8 @@ class NeRFMREModel(BaseModel):
         n_rays = rays.shape[0]
         print(f"n_rays {len(rays)}")
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
-        print(f"\nmax value {torch.max(n_rays)}")
-        print(f"\n n_rays : {n_rays}")
+        print(f"\nmax value {torch.max(rays)}")
+        print(f"\n n_rays : {rays}")
 
         def sigma_fn(t_starts, t_ends, ray_indices):
             ray_indices = ray_indices.long()
