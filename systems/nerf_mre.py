@@ -324,7 +324,7 @@ class NeRFMRESystem(BaseSystem):
             color_predict = wandb.Image(color_predict, caption="Images")
             wandb.log({"[Val] Image inference": color_predict}, step = self.epoch)
 
-            density_predict = density_predict.view(H, W, 1).detach().cpu().numpy()
+            density_predict = density_predict.view(H, W).detach().cpu().numpy()
             density_predict = wandb.Image(density_predict, caption="Images")
             wandb.log({"[Val] Density": density_predict}, step = self.epoch)
             
