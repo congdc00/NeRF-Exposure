@@ -207,7 +207,7 @@ class NeRFMRESystem(BaseSystem):
             alpha = 0 
             beta = 0 
         else:
-            alpha = 100
+            alpha = 0.001
             beta = 0.00001
 
 
@@ -317,7 +317,6 @@ class NeRFMRESystem(BaseSystem):
         
         if batch_idx == 0:
             image_predict = image_predict.view(H, W, 3).detach().cpu().numpy()
-            image_predict = PIL.Image.fromarray(image_predict)
             image_predict = wandb.Image(image_predict, caption="RGB+B")
             wandb.log({"[Train] Image predict": image_predict}, step = self.epoch)
 
