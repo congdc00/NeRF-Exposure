@@ -177,11 +177,8 @@ class NeRFMRESystem(BaseSystem):
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
 
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-         
-        ex_predict = []
-        for ex in out['list_ex'].values():
-            ex_predict.append(ex)
-        ex_predict = torch.tensor(ex_predict).to(device)
+
+        ex_predict = torch.tensor(list(out['list_ex'].values())).to(device)
         mean_exposure_predict = torch.mean(ex_predict).to(device)
         
         # loss diff mean exposure with 1
