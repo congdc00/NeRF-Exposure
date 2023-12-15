@@ -104,7 +104,7 @@ class NeRFMREModel(BaseModel):
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá r
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o)
-        print(f"len bright_ness {len(bright_ness)} and len rayo {len(rays_o)}")
+    
         if epoch == -1:
             epoch = self.pass_epoch + 1
 
@@ -122,7 +122,8 @@ class NeRFMREModel(BaseModel):
         # rgb torch.Size([97790, 3])
         # dir_feature torch.Size([97790, 16])
         # bright_ness torch.Size([97790, 1])
-
+        for b, o in zip(bright_ness,rays_o):
+            self.list_ex[str(o)] = b
         # Step 2: Rendering 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
@@ -152,7 +153,8 @@ class NeRFMREModel(BaseModel):
                 'weights': weights.view(-1),
                 'points': midpoints.view(-1),
                 'intervals': intervals.view(-1),
-                'ray_indices': ray_indices.view(-1)
+                'ray_indices': ray_indices.view(-1),
+                'list_ex': list_ex
             })
 
         

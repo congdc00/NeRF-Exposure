@@ -162,7 +162,6 @@ class NeRFMRESystem(BaseSystem):
             - batch_idx: index của từng batch
         '''
         self.epoch += 1
-        print(f"\n rays {batch['rays']}")
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
         bright_ness_predict = out["bright_ness"]
@@ -176,12 +175,16 @@ class NeRFMRESystem(BaseSystem):
             train_num_rays = int(self.train_num_rays * (self.train_num_samples / out['num_samples'].sum().item()))        
             self.train_num_rays = min(int(self.train_num_rays * 0.9 + train_num_rays * 0.1), self.config.model.max_train_num_rays)
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
-         
-        ex_predict = out['bright_ness']
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-        # loss diff mean exposure with 1
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+         
+        ex_predict = []
+        for ex in out['list_ex']:
+            ex_predict.append(ex)
+        ex_predict = torch.tensor(ex_predict)
         mean_exposure_predict = torch.mean(ex_predict)
+        
+        # loss diff mean exposure with 1
         loss_mean_exposure = torch.pow(mean_exposure_predict - 1, 2)
         
         # loss diff exposure  
