@@ -316,28 +316,18 @@ class NeRFMRESystem(BaseSystem):
         # print(f"\n -------- psnr object {psnr_object} and psnr background {psnr_background}")
         
         if batch_idx == 0:
-            self.save_image_grid(f"it{self.global_step}-{batch['index'][0].item()}.png", [
-                {'type': 'rgb', 'img': image_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
-                {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
-            ])
             image_predict = image_predict.view(H, W, 3).detach().cpu().numpy()
             image_predict = wandb.Image(image_predict, caption="Images")
-            wandb.log({"[Train] Image predict": image_predict}, step = self.global_step)
+            wandb.log({"[Train] Image predict": image_predict}, step = self.epoch)
 
             color_predict = color_predict.view(H, W, 3).detach().cpu().numpy()
             color_predict = wandb.Image(color_predict, caption="Images")
-            wandb.log({"[Val] Image inference": image_predict}, step = self.global_step)
+            wandb.log({"[Val] Image inference": image_predict}, step = self.epoch)
 
             density_predict = density_predict.view(H, W).detach().cpu().numpy()
             density_predict = wandb.Image(density_predict, caption="Images")
-            wandb.log({"[Val] Density": image_predict}, step = self.global_step)
-
+            wandb.log({"[Val] Density": image_predict}, step = self.epoch)
             
-            # wandb.log({"images": wandb.Image(image_predict.view(H, W, 3))})
-            # wandb.log({f'Prediction': [wandb.Image(image_predict, caption=f'Iteration {i}')]}, step=self.epoch)
-            # torch.save(out['theta'], "theta_enerf.pt")
-            # torch.save(out['positions'], "positions_enerf.pt")
         return {
             'psnr': psnr,
             'ssim': ssim,
