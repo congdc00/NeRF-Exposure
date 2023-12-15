@@ -321,6 +321,8 @@ class NeRFMRESystem(BaseSystem):
                 {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
                 {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
             ])
+            images = wandb.Image(image_predict.view(H, W, 3), caption="Images")
+            wandb.log({"examples": images}, step = self.epoch)
             # wandb.log({"images": wandb.Image(image_predict.view(H, W, 3))})
             # wandb.log({f'Prediction': [wandb.Image(image_predict, caption=f'Iteration {i}')]}, step=self.epoch)
             # torch.save(out['theta'], "theta_enerf.pt")
@@ -429,8 +431,6 @@ class NeRFMRESystem(BaseSystem):
                 else:
                     logger.info(log_text)
             wandb.log({"[Val] PSNR": psnr, "[Val] std PSNR": psnr_standard, "[Val] SSIM": ssim_score, "[Val] std SSIM": ssim_standard, "[Val] Exposure": mean_exposure, "[Val] PE": mean_pe, "[Val] std PE": std_pe}, step=self.epoch)
-
-
             self.log('val/psnr', psnr, prog_bar=True, rank_zero_only=True, sync_dist=True)               
 
     def test_step(self, batch, batch_idx):  
