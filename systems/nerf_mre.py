@@ -292,9 +292,9 @@ class NeRFMRESystem(BaseSystem):
         exposure_label = batch["bright_ness"].item()
         delta_exposure = abs(exposure_predict - exposure_label)*100/exposure_label
 
-        mask_object = batch['fg_mask'].view(-1, 1)
-        density_predict = out['depth'].to(mask_object.device)
-        density_predict= (density_predict*mask_object)
+        #mask_object = batch['fg_mask'].view(-1, 1)
+        #density_predict = out['depth'].to(mask_object.device)
+        #density_predict= (density_predict*mask_object)
         
         ## PSNR
         psnr = self.criterions['psnr'](color_predict.to(image_origin), image_origin)
@@ -322,11 +322,11 @@ class NeRFMRESystem(BaseSystem):
 
             color_predict = color_predict.view(H, W, 3).detach().cpu().numpy()
             color_predict = wandb.Image(color_predict, caption="Images")
-            wandb.log({"[Val] Image inference": image_predict}, step = self.epoch)
+            wandb.log({"[Val] Image inference": color_predict}, step = self.epoch)
 
             density_predict = density_predict.view(H, W).detach().cpu().numpy()
             density_predict = wandb.Image(density_predict, caption="Images")
-            wandb.log({"[Val] Density": image_predict}, step = self.epoch)
+            wandb.log({"[Val] Density": density_predict}, step = self.epoch)
             
         return {
             'psnr': psnr,

@@ -31,8 +31,8 @@ model:
   batch_image_sampling: true
   randomized: true
   ray_chunk: 16384
-  learned_background: true
-  background_color: random # white giúp giảm bộ nhớ nhẹ hơn
+  learned_background: false
+  background_color: white # white giúp giảm bộ nhớ nhẹ hơn
   geometry:
     name: volume-density
     radius: ${model.radius}
@@ -113,8 +113,8 @@ export:
   export_vertex_color: False
 
 trainer:
-  max_steps: 50000
-  log_every_n_steps: 40000
+  max_steps: 2000
+  log_every_n_steps: 2000
   num_sanity_val_steps: 0
   val_check_interval: 500
   limit_train_batches: 1.0
