@@ -57,7 +57,6 @@ class BaseSystem(pl.LightningModule, SaverMixin):
         update_module_step(self.model, self.current_epoch, self.global_step)
     
     def on_validation_batch_start(self, batch, batch_idx, dataloader_idx):
-        # print(f"on val batch start {batch}")
         self.dataset = self.trainer.datamodule.val_dataloader().dataset
         self.preprocess_data(batch, 'validation')
         update_module_step(self.model, self.current_epoch, self.global_step)
