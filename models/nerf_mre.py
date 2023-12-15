@@ -122,6 +122,7 @@ class NeRFMREModel(BaseModel):
         # dir_feature torch.Size([97790, 16])
         # bright_ness torch.Size([97790, 1])
         for b, o in zip(bright_ness,rays_o):
+            print(o)
             self.list_ex[str(o)] = b
         # Step 2: Rendering 
         # Trọng số
