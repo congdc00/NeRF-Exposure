@@ -321,10 +321,19 @@ class NeRFMRESystem(BaseSystem):
                 {'type': 'rgb', 'img': color_predict.view(H, W, 3), 'kwargs': {'data_format': 'HWC'}},
                 {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
             ])
-            print(f"type {type(image_predict.view(H, W, 3))}")
             image_predict = image_predict.view(H, W, 3).detach().cpu().numpy()
-            images = wandb.Image(image_predict, caption="Images")
-            wandb.log({"examples": images}, step = self.epoch)
+            image_predict = wandb.Image(image_predict, caption="Images")
+            wandb.log({"[Train] Image predict": image_predict}, step = self.global_step)
+
+            color_predict = color_predict.view(H, W, 3).detach().cpu().numpy()
+            color_predict = wandb.Image(color_predict, caption="Images")
+            wandb.log({"[Val] Image inference": image_predict}, step = self.global_step)
+
+            density_predict = density_predict.view(H, W, 3).detach().cpu().numpy()
+            density_predict = wandb.Image(density_predict, caption="Images")
+            wandb.log({"[Val] Density": image_predict}, step = self.global_step)
+
+            
             # wandb.log({"images": wandb.Image(image_predict.view(H, W, 3))})
             # wandb.log({f'Prediction': [wandb.Image(image_predict, caption=f'Iteration {i}')]}, step=self.epoch)
             # torch.save(out['theta'], "theta_enerf.pt")
