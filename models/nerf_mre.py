@@ -80,7 +80,6 @@ class NeRFMREModel(BaseModel):
             return density[...,None]
 
         with torch.no_grad():
-            print(f"run here")
             ray_indices, t_starts, t_ends = ray_marching(
                 rays_o, rays_d,
                 scene_aabb=None if self.config.learned_background else self.scene_aabb,
