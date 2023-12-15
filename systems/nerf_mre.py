@@ -179,6 +179,7 @@ class NeRFMRESystem(BaseSystem):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
          
         ex_predict = []
+        print(f"\n len {len(out['list_ex'].values())}")
         for ex in out['list_ex'].values():
             ex_predict.append(ex)
         ex_predict = torch.tensor(ex_predict)
