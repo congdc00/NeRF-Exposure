@@ -68,7 +68,13 @@ class NeRFMREModel(BaseModel):
         
     def forward_(self, rays, epoch=-1):
         n_rays = rays.shape[0]
+        print(f"n_rays {n_rays}")
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
+        unique_values, counts = torch.unique(rays_o, return_counts=True)
+        num_unique_values = unique_values.numel()
+        print(f"\nmax value {torch.max(rays_o)}")
+        print(f"\n unique {num_unique_values}")
+        print(f"\n len : {len(rays_o)}")
 
         def sigma_fn(t_starts, t_ends, ray_indices):
             ray_indices = ray_indices.long()
@@ -79,6 +85,7 @@ class NeRFMREModel(BaseModel):
             return density[...,None]
 
         with torch.no_grad():
+            print(f"run here")
             ray_indices, t_starts, t_ends = ray_marching(
                 rays_o, rays_d,
                 scene_aabb=None if self.config.learned_background else self.scene_aabb,
@@ -91,12 +98,7 @@ class NeRFMREModel(BaseModel):
                 alpha_thre=0.0
             )   
         ray_indices = ray_indices.long() # chỉ mục của tia chứa các điểm
-        unique_values, counts = torch.unique(rays_o, return_counts=True)
-        num_unique_values = unique_values.numel()
-        print(f"\nmax value {torch.max(rays_o)}")
-        print(f"\n unique {num_unique_values}")
-        print(f"\n len : {len(rays_o)}")
-
+        
         t_origins = rays_o[ray_indices]
         t_dirs = rays_d[ray_indices]
         midpoints = (t_starts + t_ends) / 2.
