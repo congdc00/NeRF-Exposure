@@ -22,6 +22,9 @@ import PIL
 MODE_COLMAP = False
 MODE_VAL = 1 # 0: normal (val), 1: no val
 MODE = 2
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+
 def compute_psnr(img1, img2):
     mse = F.mse_loss(img1, img2)
     if mse == 0:
@@ -164,10 +167,10 @@ class NeRFMRESystem(BaseSystem):
         self.epoch += 1
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
-        bright_ness_predict = out["bright_ness"]
-        bright_ness_label = batch["bright_ness"]
-        delta_exposure = abs(bright_ness_predict - bright_ness_label)*100/bright_ness_label
-        delta_exposure = torch.std(delta_exposure)
+        # bright_ness_predict = out["bright_ness"]
+        # bright_ness_label = batch["bright_ness"]
+        # delta_exposure = abs(bright_ness_predict - bright_ness_label)*100/bright_ness_label
+        # delta_exposure = torch.std(delta_exposure)
         # print(f"delta_exposure {delta_exposure} %;")
         loss = 0.
         # update train_num_rays
@@ -176,7 +179,6 @@ class NeRFMRESystem(BaseSystem):
             self.train_num_rays = min(int(self.train_num_rays * 0.9 + train_num_rays * 0.1), self.config.model.max_train_num_rays)
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
 
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         ex_predict = torch.tensor(list(out['list_ex'].values())).to(device)
         mean_exposure_predict = torch.mean(ex_predict).to(device)
