@@ -317,11 +317,12 @@ class NeRFMRESystem(BaseSystem):
         
         if batch_idx == 0:
             image_predict = image_predict.view(H, W, 3).detach().cpu().numpy()
-            image_predict = wandb.Image(image_predict, caption="Images")
+            image_predict = PIL.Image.fromarray(image_predict)
+            image_predict = wandb.Image(image_predict, caption="RGB+B")
             wandb.log({"[Train] Image predict": image_predict}, step = self.epoch)
 
             color_predict = color_predict.view(H, W, 3).detach().cpu().numpy()
-            color_predict = wandb.Image(color_predict, caption="Images")
+            color_predict = wandb.Image(color_predict, caption="RGB")
             wandb.log({"[Val] Image inference": color_predict}, step = self.epoch)
 
             density_predict = out["depth"].view(H, W).detach().cpu().numpy()
