@@ -90,7 +90,7 @@ class NeRFMREModel(BaseModel):
                 cone_angle=self.cone_angle, 
                 alpha_thre=0.0
             )   
-        
+        print(f"ray_indices {ray_indices}") 
         ray_indices = ray_indices.long() # chỉ mục của tia chứa các điểm
         t_origins = rays_o[ray_indices]
         t_dirs = rays_d[ray_indices]
