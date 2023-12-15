@@ -162,7 +162,7 @@ class NeRFMRESystem(BaseSystem):
             - batch_idx: index của từng batch
         '''
         self.epoch += 1
-        print(f"\n rays {batch['ray']}")
+        print(f"\n rays {batch['rays']}")
         out = self(batch) #['comp_rgb', 'opacity', 'depth', 'rays_valid', 'num_samples', 'weights', 'points', 'intervals', 'ray_indices']
 
         bright_ness_predict = out["bright_ness"]

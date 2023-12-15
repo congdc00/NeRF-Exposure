@@ -93,9 +93,9 @@ class NeRFMREModel(BaseModel):
         ray_indices = ray_indices.long() # chỉ mục của tia chứa các điểm
         unique_values, counts = torch.unique(ray_indices, return_counts=True)
         num_unique_values = unique_values.numel()
-        print(f"\nmax value {torch.max(ray_indices)}")
-        print(f"\n unique {num_unique_values}")
-        print(f"\n len : {len(ray_indices)}")
+        # print(f"\nmax value {torch.max(ray_indices)}")
+        # print(f"\n unique {num_unique_values}")
+        # print(f"\n len : {len(ray_indices)}")
 
         t_origins = rays_o[ray_indices]
         t_dirs = rays_d[ray_indices]
