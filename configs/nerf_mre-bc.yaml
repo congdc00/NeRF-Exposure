@@ -89,11 +89,11 @@ system:
   name: nerf_mre-system
   loss:
     lambda_rgb: 1.
-    lambda_distortion: 0.001
+    lambda_distortion: 0.0
   optimizer:
     name: AdamW
     args:
-      lr: 0.0006  #0.0006 -> lego_random
+      lr: 0.01  #0.0006 -> lego_random
       betas: [0.9, 0.99]
       eps: 1.e-15
 
