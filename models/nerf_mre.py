@@ -68,7 +68,7 @@ class NeRFMREModel(BaseModel):
         
     def forward_(self, rays, epoch=-1):
         n_rays = rays.shape[0]
-        print(f"n_rays {n_rays}")
+        print(f"n_rays {len(rays)}")
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
         unique_values, counts = torch.unique(rays_o, return_counts=True)
         num_unique_values = unique_values.numel()
