@@ -229,8 +229,9 @@ class NeRFMRESystem(BaseSystem):
         wandb.log({"[Train] total_loss":loss}, step=self.epoch)
         wandb.log({"[Train] loss_distortion (%)":  (loss_distortion*self.C(self.config.system.loss.lambda_distortion)/loss)*100}, step=self.epoch)
         wandb.log({"[Train] loss_rgb (%)": (loss_rgb*self.C(self.config.system.loss.lambda_rgb)/loss)*100}, step=self.epoch)
-        wandb.log({"[Train] loss_mean_exposure (%)": (alpha*loss_mean_exposure/loss)*100}, step=self.epoch)
-        wandb.log({"[Train] loss_diff_exposure (%)": (beta*loss_diff_exposure/loss)*100}, step=self.epoch)
+        if alpha != 0:
+            wandb.log({"[Train] loss_mean_exposure (%)": (alpha*loss_mean_exposure/loss)*100}, step=self.epoch)
+            wandb.log({"[Train] loss_diff_exposure (%)": (beta*loss_diff_exposure/loss)*100}, step=self.epoch)
 
         losses_model_reg = self.model.regularizations(out)
         # print(f"losses_model_reg {losses_model_reg}")
@@ -423,10 +424,6 @@ class NeRFMRESystem(BaseSystem):
                 mean_exposure = torch.mean(list_exposure)
                 log_text = f"Validation on {num_imgs}/{num_all_imgs} images -- std PSNR: {psnr_standard} -- SSIM {ssim_score} -- std SSIM: {ssim_standard} --Exposure {mean_exposure} --PE {mean_pe} --Std PE {std_pe}"
 
-                # -- std PE: {round( delta_exposure_std.item(), 3)} -- mean PE {mean_exposure}"
-                # for key, value in check_ssim.items():
-                #      print(f"Name dataset: {key} \t SSIM: {value}")
-            
                 if num_imgs<num_all_imgs:
                     logger.warning(log_text)
                 else:
