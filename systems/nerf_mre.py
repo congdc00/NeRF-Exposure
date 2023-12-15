@@ -18,7 +18,7 @@ import numpy as np
 import cv2
 import torchvision.transforms.functional as TF
 import wandb
-
+import PIL
 MODE_COLMAP = False
 MODE_VAL = 1 # 0: normal (val), 1: no val
 MODE = 2
