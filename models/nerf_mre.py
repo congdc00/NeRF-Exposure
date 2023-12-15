@@ -154,7 +154,7 @@ class NeRFMREModel(BaseModel):
                 'points': midpoints.view(-1),
                 'intervals': intervals.view(-1),
                 'ray_indices': ray_indices.view(-1),
-                'list_ex': list_ex
+                'list_ex': self.list_ex
             })
 
         
