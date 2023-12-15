@@ -31,7 +31,7 @@ model:
   batch_image_sampling: true
   randomized: true
   ray_chunk: 16384
-  learned_background: false
+  learned_background: true
   background_color: random # white giúp giảm bộ nhớ nhẹ hơn
   geometry:
     name: volume-density
