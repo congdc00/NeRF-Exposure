@@ -322,7 +322,7 @@ class NeRFMRESystem(BaseSystem):
                 {'type': 'grayscale', 'img': density_predict.view(H, W), 'kwargs': {}}
             ])
             images = wandb.Image(image_predict.view(H, W, 3), caption="Images")
-            print(f"type {images}")
+            print(f"type {type(images)}")
             wandb.log({"examples": images}, step = self.epoch)
             # wandb.log({"images": wandb.Image(image_predict.view(H, W, 3))})
             # wandb.log({f'Prediction': [wandb.Image(image_predict, caption=f'Iteration {i}')]}, step=self.epoch)
