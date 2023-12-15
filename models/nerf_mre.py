@@ -16,6 +16,7 @@ MODE = 2
 @models.register('nerf_mre')
 class NeRFMREModel(BaseModel):
     def setup(self):
+        self.list_ex = {}
         self.is_freeze = True
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
@@ -68,10 +69,7 @@ class NeRFMREModel(BaseModel):
         
     def forward_(self, rays, epoch=-1):
         n_rays = rays.shape[0]
-        print(f"n_rays {len(rays)}")
         rays_o, rays_d = rays[:, 0:3], rays[:, 3:6] # both (N_rays, 3) -> [8192, 3], [8192, 3]
-        print(f"\nmax value {torch.max(rays)}")
-        print(f"\n n_rays : {rays}")
 
         def sigma_fn(t_starts, t_ends, ray_indices):
             ray_indices = ray_indices.long()
@@ -106,6 +104,7 @@ class NeRFMREModel(BaseModel):
         density, cor_feature = self.geometry(positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá r
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o)
+        print(f"len bright_ness {len(bright_ness)} and len rayo {len(rays_o)}")
         if epoch == -1:
             epoch = self.pass_epoch + 1
 
