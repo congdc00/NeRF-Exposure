@@ -198,12 +198,16 @@ class EncodingWithNetwork(nn.Module):
         update_module_step(self.network, epoch, global_step)
 
 
-def get_encoding_with_network(n_input_dims, n_output_dims, encoding_config, network_config):
+def get_encoding_with_network(is_freeze, n_input_dims, n_output_dims, encoding_config, network_config):
     # input suppose to be range [0, 1]
     if encoding_config.otype in ['VanillaFrequency', 'ProgressiveBandHashGrid'] \
         or network_config.otype in ['VanillaMLP']:
         encoding = get_encoding(n_input_dims, encoding_config)
         network = get_mlp(encoding.n_output_dims, n_output_dims, network_config)
+        if is_freeze:
+            for param in self.network.parameters():
+                param.requires_grad = is_freeze
+
         encoding_with_network = EncodingWithNetwork(encoding, network)
     else:
         with torch.cuda.device(get_rank()):
