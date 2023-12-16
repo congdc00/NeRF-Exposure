@@ -52,14 +52,15 @@ class NeRFMREModel(BaseModel):
     def update_step(self, epoch, global_step):
         
         # Lan truyen nguoc
-        if not self.is_freeze: 
+        # self.is_free o day bi nguoc so voi forward
+        if self.is_freeze: 
             update_module_step(self.geometry, epoch, global_step)
             update_module_step(self.texture, epoch, global_step)
         else:
             update_module_step(self.shutter_speed, epoch, global_step)
 
         def occ_eval_fn(x):
-            density, _ = self.geometry(self.is_freeze,x)
+            density, _ = self.geometry(not self.is_freeze,x)
             return density[...,None] * self.render_step_size
         
         if self.training and self.config.grid_prune:
@@ -186,7 +187,7 @@ class NeRFMREModel(BaseModel):
     
     def regularizations(self, out):
         losses = {}
-        if not self.is_freeze:
+        if self.is_freeze:
             losses.update(self.geometry.regularizations(out))
             losses.update(self.texture.regularizations(out))
         else:
