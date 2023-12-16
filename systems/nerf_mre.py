@@ -18,6 +18,7 @@ import numpy as np
 import cv2
 import torchvision.transforms.functional as TF
 import wandb
+import time 
 import PIL
 MODE_COLMAP = False
 MODE_VAL = 1 # 0: normal (val), 1: no val
@@ -179,10 +180,11 @@ class NeRFMRESystem(BaseSystem):
             self.train_num_rays = min(int(self.train_num_rays * 0.9 + train_num_rays * 0.1), self.config.model.max_train_num_rays)
         loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
 
-
+        start_time = time.time()
         ex_predict = torch.tensor(list(out['list_ex'].values())).to(device)
         mean_exposure_predict = torch.mean(ex_predict).to(device)
-        
+        end_time = time.time()
+        print(f"time model {end_time - start_time}") 
         # loss diff mean exposure with 1
         loss_mean_exposure = torch.pow(mean_exposure_predict - 1, 2)
         

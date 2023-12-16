@@ -10,7 +10,7 @@ from models.utils import chunk_batch
 from systems.utils import update_module_step
 from nerfacc import ContractionType, OccupancyGrid, ray_marching, render_weight_from_density, accumulate_along_rays
 from torch.nn.parallel import DistributedDataParallel
-
+import time 
 MODE = 2
 
 @models.register('nerf_mre')
@@ -121,8 +121,11 @@ class NeRFMREModel(BaseModel):
         # rgb torch.Size([97790, 3])
         # dir_feature torch.Size([97790, 16])
         # bright_ness torch.Size([97790, 1])
+        start_time = time.time()
         for b, o in zip(bright_ness,rays_o):
             self.list_ex[str(o)] = b
+        end_time = time.time()
+        print(f"time model {end_time - start_time}")
         # Step 2: Rendering 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
