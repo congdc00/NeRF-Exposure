@@ -52,10 +52,11 @@ class NeRFMREModel(BaseModel):
     def update_step(self, epoch, global_step):
         
         # Lan truyen nguoc
-        
-        update_module_step(self.geometry, epoch, global_step)
-        update_module_step(self.texture, epoch, global_step)
-        update_module_step(self.shutter_speed, epoch, global_step)
+        if not self.is_freeze: 
+            update_module_step(self.geometry, epoch, global_step)
+            update_module_step(self.texture, epoch, global_step)
+        else:
+            update_module_step(self.shutter_speed, epoch, global_step)
 
         def occ_eval_fn(x):
             density, _ = self.geometry(self.is_freeze,x)
