@@ -122,10 +122,8 @@ class VolumeDensity(BaseImplicitGeometry):
         self.encoding_with_network = get_encoding_with_network(self.n_input_dims, self.n_output_dims, self.config.xyz_encoding_config, self.config.mlp_network_config)
 
     def forward(self,is_freeze, points):
-        print(f"run 2")
-        if is_freeze:
-            for param in self.encoding_with_network.parameters():
-                param.requires_grad = is_freeze
+        for param in self.encoding_with_network.parameters():
+            param.requires_grad = is_freeze
         points = contract_to_unisphere(points, self.radius, self.contraction_type)
         out = self.encoding_with_network(points.view(-1, self.n_input_dims)).view(*points.shape[:-1], self.n_output_dims).float()
         density, feature = out[...,0], out
