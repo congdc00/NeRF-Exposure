@@ -101,6 +101,7 @@ class NeRFMREModel(BaseModel):
         intervals = t_ends - t_starts
 
         # Step 1: Predict colour point
+        print(f"model only rgb {self.is_freeze}")
         density, cor_feature = self.geometry(self.is_freeze, positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá r
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2
