@@ -128,7 +128,6 @@ class NeRFMREModel(BaseModel):
         for b, o in zip(bright_ness_g,rays_o_g):
             self.list_ex[str(o)] = b
         end_time = time.time()
-        print(f"time model {end_time - start_time}")
         # Step 2: Rendering 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])

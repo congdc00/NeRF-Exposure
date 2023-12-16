@@ -184,7 +184,6 @@ class NeRFMRESystem(BaseSystem):
         ex_predict = torch.tensor(list(out['list_ex'].values())).to(device)
         mean_exposure_predict = torch.mean(ex_predict).to(device)
         end_time = time.time()
-        print(f"time system {end_time - start_time}") 
         
         # loss diff mean exposure with 1
         loss_mean_exposure = torch.pow(mean_exposure_predict - 1, 2)
@@ -203,7 +202,7 @@ class NeRFMRESystem(BaseSystem):
         
         # hoc normal
         if MODE == 1:
-            total_loss = loss_rgb + alpha*loss_mean_exposure
+            alpha = 0.1
         else: 
         # hoc alternative
             # if self.epoch > 0:
@@ -213,8 +212,8 @@ class NeRFMRESystem(BaseSystem):
             alpha = 0 
             beta = 0 
         else:
-            alpha = 0.1
-            beta = 0.00001
+            alpha = 0.01
+            beta = 0.001
 
 
         self.log('train/loss_rgb', loss)
