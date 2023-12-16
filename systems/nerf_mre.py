@@ -186,7 +186,7 @@ class NeRFMRESystem(BaseSystem):
         # loss diff mean exposure with 1
         loss_mean_exposure = torch.pow(mean_exposure_predict - 1, 2)
         
-        print(f" loss_exposure_predict {loss_exposure_predict}")
+        print(f" loss_exposure_predict {loss_mean_exposure}")
         # loss diff exposure  
         loss_diff_exposure = ex_predict/mean_exposure_predict-1
         loss_diff_exposure = torch.mean(torch.abs(loss_diff_exposure))
