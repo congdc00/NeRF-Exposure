@@ -17,7 +17,7 @@ MODE = 2
 class NeRFMREModel(BaseModel):
     def setup(self):
         self.list_ex = {}
-        self.is_freeze = True
+        self.is_freeze = False
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
         self.shutter_speed = models.make(self.config.shutter_speed.name, self.config.shutter_speed) # shutter_speed
