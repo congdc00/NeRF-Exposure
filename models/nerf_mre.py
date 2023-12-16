@@ -58,7 +58,7 @@ class NeRFMREModel(BaseModel):
         update_module_step(self.shutter_speed, epoch, global_step)
 
         def occ_eval_fn(x):
-            density, _ = self.geometry(not self.is_freeze,x)
+            density, _ = self.geometry(self.is_freeze,x)
             return density[...,None] * self.render_step_size
         
         if self.training and self.config.grid_prune:
