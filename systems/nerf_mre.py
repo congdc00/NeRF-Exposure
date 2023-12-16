@@ -213,7 +213,7 @@ class NeRFMRESystem(BaseSystem):
             alpha = 0 
             beta = 0 
         else:
-            alpha = 0.001
+            alpha = 0.1
             beta = 0.00001
 
 
