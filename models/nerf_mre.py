@@ -122,7 +122,10 @@ class NeRFMREModel(BaseModel):
         # dir_feature torch.Size([97790, 16])
         # bright_ness torch.Size([97790, 1])
         start_time = time.time()
-        for b, o in zip(bright_ness,rays_o):
+        bright_ness_g = torch.tensor(bright_ness, device='cuda')
+        rays_o_g = torch.tensor(rays_o, device='cuda')
+
+        for b, o in zip(bright_ness_g,rays_o_g):
             self.list_ex[str(o)] = b
         end_time = time.time()
         print(f"time model {end_time - start_time}")
