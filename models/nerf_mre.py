@@ -186,9 +186,11 @@ class NeRFMREModel(BaseModel):
     
     def regularizations(self, out):
         losses = {}
-        losses.update(self.geometry.regularizations(out))
-        losses.update(self.texture.regularizations(out))
-        losses.update(self.shutter_speed.regularizations(out))
+        if not self.is_freeze:
+            losses.update(self.geometry.regularizations(out))
+            losses.update(self.texture.regularizations(out))
+        else:
+            losses.update(self.shutter_speed.regularizations(out))
         return losses
 
     @torch.no_grad()
