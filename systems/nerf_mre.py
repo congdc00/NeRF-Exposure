@@ -185,6 +185,7 @@ class NeRFMRESystem(BaseSystem):
         mean_exposure_predict = torch.mean(ex_predict).to(device)
         end_time = time.time()
         print(f"time system {end_time - start_time}") 
+        
         # loss diff mean exposure with 1
         loss_mean_exposure = torch.pow(mean_exposure_predict - 1, 2)
         
