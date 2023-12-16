@@ -113,7 +113,7 @@ class NeRFMREModel(BaseModel):
         if MODE == 1:
             self.is_freeze = not self.is_freeze
         elif MODE == 2:
-            if epoch > 1:
+            if epoch > 0:
                 self.is_freeze = not self.is_freeze
             else:
                 bright_ness = torch.full_like(bright_ness, 1.0)
