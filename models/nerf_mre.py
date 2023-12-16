@@ -53,11 +53,9 @@ class NeRFMREModel(BaseModel):
         
         # Lan truyen nguoc
         # self.is_free o day bi nguoc so voi forward
-        if self.is_freeze: 
-            update_module_step(self.geometry, epoch, global_step)
-            update_module_step(self.texture, epoch, global_step)
-        else:
-            update_module_step(self.shutter_speed, epoch, global_step)
+        update_module_step(self.geometry, epoch, global_step)
+        update_module_step(self.texture, epoch, global_step)
+        update_module_step(self.shutter_speed, epoch, global_step)
 
         def occ_eval_fn(x):
             density, _ = self.geometry(not self.is_freeze,x)
@@ -113,7 +111,7 @@ class NeRFMREModel(BaseModel):
         if MODE == 1:
             self.is_freeze = not self.is_freeze
         elif MODE == 2:
-            if epoch > 1000:
+            if epoch > 0:
                 self.is_freeze = not self.is_freeze
             else:
                 bright_ness = torch.full_like(bright_ness, 1.0)
@@ -187,11 +185,9 @@ class NeRFMREModel(BaseModel):
     
     def regularizations(self, out):
         losses = {}
-        if self.is_freeze:
-            losses.update(self.geometry.regularizations(out))
-            losses.update(self.texture.regularizations(out))
-        else:
-            losses.update(self.shutter_speed.regularizations(out))
+        losses.update(self.geometry.regularizations(out))
+        losses.update(self.texture.regularizations(out))
+        losses.update(self.shutter_speed.regularizations(out))
         return losses
 
     @torch.no_grad()

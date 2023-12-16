@@ -205,7 +205,7 @@ class NeRFMRESystem(BaseSystem):
             alpha = 0.1
         else: 
         # hoc alternative
-            if self.epoch > 1000:
+            if self.epoch > 0:
                 self.is_true = not self.is_true
         
         if self.is_true:
