@@ -52,12 +52,13 @@ class NeRFMREModel(BaseModel):
     def update_step(self, epoch, global_step):
         
         # Lan truyen nguoc
+        
         update_module_step(self.geometry, epoch, global_step)
         update_module_step(self.texture, epoch, global_step)
         update_module_step(self.shutter_speed, epoch, global_step)
 
         def occ_eval_fn(x):
-            density, _ = self.geometry(x)
+            density, _ = self.geometry(self.is_freeze,x)
             return density[...,None] * self.render_step_size
         
         if self.training and self.config.grid_prune:
@@ -100,7 +101,6 @@ class NeRFMREModel(BaseModel):
         intervals = t_ends - t_starts
 
         # Step 1: Predict colour point
-        print(f"run 1")
         density, cor_feature = self.geometry(self.is_freeze, positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá r
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o) * 2
