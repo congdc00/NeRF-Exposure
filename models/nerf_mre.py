@@ -77,7 +77,7 @@ class NeRFMREModel(BaseModel):
             t_origins = rays_o[ray_indices]
             t_dirs = rays_d[ray_indices]
             positions = t_origins + t_dirs * (t_starts + t_ends) / 2.
-            density, _ = self.geometry(is_freeze,positions)
+            density, _ = self.geometry(self.is_freeze,positions)
             return density[...,None]
 
         with torch.no_grad():
