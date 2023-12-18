@@ -210,7 +210,7 @@ class NeRFMRESystem(BaseSystem):
             alpha = 0 
             beta = 0 
         else:
-            alpha = 100
+            alpha = 0.01
             beta = 0.001
 
         # print(f"system only rgb {self.is_true}")
