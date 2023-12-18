@@ -16,7 +16,6 @@ MODE = 2
 @models.register('nerf_mre')
 class NeRFMREModel(BaseModel):
     def setup(self):
-        self.list_ex = {}
         self.is_freeze = False
         self.geometry = models.make(self.config.geometry.name, self.config.geometry) # density
         self.texture = models.make(self.config.texture.name, self.config.texture) # radiant
@@ -125,10 +124,6 @@ class NeRFMREModel(BaseModel):
         # rgb torch.Size([97790, 3])
         # dir_feature torch.Size([97790, 16])
         # bright_ness torch.Size([97790, 1])
-        bright_ness_g = torch.tensor(bright_ness, device='cuda')
-        rays_o_g = torch.tensor(rays_o, device='cuda')
-        for b, o in zip(bright_ness_g,rays_o_g):
-            self.list_ex[str(o)] = b
         # Step 2: Rendering 
         # Trọng số
         weights = render_weight_from_density(t_starts, t_ends, density[...,None], ray_indices=ray_indices, n_rays=n_rays) #([Num_points, 1])
@@ -159,7 +154,6 @@ class NeRFMREModel(BaseModel):
                 'points': midpoints.view(-1),
                 'intervals': intervals.view(-1),
                 'ray_indices': ray_indices.view(-1),
-                'list_ex': self.list_ex
             })
 
         
