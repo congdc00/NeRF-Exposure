@@ -210,8 +210,8 @@ class NeRFMRESystem(BaseSystem):
             alpha = 0 
             beta = 0 
         else:
-            alpha = 0.01
-            beta = 0.001
+            alpha = 0.001
+            beta = 0.00001
 
         # print(f"system only rgb {self.is_true}")
         self.log('train/loss_rgb', loss)
