@@ -58,7 +58,7 @@ class NeRFMREModel(BaseModel):
         update_module_step(self.shutter_speed, epoch, global_step)
 
         def occ_eval_fn(x):
-            print(f"geo 1 only rgb {self.is_freeze}")
+            # print(f"geo 1 only rgb {self.is_freeze}")
             density, _ = self.geometry(self.is_freeze,x)
             return density[...,None] * self.render_step_size
         
@@ -78,7 +78,7 @@ class NeRFMREModel(BaseModel):
             t_origins = rays_o[ray_indices]
             t_dirs = rays_d[ray_indices]
             positions = t_origins + t_dirs * (t_starts + t_ends) / 2.
-            print(f"geo 2 only rgb {self.is_freeze}")
+            # print(f"geo 2 only rgb {self.is_freeze}")
             density, _ = self.geometry(self.is_freeze,positions)
             return density[...,None]
 
@@ -168,7 +168,6 @@ class NeRFMREModel(BaseModel):
 
     def forward(self, rays, epoch):
         if self.training:
-
             out = self.forward_(rays, epoch)
         else:
             out = chunk_batch(self.forward_, self.config.ray_chunk, True, rays)
