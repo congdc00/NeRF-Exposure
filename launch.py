@@ -108,8 +108,13 @@ def init_log(configs):
     mode_run = configs.dataset.name 
     
     config = dict(configs)
+    
+    tags = []
+    if int(configs.system.loss.lambda_distortion) > 0 
+        tags.append("Lambda distortion")
 
-    wandb.init(    
+    wandb.init(
+        tags=tags,
         project="NeRF-MRE",
         config=config
     )
