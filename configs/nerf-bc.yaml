@@ -102,5 +102,5 @@ trainer:
   val_check_interval: 4980
   limit_train_batches: 1.0
   limit_val_batches: 20
-  enable_progress_bar: false
+  enable_progress_bar: true
   precision: 16
