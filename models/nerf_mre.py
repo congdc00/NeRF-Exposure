@@ -58,7 +58,7 @@ class NeRFMREModel(BaseModel):
 
         def occ_eval_fn(x):
             # print(f"geo 1 only rgb {self.is_freeze}")
-            density, _ = self.geometry(self.is_freeze,x)
+            density, _ = self.geometry(x, self.is_freeze)
             return density[...,None] * self.render_step_size
         
         if self.training and self.config.grid_prune:
@@ -78,7 +78,7 @@ class NeRFMREModel(BaseModel):
             t_dirs = rays_d[ray_indices]
             positions = t_origins + t_dirs * (t_starts + t_ends) / 2.
             # print(f"geo 2 only rgb {self.is_freeze}")
-            density, _ = self.geometry(self.is_freeze,positions)
+            density, _ = self.geometry(positions, self.is_freeze)
             return density[...,None]
 
         with torch.no_grad():
@@ -103,7 +103,7 @@ class NeRFMREModel(BaseModel):
 
         # Step 1: Predict colour point
         # print(f"model only rgb {self.is_freeze}")
-        density, cor_feature = self.geometry(self.is_freeze, positions) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá r
+        density, cor_feature = self.geometry(positions, self.is_freeze) # Dự đoán mật độ thể tích => density [N_rays];cor_feature [N_rays, 16]16 là số chiều được mã hoá r
         rgb = self.texture(self.is_freeze, cor_feature, t_dirs) # Dự đoán ra màu sắc
         bright_ness = self.shutter_speed(not self.is_freeze, rays_o)
     
