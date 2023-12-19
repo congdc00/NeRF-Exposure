@@ -110,7 +110,7 @@ def init_log(configs):
     config = dict(configs)
     
     tags = []
-    if int(configs.system.loss.lambda_distortion) > 0 
+    if int(configs.system.loss.lambda_distortion) > 0: 
         tags.append("Lambda distortion")
 
     wandb.init(
