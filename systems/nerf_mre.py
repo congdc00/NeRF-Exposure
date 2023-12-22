@@ -1,4 +1,4 @@
-ieemport torch
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_efficient_distloss import flatten_eff_distloss
@@ -219,7 +219,7 @@ class NeRFMRESystem(BaseSystem):
         # print(f"system only rgb {self.is_true}")
         self.log('train/loss_rgb', loss)
 
-        loss += loss_rgb*self.C(self.config.system.loss.lambda_rgb)
+        loss += loss_rgb*self.C(self.config.system.loss.lambda_rgb)*gamma
         loss += loss_mean_exposure*alpha
         loss += loss_diff_exposure*beta
 
