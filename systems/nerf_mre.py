@@ -213,8 +213,8 @@ class NeRFMRESystem(BaseSystem):
             loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
             loss_ex = 0
         else:
-            alpha = 0.1
-            beta = 0.001
+            alpha = 0.01
+            beta = 0.0001
             gamma = 0.1
             loss_rgb = 0
             c_predict = torch.mean(out['comp_rgb'][out['rays_valid'][...,0]])
@@ -222,12 +222,12 @@ class NeRFMRESystem(BaseSystem):
             loss_ex = torch.abs(c_predict/c_real - 1)
  
         loss += loss_rgb*self.C(self.config.system.loss.lambda_rgb)
-        # self.log('train/loss_rgb', loss)
 
         loss += loss_mean_exposure*alpha
         loss += loss_diff_exposure*beta
         loss += loss_ex*gamma
-
+        
+        self.log('train/loss_rgb', loss)
         if self.C(self.config.system.loss.lambda_distortion) > 0:
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
             self.log('train/loss_distortion', loss_distortion)
