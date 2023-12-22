@@ -217,9 +217,9 @@ class NeRFMRESystem(BaseSystem):
             beta = 0.0001
             gamma = 0.1
             loss_rgb = 0
-            c_predict = torch.mean(out['comp_rgb'][out['rays_valid'][...,0]], dim=0)
-            c_real = torch.mean(batch['rgb'][out['rays_valid'][...,0]], dim=0)
-            loss_ex = torch.abs(torch.mean(c_predict/c_real) - 1)
+            c_predict = torch.mean(out['comp_rgb'][out['rays_valid'][...,0]])
+            c_real = torch.mean(batch['rgb'][out['rays_valid'][...,0]])
+            loss_ex = torch.abs(c_predict/c_real - 1)
  
         loss += loss_rgb*self.C(self.config.system.loss.lambda_rgb)
         # self.log('train/loss_rgb', loss)
