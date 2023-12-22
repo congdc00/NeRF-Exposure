@@ -208,20 +208,25 @@ class NeRFMRESystem(BaseSystem):
         
         if self.is_true:
             alpha = 0 
-            beta = 0 
+            beta = 0
+            gamma = 0
             loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]], batch['rgb'][out['rays_valid'][...,0]])
+            loss_ex = 0
         else:
             alpha = 0.001
             beta = 0.00001
+            gamma = 1
             loss_rgb = 0
-            loss_exposure = out['comp_rgb'][out['rays_valid'][...,0]]# /batch['rgb'][out['rays_valid'][...,0]]
-            print(f"shape loss_exposure {loss_exposure.shape}")
+            c_predict = torch.mean(out['comp_rgb'][out['rays_valid'][...,0]], dim=0)
+            c_real = torch.mean(batch['rgb'][out['rays_valid'][...,0]], dim=0)
+            loss_ex = torch.abs(torch.mean(c_predict/c_real) - 1)
  
         loss += loss_rgb*self.C(self.config.system.loss.lambda_rgb)
         # self.log('train/loss_rgb', loss)
 
         loss += loss_mean_exposure*alpha
         loss += loss_diff_exposure*beta
+        loss += loss_ex*gamma
 
         if self.C(self.config.system.loss.lambda_distortion) > 0:
             loss_distortion = flatten_eff_distloss(out['weights'], out['points'], out['intervals'], out['ray_indices'])
@@ -237,7 +242,8 @@ class NeRFMRESystem(BaseSystem):
             wandb.log({"[Train] loss_diff_exposure (%)": (beta*loss_diff_exposure/loss)*100}, step=self.epoch)
         if loss_rgb != 0:
             wandb.log({"[Train] loss_rgb (%)": (loss_rgb*self.C(self.config.system.loss.lambda_rgb)/loss)*100}, step=self.epoch)
-
+        if loss_ex != 0:
+            wandb.log({"[Train] loss_ex (%)": (loss_ex*gamma/loss)*100}, step=self.epoch)
         losses_model_reg = self.model.regularizations(out)
         # print(f"losses_model_reg {losses_model_reg}")
 
