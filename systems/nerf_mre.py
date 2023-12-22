@@ -214,7 +214,7 @@ class NeRFMRESystem(BaseSystem):
             loss_ex = 0
         else:
             alpha = 0.01
-            beta = 0.0001
+            beta = 0.0004
             gamma = 0.01
             loss_rgb = 0
             c_predict = torch.mean(out['comp_rgb'][out['rays_valid'][...,0]])
