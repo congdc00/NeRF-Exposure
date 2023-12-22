@@ -214,12 +214,13 @@ class NeRFMRESystem(BaseSystem):
         else:
             alpha = 0.001
             beta = 0.00001
-            gamma = 0.01
+            loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]]/batch['rgb'][out['rays_valid'][...,0]], 1)
+ 
 
         # print(f"system only rgb {self.is_true}")
         self.log('train/loss_rgb', loss)
 
-        loss += loss_rgb*self.C(self.config.system.loss.lambda_rgb)*gamma
+        loss += loss_rgb*self.C(self.config.system.loss.lambda_rgb)
         loss += loss_mean_exposure*alpha
         loss += loss_diff_exposure*beta
 
