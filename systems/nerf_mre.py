@@ -214,7 +214,7 @@ class NeRFMRESystem(BaseSystem):
         else:
             alpha = 0.001
             beta = 0.00001
-            loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]]/batch['rgb'][out['rays_valid'][...,0]], 1)
+            loss_rgb = F.smooth_l1_loss(out['comp_rgb'][out['rays_valid'][...,0]]/batch['rgb'][out['rays_valid'][...,0]], torch.ones_like(batch['rgb'][out['rays_valid'][...,0]]))
  
 
         # print(f"system only rgb {self.is_true}")
